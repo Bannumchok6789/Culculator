@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#EDF2FA">
+<title>สูตรสถิติ | บ้านนำโชค6789</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap');
+* { box-sizing:border-box; }
+body { margin:0; min-height:100vh; background:#EDF2FA; color:#172554; font-family:Prompt,system-ui,sans-serif; padding:20px 12px 50px; }
+.container { max-width:850px; margin:0 auto; padding:30px 25px; background:#fff; border:1px solid #DCE4F2; border-radius:22px; box-shadow:0 14px 40px #17255412; }
+h1 { font-size:24px; font-weight:700; text-align:center; margin:0 0 4px; }
+.brand-subtitle { font-family:Kanit,Prompt,sans-serif; color:#4755AC; font-size:22px; font-weight:700; text-align:center; margin:0 0 24px; }
+label { display:block; font-size:17px; text-align:center; font-weight:600; margin:0 0 8px; }
+input,button { font-family:inherit; }
+input { display:block; width:100%; height:54px; padding:8px 12px; background:#fff; color:#172554; border:1px solid #DCE4F2; border-radius:11px; font-size:19px; text-align:center; outline:none; }
+input:focus { border-color:#4755AC; box-shadow:0 0 0 3px #4755AC20; }
+.search-block { margin-bottom:14px; }
+.status { min-height:20px; color:#64748B; font-size:13px; text-align:center; margin:7px 0 0; }
+.status.error { color:#b91c1c; }
+.matched-lottery { background:#F3F5FF; border:1px solid #E1E7FC; border-radius:13px; padding:13px 11px; }
+.matched-label { text-align:center; font-size:16px; font-weight:600; color:#273C55; }
+.matched-name { color:#273C90; text-align:center; font-size:21px; font-weight:700; line-height:1.4; min-height:30px; margin:1px 0 0; }
+.freq-table { width:100%; border-collapse:collapse; text-align:center; font-variant-numeric:tabular-nums; }
+.data-block { margin-top:22px; }
+#numberInput { font-size:22px; letter-spacing:0.15px; font-weight:400; font-variant-numeric:tabular-nums; }
+.section-divider { border:0; border-top:1px solid #DCE4F2; margin:24px 0 17px; }
+h2 { margin:0 0 14px; font-size:20px; text-align:center; color:#172554; }
+.freq-wrap { border:1px solid #DCE4F2; border-radius:11px; overflow-x:auto; }
+.freq-table { table-layout:fixed; min-width:430px; }
+.freq-table th,.freq-table td { border-right:1px solid #E0E7F3; border-bottom:1px solid #E0E7F3; height:52px; padding:4px 0; vertical-align:middle; }
+.freq-table th:last-child,.freq-table td:last-child { border-right:0; }
+.freq-table tbody tr:last-child td { border-bottom:0; }
+.freq-table th { background:#F3F5FF; color:#172554; font-size:20px; font-weight:300; }
+.freq-table th:first-child { width:82px; font-size:20px; font-weight:300; }
+.freq-table td { background:#fff; font-size:20px; font-weight:300; color:#172554; }
+.freq-table td:first-child { background:#F7F9FE; font-size:20px; font-weight:300; white-space:nowrap; }
+/* แถวที่ 2: สีแดงเฉพาะเลข 0–9 ไม่เปลี่ยนสีพื้นหลังหรือช่องจำนวน */
+.freq-table tr.featured td:not(:first-child) { color:#DC2626; font-weight:300; }
+/* Unified, compact results panel: WIN / 3-digit / 2-digit in one card */
+.result-panel { max-width:650px; margin:18px auto 0; padding:8px 20px; background:#F7F9FE; border:1px solid #E1E7FC; border-radius:15px; }
+.answer { text-align:center; margin:0; padding:10px 0 13px; }
+.answer-title { font-size:20px; color:#273C55; font-weight:600; margin:0 0 3px; line-height:1.5; }
+.answer-number { color:#DC2626; font-size:20px; line-height:1.55; font-weight:300; min-height:0; letter-spacing:.2px; overflow-wrap:anywhere; font-variant-numeric:tabular-nums; }
+.set-results { display:flex; flex-direction:column; margin:0; }
+.set-row { text-align:center; background:transparent; border:0; border-top:1px solid #E1E7FC; padding:11px 3px 12px; border-radius:0; }
+.set-label { color:#273C55; font-size:20px; font-weight:600; margin:0 0 3px; line-height:1.5; }
+.set-number { color:#172554; font-size:20px; font-weight:300; line-height:1.55; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; word-break:break-word; }
+.copy { display:block; width:100%; max-width:350px; margin:8px auto 0; border:1px solid #000; background:#000; color:#fff; border-radius:11px; padding:12px; font-size:18px; font-weight:600; cursor:pointer; }
+.copy:disabled { color:#718096; background:#CDD5E2; border-color:#CDD5E2; cursor:not-allowed; }
+.copy.copied { color:#fff; background:#3B82F6; border-color:#3B82F6; }
+.copy:focus-visible { outline:3px solid #93c5fd; outline-offset:2px; }
+.fallback { margin-top:12px; text-align:center; }
+.fallback textarea { width:100%; min-height:75px; border:1px solid #DCE4F2; border-radius:9px; font:16px Prompt,system-ui,sans-serif; padding:8px; }
+.fallback button { background:#EDF1F7; border:1px solid #DFE6F0; border-radius:9px; font-size:14px; padding:9px 15px; margin-top:7px; cursor:pointer; }
+@media (max-width:480px) {
+ body { padding:12px 7px 35px; }
+ .container { padding:23px 11px; border-radius:17px; }
+ h1 { font-size:23px; }
+ .brand-subtitle { font-size:21px; }
+ .freq-table { min-width:0; }
+ .freq-table th,.freq-table td { height:46px; }
+ .freq-table th { font-size:20px; font-weight:300; }
+ .freq-table th:first-child { width:76px; font-size:20px; font-weight:300; }
+ .freq-table td { font-size:20px; font-weight:300; }
+ .freq-table td:first-child { font-size:20px; font-weight:300; }
+ .result-panel { padding:7px 12px; }
+ .answer-title,.answer-number,.set-label,.set-number { font-size:20px; }
+ #numberInput { font-size:20px; padding:8px 4px; }
+}
+</style>
+</head>
+<body>
+<main class="container">
+<h1>สูตรคำนวณ</h1>
+<p class="brand-subtitle">🏠 บ้านนำโชค6789</p>
+<section class="search-block" aria-label="ค้นหาชื่อหวย">
+<label for="lotteryName">ค้นหาชื่อหวย</label>
+<input id="lotteryName" type="search" autocomplete="off" spellcheck="false" placeholder="พิมพ์ชื่อหวย" aria-describedby="searchStatus">
+<p id="searchStatus" class="status" role="status" aria-live="polite"></p>
+</section>
+<section class="matched-lottery" aria-label="ชื่อหวยที่ค้นพบ">
+<div class="matched-label">ค้นพบ</div>
+<div class="matched-name" id="matchedName">—</div>
+</section>
+<section class="data-block" aria-label="กรอกตัวเลข">
+<label for="numberInput">กรอกตัวเลข</label>
+<input id="numberInput" type="text" inputmode="numeric" maxlength="15" autocomplete="off" spellcheck="false">
+</section>
+<hr class="section-divider">
+<section aria-label="ตารางคำนวณเลขเด่น">
+<h2>ตารางคำนวณเลขเด่น</h2>
+<div class="freq-wrap">
+<table class="freq-table" aria-label="ตารางนับความถี่เลข 0 ถึง 9">
+<thead><tr><th scope="col">จำนวน</th><th scope="col">0</th><th scope="col">1</th><th scope="col">2</th><th scope="col">3</th><th scope="col">4</th><th scope="col">5</th><th scope="col">6</th><th scope="col">7</th><th scope="col">8</th><th scope="col">9</th></tr></thead>
+<tbody id="frequencyBody"></tbody>
+</table>
+</div>
+<div class="result-panel" aria-label="ผลวินและชุดเลขในกรอบเดียว">
+  <div class="answer"><p class="answer-title">วิน</p><div class="answer-number" id="featuredDigits" aria-live="polite">—</div></div>
+  <div class="set-results" aria-label="ชุดเลขจากวิน">
+    <div class="set-row"><p class="set-label">3 ตัว</p><div class="set-number" id="triples" aria-live="polite">—</div></div>
+    <div class="set-row"><p class="set-label">2 ตัว</p><div class="set-number" id="pairs" aria-live="polite">—</div></div>
+  </div>
+</div>
+<button class="copy" type="button" id="copyButton" disabled>คัดลอก</button>
+<div class="fallback" id="copyFallback" hidden><p>เลือกข้อความนี้แล้วคัดลอกได้</p><textarea id="copyFallbackText" readonly></textarea><button type="button" id="selectCopyText">เลือกข้อความทั้งหมด</button></div>
+</section>
+</main>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const lotteryInput=$('lotteryName'),numberInput=$('numberInput'),statusNode=$('searchStatus');
+const freqBody=$('frequencyBody'),matchedName=$('matchedName');
+const copyButton=$('copyButton'),winnerNode=$('featuredDigits');
+const triplesNode=$('triples'),pairsNode=$('pairs');
+const digits='0123456789'.split('');
+let activeLookup=0,searchTimer=null,cachedDirectory=null;
+let latestDrawDate=null,nextDrawDate=null,selectedLotteryName='',manualRevision=0;
+
+// รายชื่อและชื่อย่อจากหน้าเว็บต้นฉบับ เพื่อให้การค้นหายังคงคุ้นเคย
+const lotteryNames = [
+  ['ฮานอยปกติ','นอยปกติ','ฮานอยธรรมดา','นอยธรรมดา','ฮานอย'],
+  ['ฮานอยพิเศษ','นอยพิเศษ','ฮานอยพิเศส','นอยพิเสด'],
+  ['ฮานอย VIP','นอยvip','ฮานอยวีไอพี','นอยวีไอพี'],
+  ['ฮานอย Extra','นอยextra','ฮานอยเอ็กซ์ตร้า','นอยเอ็กตร้า'],
+  ['ฮานอย TV','นอยtv','ฮานอยทีวี','นอยทีวี'],
+  ['ฮานอยกาชาด','นอยกาชาด'],
+  ['ฮานอยเฉพาะกิจ','นอยเฉพาะกิจ'],
+  ['ฮานอยพัฒนา','นอยพัฒนา'],
+  ['ลาว VIP','ลาวvip','ลาววีไอพี'],
+  ['ลาวสามัคคี','สามัคคี','ลาวสามัคคีปกติ'],
+  ['ลาวสามัคคี VIP','ลาวสามัคคีvip','สามัคคีวีไอพี'],
+  ['ลาวพัฒนา','ลาวพัดทะนา'],
+  ['ลาวอาเซียน','ลาวอาเชียน'],
+  ['ลาวเที่ยง','ลาวพัฒนาเที่ยง'],
+  ['ลาวสตาร์','ลาวสตา','ลาวstar'],
+  ['ลาวสตาร์ VIP','ลาวสตาvip','ลาวstarvip'],
+  ['ลาว HD','ลาวhd','ลาวเอชดี'],
+  ['ลาวกาชาด','กาชาดลาว'],
+  ['ลาวเวียงจันทร์','เวียงจันทร์'],
+  ['นิเคอิเช้า','นิเคอิรอบเช้า','นิเคอิ'],
+  ['นิเคอิ VIP เช้า','นิเคอิvipเช้า','นิเคอิวีไอพีเช้า'],
+  ['นิเคอิบ่าย','นิเคอิรอบบ่าย','นิคเคอิบ่าย'],
+  ['นิเคอิ VIP บ่าย','นิเคอิvipบ่าย','นิเคอิวีไอพีบ่าย'],
+  ['หุ้นจีนเช้า','จีนเช้า','หุ้นจีน'],
+  ['หุ้นจีน VIP เช้า','จีนvipเช้า','หุ้นจีนวีไอพีเช้า'],
+  ['หุ้นจีนบ่าย','จีนบ่าย'],
+  ['หุ้นจีน VIP บ่าย','จีนvipบ่าย','หุ้นจีนวีไอพีบ่าย'],
+  ['ฮั่งเส็งเช้า','ฮั่งเซ็งเช้า','ฮั่งเส็ง'],
+  ['ฮั่งเส็ง VIP เช้า','ฮั่งเส็งvipเช้า'],
+  ['ฮั่งเส็งบ่าย','ฮั่งเซ็งบ่าย'],
+  ['ฮั่งเส็ง VIP บ่าย','ฮั่งเส็งvipบ่าย','ฮั่งเซ็งวีไอพีบ่าย'],
+  ['หวยรัฐบาลไทย','หวยไทย','รัฐบาลไทย','สลากกินแบ่งรัฐบาล','หวยรัฐบาล','หวยไทยปกติ'],
+  ['ออมสิน','หวยออมสิน','สลากออมสิน','สลากออมสินพิเศษ','ธนาคารออมสิน'],
+  ['ธ.ก.ส.','ธกส','หวยธกส','สลากธกส','สลาก ธ.ก.ส.','ธนาคารเพื่อการเกษตรและสหกรณ์การเกษตร'],
+  ['หุ้นไทยเช้า','ไทยเช้า'],
+  ['หุ้นไทยเที่ยง','ไทยเที่ยง'],
+  ['หุ้นไทยบ่าย','ไทยบ่าย'],
+  ['หุ้นไทยเย็น','ไทยเย็น'],
+  ['หุ้นอินเดีย','อินเดีย'],
+  ['อังกฤษ VIP','อังกฤษvip','อังกฤษวีไอพี'],
+  ['สิงคโปร์','สิงค์โปร์','สิงคโป','สิงคโปร์ปกติ'],
+  ['สิงคโปร์ VIP','สิงค์โปร์vip','สิงคโปร์วีไอพี'],
+  ['ดาวโจนส์','ดาวโจน','ดาวโจนส์ปกติ'],
+  ['ดาวโจนส์ VIP','ดาวโจนส์vip','ดาวโจนวีไอพี']
+];
+
+function cleanName(v) { return String(v||'').replace(/[\u{1F1E6}-\u{1F1FF}]{2}/gu,'').replace(/\s+/g,' ').trim(); }
+function normalize(v) {
+  return cleanName(v).toLowerCase()
+    .replace(/วีไอพี/g,'vip').replace(/ฮานอย/g,'นอย').replace(/นิคเคอิ/g,'นิเคอิ')
+    .replace(/[\s._\-()]/g,'').replace(/์/g,'');
+}
+function stripCategory(v){ return cleanName(v).replace(/^(?:ผลหวย|ผล|หวย|หุ้น|ตลาดหุ้น)\s+/,'').trim(); }
+function thaiKind(v){
+  const q=normalize(v);
+  if(/(?:ธกส|ธนาคารเพื่อการเกษตร|สลากทวีสิน)/.test(q))return 'baac';
+  if(/(?:ออมสิน|gsb)/.test(q))return 'gsb';
+  if(/(?:รัฐบาลไทย|รัฐบาล|สลากกินแบ่งรัฐบาล|หวยไทย|ล็อตเตอรี่ไทย|ลอตเตอรี่ไทย)/.test(q))return 'government';
+  if(/(?:หุ้นไทย|ตลาดหุ้นไทย|setindex|thaiset)/.test(q))return 'stocks';
+  return '';
+}
+const specialTokens=['extra','tv','hd','พิเศษ','กาชาด','เฉพาะกิจ','สามัคคี','สตาร์','อาเซียน','พัฒนา'];
+function compatible(a,b){
+  const x=normalize(a),y=normalize(b),kind=thaiKind(a),kind2=thaiKind(b);
+  if(x.includes('vip')!==y.includes('vip'))return false;
+  if((x.includes('เช้า')||x.includes('บ่าย')) &&
+    (x.includes('เช้า')!==y.includes('เช้า') || x.includes('บ่าย')!==y.includes('บ่าย')))return false;
+  if(kind && kind!==kind2)return false;
+  if(!kind && ['baac','gsb','government'].includes(kind2))return false;
+  for(const t of specialTokens){ if((x.includes(t)!==y.includes(t)) && !(t==='พิเศษ'&&kind==='gsb'))return false; }
+  return true;
+}
+function localCanonical(raw){
+  const q=normalize(stripCategory(raw));
+  if(q.length<2)return cleanName(raw);
+  for(const names of lotteryNames){
+    if(names.some(n=>normalize(n)===q))return names[0];
+  }
+  return stripCategory(raw);
+}
+function dist(a,b){
+  let prev=Array.from({length:b.length+1},(_,i)=>i);
+  for(let i=1;i<=a.length;i++){
+    let diag=prev[0];prev[0]=i;
+    for(let j=1;j<=b.length;j++){const old=prev[j];prev[j]=Math.min(prev[j]+1,prev[j-1]+1,diag+(a[i-1]===b[j-1]?0:1));diag=old;}
+  }return prev[b.length];
+}
+function bestMatch(raw,items){
+  const canonical=localCanonical(raw),q=normalize(canonical);
+  if(q.length<2)return null;
+  let best=null,bestScore=-999;
+  for(const item of items){
+    const name=cleanName(item.lottery_name||''),n=normalize(stripCategory(name));
+    if(!name||!compatible(canonical,name))continue;
+    const diff=dist(q,n);
+    const score=q===n?100:n.startsWith(q)?82+q.length/100:q.startsWith(n)?78+n.length/100:diff<=2&&q.length>=4?65-diff*8:-100;
+    if(score>bestScore){best=item;bestScore=score;}
+  }
+  return bestScore>=50?best:null;
+}
+function lotteryFlag(name){
+  const x=normalize(name);
+  if(/^(?:ลาว|เวียงจันทร์|สามัคคี|lao)/.test(x))return '🇱🇦';
+  if(/^(?:นอย|เวียดนาม|hanoi)/.test(x))return '🇻🇳';
+  if(/^(?:นิเคอิ|nikkei)/.test(x))return '🇯🇵';
+  if(/^(?:หุ้นจีน|จีน|เซี่ยงไฮ้)/.test(x))return '🇨🇳';
+  if(/^(?:ฮั่งเส็ง|ฮั่งเซ็ง)/.test(x))return '🇭🇰';
+  if(/^(?:ดาวโจนส์|ดาวโจน|dowjones)/.test(x))return '🇺🇸';
+  if(/^(?:สิงคโปร์|สิงค์โปร์)/.test(x))return '🇸🇬';
+  if(/^(?:หุ้นอินเดีย|อินเดีย)/.test(x))return '🇮🇳';
+  if(/^(?:อังกฤษ|หุ้นอังกฤษ)/.test(x))return '🇬🇧';
+  if(/^(?:หุ้นไทย|ไทย|หวยรัฐบาลไทย|รัฐบาล|ออมสิน|ธกส)/.test(x))return '🇹🇭';
+  return '';
+}
+function displayName(name){
+  const clean=cleanName(name);
+  const f=lotteryFlag(clean);
+  return f?`${f} ${clean} ${f}`:clean;
+}
+// Formula: row 2 first, then unused digits from row 1, maximum six base digits.
+// A seventh digit is allowed ONLY for the missing 6/9 partner and is wrapped in ().
+function assembleWin(raw){
+  const counts=digits.map(d=>[...raw].filter(x=>x===d).length);
+  const primary=digits.filter((_,i)=>counts[i]>=2);
+  const firstRow=digits.filter((_,i)=>counts[i]>=1);
+  const base=primary.slice(0,6);
+  for(const d of firstRow){
+    if(base.length===6)break;
+    if(!base.includes(d))base.push(d);
+  }
+  const has6=base.includes('6'),has9=base.includes('9');
+  const partner=has6&&!has9?'9':has9&&!has6?'6':'';
+  let supplement='';
+  if(partner){
+    if(base.length<6)base.push(partner);
+    else supplement='('+partner+')';
+  }
+  return {base,display:base.join('')+supplement,counts};
+}
+const threePatterns=[[0,2,4],[1,3,5],[0,3,5],[1,2,4]];
+const twoPatterns=[[0,1],[0,2],[1,3],[2,4],[3,5]];
+function digitSets(base,size){
+  const patterns=(size===3?threePatterns:twoPatterns);
+  if(base.length===6)return patterns.map(seq=>seq.map(i=>base[i]).join(''));
+  // If the input contains fewer than six different digits, show only real combinations.
+  const combos=[];
+  function visit(start,selected){
+    if(selected.length===size){combos.push(selected.join(''));return;}
+    for(let i=start;i<base.length;i++)visit(i+1,[...selected,base[i]]);
+  }
+  visit(0,[]);
+  return combos.slice(0,patterns.length);
+}
+function renderFrequency(){
+  // All calculations read ONLY the current input field, never the hidden draw history.
+  const value=numberInput.value.replace(/\D/g,'').slice(0,15);
+  const result=assembleWin(value), count=result.counts;
+  freqBody.replaceChildren();
+  for(let r=1;r<=4;r++){
+    const tr=document.createElement('tr');
+    if(r===2)tr.classList.add('featured');
+    const first=document.createElement('td');first.textContent=count.filter(n=>n>=r).length+' ตัว';tr.append(first);
+    for(let i=0;i<10;i++){
+      const td=document.createElement('td');td.textContent=count[i]>=r?digits[i]:'\u00a0';tr.append(td);
+    }
+    freqBody.append(tr);
+  }
+  const triples=result.base.length>=3?digitSets(result.base,3):[];
+  const pairs=result.base.length>=2?digitSets(result.base,2):[];
+  winnerNode.textContent=result.display||'—';
+  triplesNode.textContent=triples.join('-')||'—';
+  pairsNode.textContent=pairs.join('-')||'—';
+  copyButton.disabled=!result.display;
+  copyButton.textContent='คัดลอก';copyButton.classList.remove('copied');
+  $('copyFallback').hidden=true;
+}
+numberInput.addEventListener('input',()=>{
+  manualRevision++;
+  const cleaned=numberInput.value.replace(/\D/g,'').slice(0,15);
+  if(numberInput.value!==cleaned)numberInput.value=cleaned;
+  renderFrequency();
+});
+function formatDrawDate(raw){
+  const value=String(raw||'').trim();
+  const iso=value.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(iso)return `${iso[3]}/${iso[2]}/${iso[1]}`;
+  const local=value.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(local)return `${local[1].padStart(2,'0')}/${local[2].padStart(2,'0')}/${local[3]}`;
+  return '';
+}
+function bangkokToday(){
+  return new Intl.DateTimeFormat('en-GB', {timeZone:'Asia/Bangkok',day:'2-digit',month:'2-digit',year:'numeric'}).format(new Date());
+}
+// Read dates directly from the selected lottery's fetched result history.
+// The dataset does NOT publish a verified future draw date, so predicted dates
+// MUST be marked as estimates and must never be presented as official schedules.
+const DAY_MS=86400000;
+function drawDateUTC(raw){
+  const value=String(raw??'').trim();
+  const match=value.match(/^(\d{4})-(\d{2})-(\d{2})(?:$|[T\s])/);
+  if(!match)return null;
+  const year=Number(match[1]),month=Number(match[2]),day=Number(match[3]);
+  if(year<2000||year>2200)return null;
+  const time=Date.UTC(year,month-1,day);
+  const date=new Date(time);
+  if(date.getUTCFullYear()!==year||date.getUTCMonth()!==month-1||date.getUTCDate()!==day)return null;
+  return time;
+}
+function isoUTC(time){return new Date(time).toISOString().slice(0,10);}
+function addUtcDays(time,days){return time+days*DAY_MS;}
+function isWeekend(time){const weekday=new Date(time).getUTCDay();return weekday===0||weekday===6;}
+function nextBusinessDay(time){
+  let t=addUtcDays(time,1);
+  while(isWeekend(t))t=addUtcDays(t,1);
+  return t;
+}
+function nextFirstOrSixteenth(time){
+  const date=new Date(time),year=date.getUTCFullYear(),month=date.getUTCMonth(),day=date.getUTCDate();
+  if(day<16)return Date.UTC(year,month,16);
+  return Date.UTC(year,month+1,1);
+}
+// Return a predicted ISO date only when enough consistent history exists.
+function predictNextDrawDate(drawHistory, lotteryName){
+  const observed=[...new Set((drawHistory||[]).map(x=>drawDateUTC(x.draw_date)).filter(x=>x!==null))]
+    .sort((a,b)=>b-a).slice(0,8);
+  if(observed.length<4)return null;
+  const newest=observed[0];
+  const gaps=observed.slice(0,-1).map((time,i)=>Math.round((time-observed[i+1])/DAY_MS));
+  const recent=gaps.slice(0,5);
+  const kind=thaiKind(lotteryName);
+  // Government lottery normally follows days 1 and 16; exceptional changes can occur.
+  if(kind==='government'&&observed.filter(time=>[1,16].includes(new Date(time).getUTCDate())).length>=4)
+    return isoUTC(nextFirstOrSixteenth(newest));
+  // Weekly draw on one stable weekday.
+  if(recent.length>=3&&recent.slice(0,3).every(n=>n===7))
+    return isoUTC(addUtcDays(newest,7));
+  // Stable every-two-weeks rhythm (e.g. a specific fortnightly lottery).
+  if(recent.length>=3&&recent.slice(0,3).every(n=>n===14))
+    return isoUTC(addUtcDays(newest,14));
+  // Stable twice-a-week rhythm: gaps alternate 3/4 days.
+  if(recent.length>=4&&recent.slice(0,4).every(n=>n===3||n===4)){
+    const weekdays=[...new Set(observed.slice(0,6).map(t=>new Date(t).getUTCDay()))];
+    if(weekdays.length===2){
+      let candidate=addUtcDays(newest,1);
+      for(let i=0;i<7;i++,candidate=addUtcDays(candidate,1))
+        if(weekdays.includes(new Date(candidate).getUTCDay()))return isoUTC(candidate);
+    }
+  }
+  // Stock markets and indexes trade on weekdays; historical results may omit holidays.
+  const isStock=kind==='stocks'||/^(?:หุ้น|ตลาดหุ้น|นิเคอิ|นิคเคอิ|ฮั่งเส็ง|ฮั่งเซ็ง|ดาวโจนส์|จีน|สิงคโปร์|อังกฤษ|อินเดีย|ไต้หวัน|เกาหลี|รัสเซีย|เยอรมัน)/.test(cleanName(lotteryName));
+  const allWeekdays=observed.every(t=>!isWeekend(t));
+  if(isStock && allWeekdays && recent.length>=3 && recent.slice(0,4).filter(n=>n===1||n===2||n===3||n===4).length>=3)
+    return isoUTC(nextBusinessDay(newest));
+  // A consistently daily lottery, including markets that also draw on weekends.
+  if(recent.length>=3&&recent.slice(0,3).every(n=>n===1))
+    return isoUTC(addUtcDays(newest,1));
+  // Unknown / irregular cycle: do not invent a date.
+  return null;
+}
+function copyLotteryName(){
+  const source=selectedLotteryName||localCanonical(lotteryInput.value)||lotteryInput.value.trim();
+  return cleanName(source).replace(/^(?:ผลหวย|ผล|หวย)\s*/,'').replace(/\s+(?=VIP\b)/gi,'').replace(/\s+/g,' ').trim();
+}
+function copyText(){
+  const lotteryName=copyLotteryName()||'ไม่ระบุชื่อหวย';
+  const flag=lotteryFlag(lotteryName);
+  const title=`${flag?flag+'  ':''}ผล${lotteryName}${flag?' '+flag:''}`;
+  const next=formatDrawDate(nextDrawDate);
+  const lines=[
+    title,
+    '  วันที่'+(next||'รอยืนยัน'),
+    '➖➖➖➖➖➖➖',
+    'วิน :  '+winnerNode.textContent,
+    '',
+    '          3 ตัว ',
+    triplesNode.textContent==='—'?'':triplesNode.textContent,
+    '          2 ตัว ',
+    pairsNode.textContent==='—'?'':pairsNode.textContent,
+    '➖➖➖➖➖➖➖',
+    '     - สูตรสถิติ -'
+  ];
+  return lines.join('\n');
+}
+const API='https://bixzsnyoqpfhoyrvshnf.supabase.co/rest/v1/';
+const PUBLIC_KEY='sb_publishable_n5ovnGDXxoLmJMSSX3nOww_lWJBkWxK';
+async function apiRows(path){
+  const controller=new AbortController();
+  const limit=setTimeout(()=>controller.abort(),9000);
+  try{
+    const res=await fetch(API+path,{headers:{apikey:PUBLIC_KEY,Accept:'application/json'},cache:'no-store',signal:controller.signal});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    if(!Array.isArray(data))throw new Error('ข้อมูลตอบกลับไม่ถูกต้อง');
+    return data;
+  }finally{clearTimeout(limit);}
+}
+function getDirectory(){
+  if(!cachedDirectory)cachedDirectory=apiRows('lotteries?select=lottery_key,lottery_name,is_active&is_active=eq.true&order=lottery_name.asc&limit=500')
+    .catch(err=>{cachedDirectory=null;throw err;});
+  return cachedDirectory;
+}
+function setStatus(text='',error=false){statusNode.textContent=text;statusNode.classList.toggle('error',error);}
+function clearSearchResults(){
+  matchedName.textContent='—';
+  selectedLotteryName='';latestDrawDate=null;nextDrawDate=null;
+  numberInput.value='';renderFrequency();
+}
+async function searchLottery(raw,token,revision){
+  if(token!==activeLookup)return;
+  setStatus('กำลังค้นหาข้อมูลย้อนหลัง…');
+  try{
+    const directory=await getDirectory();
+    if(token!==activeLookup)return;
+    const match=bestMatch(raw,directory);
+    if(!match){setStatus('ไม่พบชื่อหวยนี้ในฐานข้อมูล สามารถกรอกตัวเลขเองได้',true);return;}
+    const name=cleanName(match.lottery_name);
+    selectedLotteryName=name;
+    matchedName.textContent=displayName(name);
+    const key=String(match.lottery_key||'');
+    if(!key){setStatus('ไม่พบรหัสข้อมูลหวย',true);return;}
+    const rows=await apiRows('lottery_results?select=draw_date,top3,bottom2&lottery_key=eq.'+encodeURIComponent(key)+'&order=draw_date.desc&limit=30');
+    if(token!==activeLookup)return;
+    const valid=rows.filter(r=>/^\d{3}$/.test(String(r.top3??''))&&/^\d{2}$/.test(String(r.bottom2??'')))
+      .slice(0,6).map(r=>({draw_date:r.draw_date,top:String(r.top3),bottom:String(r.bottom2)}));
+    // Always refresh date metadata from this exact lottery's newest valid draw.
+    latestDrawDate=valid.length?valid[0].draw_date:null;
+    nextDrawDate=valid.length?predictNextDrawDate(valid,name):null;
+    if(valid.length===6){
+      if(manualRevision!==revision){setStatus('ข้อมูลย้อนหลังพร้อมใช้งาน แต่คงตัวเลขที่แก้ไขไว้');return;}
+      numberInput.value=valid.slice(3,6).map(d=>d.top+d.bottom).join('');
+      renderFrequency();
+      setStatus();
+    }else{
+      setStatus(`พบผลที่มีเลขครบ ${valid.length} งวด (ต้องมีครบ 6 งวดจึงจะเติมอัตโนมัติ)`,true);
+    }
+  }catch(err){
+    if(token!==activeLookup)return;
+    setStatus('ไม่สามารถดึงผลย้อนหลังออนไลน์ได้ กรุณาตรวจสอบอินเทอร์เน็ตหรือกรอกตัวเลขเอง',true);
+  }
+}
+function queueSearch(){
+  clearTimeout(searchTimer);
+  const token=++activeLookup;
+  clearSearchResults();setStatus();
+  const raw=lotteryInput.value.trim();
+  if(raw.length<2){if(raw)setStatus('กรุณากรอกชื่อหวยอย่างน้อย 2 ตัวอักษร');return;}
+  const revision=manualRevision;
+  searchTimer=setTimeout(()=>searchLottery(raw,token,revision),400);
+}
+lotteryInput.addEventListener('input',queueSearch);
+lotteryInput.addEventListener('keydown',event=>{
+  if(event.key==='Enter'){
+    event.preventDefault();clearTimeout(searchTimer);
+    const t=++activeLookup;clearSearchResults();
+    const raw=lotteryInput.value.trim();
+    if(raw.length>=2)searchLottery(raw,t,manualRevision);else setStatus('กรุณากรอกชื่อหวยอย่างน้อย 2 ตัวอักษร');
+  }
+});
+async function copyWin(){
+  if(!winnerNode.textContent||winnerNode.textContent==='—')return;
+  const value=copyText();
+  let done=false;
+  if(navigator.clipboard&&window.isSecureContext){
+    try{await navigator.clipboard.writeText(value);done=true;}catch(_e){}
+  }
+  if(!done){
+    const ta=document.createElement('textarea');ta.value=value;ta.readOnly=true;
+    ta.style.cssText='position:fixed;left:0;top:0;width:1px;height:1px;opacity:0';
+    document.body.append(ta);ta.focus();ta.select();
+    try{done=document.execCommand('copy');}catch(_e){}
+    ta.remove();
+  }
+  if(done){copyButton.textContent='คัดลอกแล้ว';copyButton.classList.add('copied');$('copyFallback').hidden=true;}
+  else{
+    $('copyFallbackText').value=value;$('copyFallback').hidden=false;
+    $('copyFallbackText').focus();$('copyFallbackText').select();
+  }
+}
+copyButton.addEventListener('click',copyWin);
+$('selectCopyText').addEventListener('click',()=>{$('copyFallbackText').focus();$('copyFallbackText').select();});
+renderFrequency();
+</script>
+</body>
+</html>
