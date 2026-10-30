@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#EDF2FA">
+<title>สูตรคำนวณหวย</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap');
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:#f4f5f7;color:#1f2937;font-family:Prompt,system-ui,sans-serif;display:flex;justify-content:center;align-items:center;padding:18px}
+.container{width:100%;max-width:850px;background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:34px 16px;box-shadow:0 8px 25px #1f293710}
+h1{color:#000000;font-size:20px;text-align:center;margin:2px 0 4px;font-weight:800}
+.brand-subtitle{font-family:Kanit,Prompt,sans-serif;font-size:20px;font-weight:700;letter-spacing:.4px;color:#000000;text-align:center;margin:0 0 22px;line-height:1.5}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.matched-lottery{margin:0 0 14px;padding:12px 10px;border:1px solid #E1E7FC;border-radius:11px;background:#F3F4F6;text-align:center}.matched-label{font-size:16px;font-weight:600;color:#273C55}.matched-name{font-size:20px;font-weight:700;color:#273C90;min-height:29px;display:flex;align-items:center;justify-content:center;gap:7px}.matched-name .country-flag{width:29px;height:22px;object-fit:contain;display:inline-block;flex:none;vertical-align:middle}.matched-name .country-flag-emoji{font-family:"Apple Color Emoji","Noto Color Emoji","Segoe UI Emoji",sans-serif;font-size:24px;line-height:1;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;flex:none}.matched-note{font-size:15px;color:#64748B;margin-top:4px}.lottery-search{margin-bottom:14px}.lottery-search input{width:100%}.name-feedback{text-align:center;min-height:20px;margin:5px 0 0;font-size:13px;color:#64748b}
+label{display:block;text-align:center;font-size:18px;margin-bottom:6px;color:#000;font-weight:600}
+input{display:block;width:100%;height:53px;border-radius:9px;border:1px solid #d1d5db;background:white;font-size:20px;text-align:center;font-family:inherit;color:#1f2937;outline:none}
+input:focus{border-color:#d8a92f;box-shadow:0 0 0 2px #f2c14d40}
+button{font-family:inherit;cursor:pointer}
+.calc{width:100%;margin-top:15px;padding:10px;background:#f2c14d;border:0;border-radius:9px;color:#222;font-size:18px;font-weight:600}
+.reset{display:block;width:100%;margin-top:9px;padding:10px;border:1px solid #cbd5e1;border-radius:9px;background:#f1f5f9;color:#000;font-size:18px;font-weight:600}
+.hint{text-align:center;font-size:14px;color:#000;margin:10px 0 0;font-weight:600}.error{color:#000}
+.result{display:block;margin-top:16px}
+.formula-columns{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:start;margin-top:15px}.formula-group{min-width:0;margin-top:0;padding-top:13px;border-top:1px solid #e5e7eb}
+.group-title{text-align:center;color:#000;font-size:18px;font-weight:600;margin:0 0 8px}
+.method-box{background:#f8fafc;border:1px solid #e5e7eb;border-radius:9px;padding:12px;margin-top:10px}.method-title{font-size:18px;color:#000;margin:0 0 4px;font-weight:600}.method-expression{font-size:18px;font-weight:300;color:#000000;overflow-wrap:anywhere;word-break:break-word;margin:0}.result-box{background:#f9fafb;border-radius:9px;text-align:center;padding:12px 8px;margin-top:10px}
+.result-title{font-size:18px;color:#000;margin-bottom:2px;font-weight:600}
+.result-value{font-size:18px;font-weight:300;overflow-wrap:anywhere;color:#dc2626;line-height:1.4}
+.run-value{color:#000000}
+.copy{width:100%;margin-top:16px;border:1px solid #111827;border-radius:9px;background:#111827;color:#fff;padding:12px;font-size:18px;font-weight:600;cursor:pointer;transition:background .2s,border-color .2s}
+.copy:disabled{background:#d1d5db;border-color:#d1d5db;color:#6b7280;cursor:not-allowed;opacity:.65}
+.copy.copied{background:#0ea5e9;border-color:#0ea5e9;color:#fff}
+.copy:focus-visible{outline:3px solid #93c5fd;outline-offset:2px}
+@media(max-width:350px){.container{padding:28px 12px}h1{font-size:19px}label{font-size:16px}.result-value{font-size:18px}}
+/* Modern Minimal V.3 styling */
+body{background:#EDF2FA;color:#172554}
+.container{border-color:#DCE4F2;border-radius:22px;box-shadow:0 14px 40px #17255412;padding:34px 20px}
+h1{color:#172554;font-weight:700;font-size:24px}
+.brand-subtitle{color:#4755AC;font-size:22px}
+label{color:#172554}
+input{border-color:#DCE4F2;border-radius:11px}
+input:focus{border-color:#4755AC;box-shadow:0 0 0 3px #4755AC20}
+.calc{background:#F3C75A;border-radius:11px}
+.reset{background:#EDF1F7;border-color:#DFE6F0;border-radius:11px;color:#172554}
+.hint{color:#64748B}
+.formula-columns{gap:12px}
+.formula-group{border:1px solid #E1E7FC;border-radius:13px;background:#F3F5FF;padding:12px}
+.formula-group:nth-child(2){background:#F2F7FF;border-color:#DCEBFF}
+.group-title{color:#273C90}
+.formula-group:nth-child(2) .group-title{color:#22549B}
+.result-box,.method-box{background:#fff;border:0;border-radius:10px}
+.result-title,.method-title{color:#273C55}
+.result-value{color:#D92649}
+.run-value,.method-expression{color:#172554}
+.copy{background:#000;border-color:#000;color:#fff;border-radius:11px}
+.copy:disabled{background:#CDD5E2;border-color:#CDD5E2;color:#718096}
+.copy.copied{background:#0EA5E9;border-color:#0EA5E9;color:#fff}
+@media(max-width:380px){.container{padding:25px 11px}.formula-columns{gap:7px}.formula-group{padding:7px}.result-box,.method-box{padding:9px 5px}.method-expression{font-size:15px}.result-title,.method-title{font-size:16px}}
+.external-credit{text-align:center;font-size:12px;color:#64748B;margin:-7px 0 12px}.external-credit a{color:#22549B}
+.wintool-tools{margin:9px 0 13px;border:1px solid #DCEBFF;background:#F2F7FF;border-radius:11px;padding:12px 10px;text-align:center}.wintool-tools a{display:inline-block;background:#273C90;color:#fff;border-radius:9px;padding:10px 12px;text-decoration:none;font-size:15px;font-weight:600}.wintool-tools label{font-size:14px;margin:10px 0 5px}.wintool-tools textarea{width:100%;height:65px;resize:vertical;border:1px solid #DCE4F2;border-radius:8px;padding:8px;font:14px Prompt,system-ui,sans-serif}.wintool-tools button{background:#EDF1F7;border:1px solid #DFE6F0;border-radius:8px;padding:9px 12px;color:#172554;font-weight:600;margin-top:7px}.wintool-note{font-size:12px;color:#64748B;margin-top:6px}.wintool-feedback{font-size:13px;color:#22549B;margin-top:5px;min-height:16px}
+
+/* V.3: keep the exact provided V.2 visual theme while displaying three formulas. */
+.formula-columns{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.formula-group{padding:9px;min-width:0}
+.formula-group:nth-child(2){background:#F3F5FF;border-color:#E1E7FC}
+.formula-group:nth-child(3){background:#F2F7FF;border-color:#DCEBFF}
+.formula-group:nth-child(3) .group-title{color:#22549B}
+.formula-group .result-box,.formula-group .method-box{padding:10px 5px;margin-top:7px}
+.formula-group .result-title,.formula-group .method-title{font-size:14px}
+.formula-group .result-value,.formula-group .method-expression{font-size:14px;line-height:1.5}
+.formula-group .set-value{overflow-wrap:anywhere;word-break:break-word}
+@media(max-width:430px){.container{padding:23px 9px}.formula-columns{gap:5px}.formula-group{padding:6px}.formula-group .result-title,.formula-group .method-title{font-size:12px}.formula-group .result-value,.formula-group .method-expression{font-size:12px}}
+/* คืนรูปแบบช่วงค้นหาชื่อหวย → ค้นพบ → แหล่งข้อมูล ตามเว็บไซต์เดิม */
+.lottery-search{margin-bottom:14px}
+.matched-lottery{margin-bottom:0}
+.external-credit{margin:7px 0 13px;text-align:center;font-size:12px;color:#64748B}
+.external-credit[hidden],.matched-note[hidden],.name-feedback[hidden]{display:none}
+.external-credit a{color:#22549B}
+
+/* V.3: ทั้งสามคอลัมน์กว้างเท่ากัน สูงเท่ากัน และกล่องผลเต็มหน้ากว้าง */
+.formula-columns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch;gap:9px}
+.formula-columns>.formula-group{min-width:0;width:100%;height:100%;margin:0;display:flex;flex-direction:column;box-sizing:border-box}
+.formula-columns>.formula-group>.result-box,
+.formula-columns>.formula-group>.method-box{width:100%;min-width:0;box-sizing:border-box}
+@media(max-width:430px){.formula-columns{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}}
+
+/* สีคอลัมน์ตามตัวอย่างที่เลือก: ส้ม / ม่วง / ฟ้า */
+.formula-columns>.formula-group:nth-child(1){background:#FFF1E6;border-color:#F5D6B7}
+.formula-columns>.formula-group:nth-child(1) .group-title{color:#C45A13}
+.formula-columns>.formula-group:nth-child(2){background:#F3E8FF;border-color:#E2CCFC}
+.formula-columns>.formula-group:nth-child(2) .group-title{color:#7E22CE}
+.formula-columns>.formula-group:nth-child(3){background:#F2F7FF;border-color:#DCEBFF}
+.formula-columns>.formula-group:nth-child(3) .group-title{color:#22549B}
+
+/* ขยับคำประเภท (หุ้น/หวย) กับชื่อหวยให้ชิดกันในช่องค้นพบ */
+.matched-name{letter-spacing:-0.2px;line-height:1.25}
+
+/* V.3: ตัวเลขและผลลัพธ์ทุกสูตร ขนาด 18px น้ำหนักบาง */
+.formula-columns .result-value,
+.formula-columns .method-expression{
+  font-size:18px;
+  font-weight:300;
+  line-height:1.35;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+/* ปุ่มคัดลอกคู่กัน กว้างเท่ากัน */
+.copy-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:9px}
+.copy-actions .copy{width:100%;min-width:0;margin-top:0}
+@media(max-width:380px){.copy-actions{gap:7px}.copy-actions .copy{font-size:15px;padding:11px 5px}}
+/* วันที่ผลย้อนหลังล่าสุด: 15px */
+.matched-note{font-size:15px!important;font-weight:400}
+
+/* ตารางผลงวดล่าสุด: แสดงหวยทุกประเภทที่มีข้อมูลจากระบบค้นหาออนไลน์ */
+.history-section{margin-top:22px;border:1px solid #DCE4F2;border-radius:13px;background:#F8FAFF;padding:14px 12px}
+.history-section[hidden]{display:none!important}
+.history-heading{text-align:center;font-size:18px;color:#172554;font-weight:600;margin:0 0 4px}
+.history-desc{text-align:center;color:#64748B;font-size:13px;margin:0 0 10px}
+.history-scroll{width:100%;max-height:380px;overflow:auto;border:1px solid #DCE4F2;border-radius:10px;background:white}
+.history-table{width:100%;border-collapse:collapse;table-layout:fixed;font-variant-numeric:tabular-nums}
+.history-table th{position:sticky;top:0;background:#273C90;color:white;font-size:15px;padding:10px 5px;text-align:center;z-index:1}
+.history-table td{padding:8px 5px;text-align:center;border-top:1px solid #E5EAF4;font-size:20px;color:#172554}
+.history-table tbody tr:first-child td{background:#EAF2FF;font-weight:700}
+.history-table th:first-child,.history-table td:first-child{width:42%}
+.history-credit{font-size:12px;text-align:center;color:#64748B;margin:10px 0 0}
+.history-credit a{color:#22549B}
+
+/* รวมชื่อหวยที่ค้นพบและตารางย้อนหลังไว้ในกรอบเดียวกัน */
+.matched-lottery{margin-bottom:14px}
+.matched-lottery .history-section{margin-top:12px;padding:0;border:0;border-radius:0;background:transparent}
+/* ตารางข้อมูลหวย: พื้นหลังสีขาวทั้งหัวตารางและทุกช่องตัวเลข */
+.history-table thead th{background:#FFFFFF;color:#27313D}
+.history-table tbody td,
+.history-table tbody tr:first-child td{background:#FFFFFF;color:#27313D}
+.history-table tbody td{border-top:1px solid #E5EAF4}
+.history-scroll{border-color:#DCE4F2}
+</style>
+</head>
+<body>
+<main class="container">
+<h1>สูตรคำนวณหวย</h1>
+<p class="brand-subtitle">🏠 บ้านนำโชค6789</p>
+<form id="calcForm">
+<div class="lottery-search"><label for="lotteryName">ค้นหาชื่อหวย</label><input id="lotteryName" type="search" autocomplete="off" spellcheck="false"><p class="name-feedback" id="nameFeedback" aria-live="polite" hidden></p></div>
+<div class="matched-lottery" aria-live="polite"><div class="matched-name" id="matchedName">—</div><div class="matched-note" id="matchedNote" hidden></div>
+<section class="history-section" id="latestDraw" hidden aria-label="ข้อมูลหวย">
+<div class="history-scroll"><table class="history-table" aria-label="ตารางข้อมูลหวย">
+<thead><tr><th scope="col">วันที่</th><th scope="col">3 ตัวบน</th><th scope="col">2 ตัวล่าง</th></tr></thead>
+<tbody><tr id="latestDrawRow"><td></td><td></td><td></td></tr></tbody>
+</table></div>
+<p class="history-credit">แหล่งข้อมูล: <a href="https://wintool37.netlify.app/" target="_blank" rel="noopener noreferrer">WinTool37 — สถิติย้อนหลัง 30 งวด</a></p>
+</section>
+</div>
+<div id="externalCredit" class="external-credit" hidden></div>
+<div class="fields">
+<div><label for="top3">3 ตัวบน</label><input id="top3" maxlength="3" inputmode="numeric" autocomplete="off"></div>
+<div><label for="down2">2 ตัวล่าง</label><input id="down2" maxlength="2" inputmode="numeric" autocomplete="off"></div>
+</div>
+<button class="calc" type="submit">คำนวณ</button>
+<button class="reset" type="button" id="resetBtn">รีเซ็ต</button>
+<a class="reset" href="./hanoi.html" target="_blank" rel="noopener noreferrer" style="text-align:center;text-decoration:none;">ใบเปิด 3 ฮานอย</a>
+</form>
+  <div class="copy-actions">
+    <button type="button" class="copy" id="copy1" disabled>คัดลอก สูตร 1</button>
+    <button type="button" class="copy" id="copy23" disabled>คัดลอก สูตร 2-3</button>
+  </div>
+<p class="hint" id="hint">กรอกตัวเลขเพื่อเริ่มคำนวณ</p>
+<section class="result" id="result" aria-live="polite">
+  <div class="formula-columns">
+   <div class="formula-group">
+    <h2 class="group-title">สูตร 1 (ส้ม)</h2>
+    <div class="result-box"><div class="result-title">รูด</div><div class="result-value run-value" id="run1"></div></div>
+    <div class="result-box"><div class="result-title">วิน</div><div class="result-value" id="win1"></div></div>
+    <div class="result-box"><div class="result-title">เลข 3 ตัว</div><div class="result-value set-value" id="triple1"></div></div>
+    <div class="result-box"><div class="result-title">เลข 2 ตัว</div><div class="result-value set-value" id="pair1"></div></div>
+   </div>
+   <div class="formula-group">
+    <h2 class="group-title">สูตร 2 (ม่วง)</h2>
+    <div class="result-box"><div class="result-title">รูด</div><div class="result-value run-value" id="run"></div></div>
+    <div class="result-box"><div class="result-title">วิน</div><div class="result-value" id="win"></div></div>
+    <div class="result-box"><div class="result-title">เลข 3 ตัว</div><div class="result-value set-value" id="triple"></div></div>
+    <div class="result-box"><div class="result-title">เลข 2 ตัว</div><div class="result-value set-value" id="pair2"></div></div>
+   </div>
+   <div class="formula-group">
+    <h2 class="group-title">สูตร 3</h2>
+    <div class="method-box"><p class="method-title">ขั้นตอนที่ 1</p><p class="method-expression" id="method1"></p></div>
+    <div class="method-box"><p class="method-title">ขั้นตอนที่ 2</p><p class="method-expression" id="method2"></p></div>
+    <div class="result-box"><div class="result-title">ผลคำนวณ</div><div class="result-value" id="percentPair"></div></div>
+    <div class="result-box"><div class="result-title">วิน</div><div class="result-value" id="uniqueDigits"></div></div>
+   </div>
+  </div>
+
+  <div id="copyFallback" hidden style="margin-top:10px;text-align:center">
+    <p style="font-size:14px;color:#172554;margin:0 0 7px">เบราว์เซอร์ไม่อนุญาตให้คัดลอกอัตโนมัติ กรุณาเลือกข้อความด้านล่างแล้วกด Ctrl+C (Mac: ⌘+C)</p>
+    <textarea id="copyFallbackText" readonly aria-label="ข้อความสำหรับคัดลอกด้วยตนเอง" style="display:block;width:100%;height:180px;padding:10px;font:14px Prompt,system-ui,sans-serif;border:1px solid #DCE4F2;border-radius:10px;resize:vertical"></textarea>
+    <button type="button" id="selectCopyText" style="background:#EDF1F7;border:1px solid #DCE4F2;border-radius:9px;padding:9px 16px;margin-top:8px;font:600 14px Prompt,system-ui,sans-serif;cursor:pointer">เลือกข้อความทั้งหมด</button>
+  </div>
+</section>
+
+</main>
+<script>
+const lotteryInput = document.getElementById('lotteryName');
+
+
+const externalCredit=document.getElementById('externalCredit');
+let externalRequest=0;
+let externalMatch=null;
+const nameFeedback = document.getElementById('nameFeedback');
+const matchedName = document.getElementById('matchedName');
+const matchedNote = document.getElementById('matchedNote');
+const topInput = document.getElementById('top3');
+const downInput = document.getElementById('down2');
+const hint = document.getElementById('hint');
+const copyBtns = [document.getElementById('copy1'), document.getElementById('copy23')];
+const resultIds = ['run1','win1','triple1','pair1','run','win','triple','pair2','method1','method2','percentPair','uniqueDigits'];
+let copyTexts = ['', ''];
+let sourcedDraw = null; // วันที่งวดที่ใช้คำนวณจาก WinTool37 เท่านั้น
+
+// สูตรที่ล็อกไว้ของเราเท่านั้น — Matrix Mirror V3 (คงลำดับเลขวิน) และ 7% / 99%
+// ไม่อ้างอิงหรือเรียกใช้ฟังก์ชันคำนวณใด ๆ จากเว็บไซต์ต้นแบบ
+function sixNine(text, parentheses) {
+  const has6 = text.includes('6'), has9 = text.includes('9');
+  const extra = has6 && !has9 ? '9' : has9 && !has6 ? '6' : '';
+  return text + (extra ? (parentheses ? '(' + extra + ')' : extra) : '');
+}
+function computeOriginal(top,down){
+  const [a,b,c]=top.split('').map(Number);
+  const [d,e]=down.split('').map(Number);
+  // สูตร 17 รายการจากสูตรเดิม ไม่ใช้สูตรเมทริกซ์ V3 ในไฟล์ต้นแบบ
+  const formula=[
+    (a+b)%10,(b+c)%10,(c+a)%10,
+    (a+d)%10,(b+e)%10,(c+d)%10,
+    (a+b+c)%10,(a+c+e)%10,(b+c+d)%10,
+    (d+e)%10,(a+e)%10,(b+d)%10,
+    (a+b+d)%10,(b+c+e)%10,(a+d+e)%10,
+    (c+b+a)%10,(e+d)%10
+  ];
+  const score=Array(10).fill(0);
+  formula.forEach(n=>score[n]++);
+  const ordered=Array.from({length:10},(_,i)=>i)
+    .filter(n=>score[n]>0)
+    .sort((x,y)=>score[y]-score[x]||x-y).map(String);
+  const win=ordered.slice(0,6);
+  for(let i=0;i<10&&win.length<6;i++){
+    if(!win.includes(String(i)))win.push(String(i));
+  }
+  const winBase=win.join('');
+  const extra=win.includes('6')&&!win.includes('9')?'(9)':
+    win.includes('9')&&!win.includes('6')?'(6)':'';
+  // เลขเด่น 3/2 ตัวเป็นชุดที่เลือกจากตำแหน่งเลขวิน ไม่ใช่สูตรคำนวณเพิ่ม
+  const triples=[[0,2,4],[1,3,5],[0,3,5],[1,2,4],[0,1,5]]
+    .map(indices=>indices.map(i=>win[i]).join(''));
+  const pairs=[[0,1],[0,2],[1,3],[2,4],[3,5]]
+    .map(indices=>indices.map(i=>win[i]).join(''));
+  return {run:ordered.slice(0,2).join('-'),win:winBase+extra,
+    triple:triples.join('-'),pair:pairs.join('-')};
+}
+
+function calculate(top, down) {
+  const [t1,t2,t3] = [...top].map(Number);
+  const [b1,b2] = [...down].map(Number);
+  const run1 = (t3+b1+7)%10;
+  const run2 = (run1+5)%10;
+  const m1 = (t1+t2+1)%10;
+  const m3 = Math.abs(t3-b2+3)%10;
+  const digits = [...new Set([run1,run2,m1,(m1+5)%10,m3,(m3+5)%10])];
+  for (const n of [7,8,2,3,0,5,1,4,6,9]) {
+    if (digits.length >= 6) break;
+    if (!digits.includes(n)) digits.push(n);
+  }
+  // สร้างเลขชุด 3 ตัวโดยใช้เลขวินเดิม 6 ตัว (ไม่แทรกเลขเติม 6/9)
+  const triple = [
+    `${digits[0]}${digits[2]}${digits[4]}`,
+    `${digits[1]}${digits[3]}${digits[5]}`,
+    `${digits[1]}${digits[4]}${digits[1]}`,
+    `${digits[0]}${digits[3]}${digits[5]}`
+  ].join(' - ');
+  const p1 = (Number(top)*0.07).toFixed(2);
+  const p2 = (Number(down)*0.99 + Number(top.slice(-2))).toFixed(2);
+  const pair2=[[0,1],[0,2],[1,3],[2,4],[3,5]].map(indices=>indices.map(i=>digits[i]).join('')).join('-');
+  const unique = [...new Set((p1+p2).replace(/\./g,'').split(''))].join('');
+  return {run:`${run1}-${run2}`,win:sixNine(digits.join(''),true),triple,
+          p1,p2,pair2,unique:sixNine(unique,false)};
+}
+
+// ฐานชื่อหวยสำหรับค้นหาเฉพาะภายในหน้าเว็บ ไม่เรียกข้อมูลหรือสูตรจากเว็บภายนอก
+// ไม่แสดง dropdown หรือรายชื่อทั้งหมดให้เลือก
+const lotteryNames = [
+  ['ฮานอยปกติ','นอยปกติ','ฮานอยธรรมดา','นอยธรรมดา','ฮานอย'],
+  ['ฮานอยพิเศษ','นอยพิเศษ','ฮานอยพิเศส','นอยพิเสด'],
+  ['ฮานอย VIP','นอยvip','ฮานอยวีไอพี','นอยวีไอพี'],
+  ['ฮานอย Extra','นอยextra','ฮานอยเอ็กซ์ตร้า','นอยเอ็กตร้า'],
+  ['ฮานอย TV','นอยtv','ฮานอยทีวี','นอยทีวี'],
+  ['ฮานอยกาชาด','นอยกาชาด'],
+  ['ฮานอยเฉพาะกิจ','นอยเฉพาะกิจ'],
+  ['ฮานอยพัฒนา','นอยพัฒนา'],
+  ['ลาว VIP','ลาวvip','ลาววีไอพี'],
+  ['ลาวสามัคคี','สามัคคี','ลาวสามัคคีปกติ'],
+  ['ลาวสามัคคี VIP','ลาวสามัคคีvip','สามัคคีวีไอพี'],
+  ['ลาวพัฒนา','ลาวพัดทะนา'],
+  ['ลาวอาเซียน','ลาวอาเชียน'],
+  ['ลาวเที่ยง','ลาวพัฒนาเที่ยง'],
+  ['ลาวสตาร์','ลาวสตา','ลาวstar'],
+  ['ลาวสตาร์ VIP','ลาวสตาvip','ลาวstarvip'],
+  ['ลาว HD','ลาวhd','ลาวเอชดี'],
+  ['ลาวกาชาด','กาชาดลาว'],
+  ['ลาวเวียงจันทร์','เวียงจันทร์'],
+  ['นิเคอิเช้า','นิเคอิรอบเช้า','นิเคอิ'],
+  ['นิเคอิ VIP เช้า','นิเคอิvipเช้า','นิเคอิวีไอพีเช้า'],
+  ['นิเคอิบ่าย','นิเคอิรอบบ่าย','นิคเคอิบ่าย'],
+  ['นิเคอิ VIP บ่าย','นิเคอิvipบ่าย','นิเคอิวีไอพีบ่าย'],
+  ['หุ้นจีนเช้า','จีนเช้า','หุ้นจีน'],
+  ['หุ้นจีน VIP เช้า','จีนvipเช้า','หุ้นจีนวีไอพีเช้า'],
+  ['หุ้นจีนบ่าย','จีนบ่าย'],
+  ['หุ้นจีน VIP บ่าย','จีนvipบ่าย','หุ้นจีนวีไอพีบ่าย'],
+  ['ฮั่งเส็งเช้า','ฮั่งเซ็งเช้า','ฮั่งเส็ง'],
+  ['ฮั่งเส็ง VIP เช้า','ฮั่งเส็งvipเช้า'],
+  ['ฮั่งเส็งบ่าย','ฮั่งเซ็งบ่าย'],
+  ['ฮั่งเส็ง VIP บ่าย','ฮั่งเส็งvipบ่าย','ฮั่งเซ็งวีไอพีบ่าย'],
+  ['หวยรัฐบาลไทย','หวยไทย','รัฐบาลไทย','สลากกินแบ่งรัฐบาล','หวยรัฐบาล','หวยไทยปกติ'],
+  ['ออมสิน','หวยออมสิน','สลากออมสิน','สลากออมสินพิเศษ','ธนาคารออมสิน'],
+  ['ธ.ก.ส.','ธกส','หวยธกส','สลากธกส','สลาก ธ.ก.ส.','ธนาคารเพื่อการเกษตรและสหกรณ์การเกษตร'],
+  ['หุ้นไทยเช้า','ไทยเช้า'],
+  ['หุ้นไทยเที่ยง','ไทยเที่ยง'],
+  ['หุ้นไทยบ่าย','ไทยบ่าย'],
+  ['หุ้นไทยเย็น','ไทยเย็น'],
+  ['หุ้นอินเดีย','อินเดีย'],
+  ['อังกฤษ VIP','อังกฤษvip','อังกฤษวีไอพี'],
+  ['สิงคโปร์','สิงค์โปร์','สิงคโป','สิงคโปร์ปกติ'],
+  ['สิงคโปร์ VIP','สิงค์โปร์vip','สิงคโปร์วีไอพี'],
+  ['ดาวโจนส์','ดาวโจน','ดาวโจนส์ปกติ'],
+  ['ดาวโจนส์ VIP','ดาวโจนส์vip','ดาวโจนวีไอพี']
+];
+const flags = {'ฮานอย':'🇻🇳','ลาว':'🇱🇦','นิเคอิ':'🇯🇵','หุ้นจีน':'🇨🇳','ฮั่งเส็ง':'🇭🇰','หุ้นไทย':'🇹🇭','หวยรัฐบาลไทย':'🇹🇭','ออมสิน':'🇹🇭','ธ.ก.ส.':'🇹🇭','หุ้นอินเดีย':'🇮🇳','อังกฤษ':'🇬🇧','สิงคโปร์':'🇸🇬','ดาวโจนส์':'🇺🇸'};
+function normalized(s) {return s.toLowerCase().replace(/วีไอพี/g,'vip').replace(/[\s._\-()]/g,'').replace(/์/g,'').replace(/สิงค์/g,'สิง').trim();}
+
+// จัดชื่อให้อ่านง่าย: ประเภทก่อนชื่อ โดยไม่เติมคำซ้ำ และไม่เปลี่ยนชื่อสำหรับการดึงฐานข้อมูล
+function lotteryCategory(raw){
+  const name=cleanLotteryName(raw).trim();
+  const n=normalized(name);
+  if(/^(?:หุ้น|ตลาดหุ้น|นิเคอิ|นิคเคอิ|ฮั่งเส็ง|ฮั่งเซ็ง|ดาวโจนส์|หุ้นจีน|หุ้นไทย|หุ้นอินเดีย|จีน|ไต้หวัน|เกาหลี|สิงคโปร์|อินเดีย|อังกฤษ|รัสเซีย|เยอรมัน|เยอรมนี|อียิปต์)/.test(n))return 'หุ้น';
+  if(/^(?:nikkei|hangseng|dowjones|setindex|thaiset|shanghai|taiwan|kospi|sensex|ftse|dax|egx|moex)/.test(n))return 'หุ้น';
+  return 'หวย';
+}
+function formatLotteryName(raw){
+  // แสดงชื่อหวยจริงเท่านั้น ไม่เติมคำนำหน้าประเภท หุ้น/หวย
+  const cleaned=cleanLotteryName(raw);
+  if(thaiDrawKind(cleaned)==='government')return 'หวยรัฐบาลไทย';
+  return cleaned.replace(/^(?:หุ้น|หวย)\s*/,'').trim();
+}
+function searchLotteryName(raw){
+  return cleanLotteryName(raw).replace(/^(?:หุ้น|หวย)\s+/,'').trim();
+}
+// หมวดสำหรับกรองชื่อทั้งรายการในเครื่องและฐานข้อมูล WinTool37
+function lookupGroup(raw){
+  const name=cleanLotteryName(raw).replace(/^(?:หุ้น|หวย)\s+/,'').trim();
+  const n=normalized(name);
+  if(thaiDrawKind(name)==='stocks'||/^(?:หุ้นไทย|ตลาดหุ้นไทย)/.test(n))return 'stockthai';
+  if(/^(?:ฮานอย|นอย)/.test(n))return 'hanoi';
+  if(/^ลาว/.test(n))return 'lao';
+  if(thaiDrawKind(name)==='government'||thaiDrawKind(name)==='gsb'||thaiDrawKind(name)==='baac')return 'thai';
+  if(lotteryCategory(name)==='หุ้น')return n.includes('vip')?'stockvip':'stocknormal';
+  return 'stocknormal';
+}
+function inSelectedGroup(raw){return true;} // จัดกลุ่มภายในอัตโนมัติ ไม่ให้ผู้ใช้ต้องเลือก
+function editDistance(a,b){const prev=Array.from({length:b.length+1},(_,i)=>i);for(let i=1;i<=a.length;i++){let diag=prev[0];prev[0]=i;for(let j=1;j<=b.length;j++){const old=prev[j];prev[j]=Math.min(prev[j]+1,prev[j-1]+1,diag+(a[i-1]===b[j-1]?0:1));diag=old;}}return prev[b.length];}
+function findLottery(input){
+  const query=normalized(searchLotteryName(input));
+  if(!query)return null;
+  const vip=query.includes('vip'), afternoon=query.includes('บ่าย'),morning=query.includes('เช้า');
+  let best=null,bestScore=-Infinity;
+  for(const variants of lotteryNames){
+    if(!inSelectedGroup(variants[0]))continue;
+    const title=variants[0],t=normalized(title);
+    // อย่าจับคู่ VIP และรอบบ่าย/เช้าเข้ากับคนละรอบ
+    if(vip!==t.includes('vip'))continue;
+    if((afternoon||morning) && (afternoon!==t.includes('บ่าย')||morning!==t.includes('เช้า')))continue;
+    for(const alias of variants){const name=normalized(alias);let score;
+      if(query===name)score=100;
+      else if(name.startsWith(query))score=85+query.length/100;
+      else if(query.startsWith(name))score=77+name.length/100;
+      else if(name.includes(query)&&query.length>=3)score=72+query.length/100;
+      else {const dist=editDistance(query,name);score=60-10*dist-Math.abs(query.length-name.length);}
+      if(score>bestScore){bestScore=score;best=title;}
+    }
+  }
+  return bestScore>=50?best:null;
+}
+function chosenName(){return externalMatch || findLottery(lotteryInput.value)||lotteryInput.value.trim();}
+// อ่านเฉพาะข้อมูลหวยและผลรางวัลจาก Supabase ของ WinTool37
+// Publishable key เป็นคีย์สาธารณะที่ปรากฏในสคริปต์ต้นทาง ไม่ใช้ secret/service role
+const WINTOOL_DB='https://bixzsnyoqpfhoyrvshnf.supabase.co/rest/v1/';
+const WINTOOL_PUBLIC_KEY='sb_publishable_n5ovnGDXxoLmJMSSX3nOww_lWJBkWxK';
+const WINTOOL_HEADERS={apikey:WINTOOL_PUBLIC_KEY,Accept:'application/json'};
+let remoteDirectoryPromise=null;
+let searchTimer=null;
+let manualRevision=0;
+async function apiRows(path){
+  const ctrl=new AbortController(),timeout=setTimeout(()=>ctrl.abort(),9000);
+  try {
+    const response=await fetch(WINTOOL_DB+path,{headers:WINTOOL_HEADERS,cache:'no-store',signal:ctrl.signal});
+    if(!response.ok)throw new Error('ไม่สามารถอ่านข้อมูลได้ (HTTP '+response.status+')');
+    const rows=await response.json();if(!Array.isArray(rows))throw new Error('รูปแบบข้อมูลไม่ถูกต้อง');
+    return rows;
+  } finally {clearTimeout(timeout);}
+}
+function fetchDirectory(){
+  if(!remoteDirectoryPromise)remoteDirectoryPromise=apiRows('lotteries?select=lottery_key,lottery_name,lottery_icon,is_active&is_active=eq.true&order=lottery_name.asc&limit=500').catch(e=>{remoteDirectoryPromise=null;throw e;});
+  return remoteDirectoryPromise;
+}
+// แยกหวยรัฐบาล ออมสิน และ ธ.ก.ส. ออกจากตลาดหุ้นไทยอย่างชัดเจน
+function thaiDrawKind(raw){
+  const key=normalized(cleanLotteryName(raw)).replace(/^(?:ผลหวย|ผล|หวย)/,'');
+  if(/(?:ธกส|ธนาคารเพื่อการเกษตร|สลากทวีสิน)/.test(key))return 'baac';
+  if(/(?:ออมสิน|gsb)/.test(key))return 'gsb';
+  if(/(?:รัฐบาลไทย|รัฐบาล|สลากกินแบ่งรัฐบาล|หวยไทย|ล็อตเตอรี่ไทย|ลอตเตอรี่ไทย)/.test(key)||key==='ไทย')return 'government';
+  if(/(?:หุ้นไทย|ตลาดหุ้นไทย|setindex|thaiset)/.test(key))return 'stocks';
+  return '';
+}
+function bestRemoteMatch(raw,rows){
+  const q=normalized(searchLotteryName(raw)),vip=q.includes('vip'),aft=q.includes('บ่าย'),morn=q.includes('เช้า');
+  if(q.length<2)return null;
+  const queryKind=thaiDrawKind(raw);
+  let best=null,score=-999;
+  for(const row of rows){
+    const name=cleanLotteryName(row.lottery_name||''),n=normalized(searchLotteryName(name));
+    if(!inSelectedGroup(name))continue;
+    if(!n||vip!==n.includes('vip'))continue;
+    const rowKind=thaiDrawKind(name);
+    // ไม่จับคู่หวยรัฐบาลกับหุ้นไทย หรือสลากคนละธนาคาร
+    if(queryKind){if(queryKind!==rowKind)continue;}
+    else if(rowKind==='government'||rowKind==='gsb'||rowKind==='baac')continue;
+    if((aft||morn)&&(aft!==n.includes('บ่าย')||morn!==n.includes('เช้า')))continue;
+    const special=['extra','tv','hd','พิเศษ','กาชาด','เฉพาะกิจ','สามัคคี','สตาร์'];
+    // คำว่า "พิเศษ" เป็นส่วนหนึ่งของชื่อสลากออมสินได้ ไม่ใช้เป็นรอบหวย
+    if(special.some(v=>!(queryKind==='gsb'&&v==='พิเศษ')&&q.includes(v)!==n.includes(v)))continue;
+    const aliases=[n];
+    const local=findLottery(raw);
+    if(local&&normalized(local)===n)aliases.push(q);
+    for(const v of aliases){
+      const dist=editDistance(q,v);
+      let val=q===v?100:v.startsWith(q)?80:q.startsWith(v)?75:dist<=2&&q.length>=4?66-8*dist:-100;
+      if(queryKind&&queryKind===rowKind){
+        // อนุญาตชื่อทางการและชื่อย่อภายในหวยชนิดเดียวกันเท่านั้น
+        if(val<50)val=65;
+        if(queryKind==='government'&&n.includes('หุ้น'))continue;
+      }
+      if(val>score){score=val;best=row;}
+    }
+  }
+  return score>=50?best:null;
+}
+async function lookupWinTool(raw,token,revision){
+  if(!raw||raw.trim().length<2)return;
+  nameFeedback.textContent='';
+  try{
+    const directory=await fetchDirectory();
+    if(token!==externalRequest||revision!==manualRevision)return;
+    const match=bestRemoteMatch(raw,directory);
+    if(!match){nameFeedback.textContent='ไม่พบชื่อหวยใน WinTool37 — สามารถกรอกเลขเองได้';return;}
+    const lotteryName=String(match.lottery_name),lotteryKey=String(match.lottery_key);
+    externalMatch=cleanLotteryName(lotteryName);
+    // แสดงธงชาติของหวยที่ค้นพบหน้าชื่อและหลังชื่อ โดยไม่แก้ชื่อหวยในฐานข้อมูล
+    const matchFlag=lotteryFlag(lotteryName)||lotteryFlag(raw)||(String(match.lottery_icon||'').match(/[\u{1F1E6}-\u{1F1FF}]{2}/u)||[])[0]||'';
+    setMatchedNameWithFlag(formatLotteryName(lotteryName),matchFlag);
+    matchedNote.hidden=true;matchedNote.textContent='';
+    nameFeedback.textContent='';
+    const rows=await apiRows('lottery_results?select=draw_date,top3,bottom2&lottery_key=eq.'+encodeURIComponent(lotteryKey)+'&order=draw_date.desc&limit=30');
+    if(token!==externalRequest||revision!==manualRevision)return;
+    const latest=rows.find(x=>/^\d{3}$/.test(String(x.top3||''))&&/^\d{2}$/.test(String(x.bottom2||'')));
+    if(!latest){matchedNote.hidden=false;matchedNote.textContent='พบชื่อหวย แต่ยังไม่มีผล 3 ตัวบน–2 ตัวล่างที่สมบูรณ์ในสถิติ';return;}
+    topInput.value=String(latest.top3);
+    downInput.value=String(latest.bottom2);
+    clearResults();
+    nameFeedback.textContent='';
+    hint.textContent='';
+    showLatestDraw(lotteryName,latest);
+    sourcedDraw={date:String(latest.draw_date||''),top:String(latest.top3),down:String(latest.bottom2)};
+    renderResults();
+  }catch(err){
+    if(token!==externalRequest||revision!==manualRevision)return;
+    matchedNote.hidden=true;matchedNote.textContent='';
+    nameFeedback.textContent='ค้นหาออนไลน์ไม่สำเร็จ';
+  }
+}
+// วันที่บนโพย = วันถัดจากวันที่ของงวดต้นทาง ไม่ใช่วันเปิดเว็บไซต์
+function nextDrawDay(sourceDate){
+  const match=/^(\d{4})-(\d{2})-(\d{2})(?:$|[T\s])/.exec(String(sourceDate||'').trim());
+  if(!match)return '';
+  const year=Number(match[1]),month=Number(match[2]),day=Number(match[3]);
+  if(year<100||year>9998)return '';
+  const date=new Date(Date.UTC(year,month-1,day));
+  if(date.getUTCFullYear()!==year||date.getUTCMonth()!==month-1||date.getUTCDate()!==day)return '';
+  date.setUTCDate(date.getUTCDate()+1);
+  return String(date.getUTCDate()).padStart(2,'0')+'/'+String(date.getUTCMonth()+1).padStart(2,'0')+'/'+date.getUTCFullYear();
+}
+function formatLatestDate(date){
+  const value=String(date||'').trim();
+  const parts=/^(\d{4})-(\d{2})-(\d{2})/.exec(value);
+  if(!parts)return value||'ไม่ระบุวันที่';
+  const months=['','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  const year=Number(parts[1]),month=Number(parts[2]),day=Number(parts[3]);
+  if(month<1||month>12||day<1||day>31)return value;
+  return day+' '+months[month]+' '+String((year+543)%100).padStart(2,'0');
+}
+function showLatestDraw(name,latest){
+  const section=document.getElementById('latestDraw');
+  const cells=document.getElementById('latestDrawRow').cells;
+  const date=formatLatestDate(latest.draw_date);
+  section.dataset.drawDate=String(latest.draw_date||'');
+  section.dataset.top=String(latest.top3||'');
+  section.dataset.down=String(latest.bottom2||'');
+  cells[0].textContent=date;
+  cells[1].textContent=String(latest.top3);
+  cells[2].textContent=String(latest.bottom2);
+  section.hidden=false;
+}
+function updateName(){
+  const token=++externalRequest,raw=lotteryInput.value.trim();
+  clearTimeout(searchTimer);
+  document.getElementById('latestDraw').hidden=true;
+  delete document.getElementById('latestDraw').dataset.drawDate;
+  delete document.getElementById('latestDraw').dataset.top;
+  delete document.getElementById('latestDraw').dataset.down;
+  sourcedDraw=null;
+  externalMatch=null;externalCredit.hidden=true;externalCredit.replaceChildren();
+  matchedName.textContent='—';
+  matchedNote.hidden=true;matchedNote.textContent='';
+  nameFeedback.textContent='';
+  topInput.value='';downInput.value='';clearResults();
+  const revision=manualRevision;
+  if(raw.length>=2)searchTimer=setTimeout(()=>lookupWinTool(raw,token,revision),400);
+}
+lotteryInput.addEventListener('input',()=>{manualRevision++;updateName();clearResults();hint.textContent='';});
+// ใช้อิโมจิธง Unicode ตามรายการ PiliApp: https://th.piliapp.com/emoji/list/flags/
+// บน Windows ที่อาจแสดงธงเป็นตัวย่อ ให้แสดงภาพธงสำรองแทน
+function setMatchedNameWithFlag(name,flag){
+  matchedName.replaceChildren();
+  if(!flag){matchedName.textContent=name;return;}
+  const countryFlag=Array.from(flag);
+  if(countryFlag.length!==2||!countryFlag.every(ch=>ch.codePointAt(0)>=0x1F1E6&&ch.codePointAt(0)<=0x1F1FF)){
+    matchedName.textContent=name;
+    return;
+  }
+  const makeEmoji=()=>{
+    const emoji=document.createElement('span');
+    emoji.className='country-flag-emoji';
+    emoji.textContent=flag;
+    emoji.setAttribute('aria-hidden','true');
+    return emoji;
+  };
+  const makeFlag=()=>{
+    // เครื่องที่รองรับอิโมจิธงใช้ตัวอิโมจิโดยตรงตาม PiliApp
+    if(!/Windows/i.test(navigator.userAgent))return makeEmoji();
+    const code=countryFlag.map(ch=>ch.codePointAt(0).toString(16)).join('-');
+    const img=document.createElement('img');
+    img.className='country-flag';
+    img.src='https://cdn.jsdelivr.net/npm/twemoji@14.0.2/assets/svg/'+code+'.svg';
+    img.alt='';
+    img.setAttribute('aria-hidden','true');
+    img.onerror=()=>img.replaceWith(makeEmoji());
+    return img;
+  };
+  const label=document.createElement('span');
+  label.textContent=name;
+  matchedName.append(makeFlag(),label,makeFlag());
+}
+function cleanLotteryName(name){
+  return String(name||'').replace(/[\u{1F1E6}-\u{1F1FF}]{2}/gu,'').replace(/\s+/g,' ').trim();
+}
+function lotteryFlag(name){
+  const raw=String(name||'');
+  const clean=cleanLotteryName(raw);
+  // ดูจากชื่อหวยก่อนเสมอ แม้ข้อมูลจากต้นทางจะไม่มีธง
+  const key=normalized(clean);
+  const aliases=[
+    [/^(?:ลาว|เวียงจันทร์|สามัคคี|lao)/,'🇱🇦'],
+    [/^(?:หุ้นไทย|ไทย|thaiset|หวยรัฐบาลไทย|รัฐบาลไทย|รัฐบาล|สลากกินแบ่งรัฐบาล|ออมสิน|ธกส|ธนาคารเพื่อการเกษตร)/,'🇹🇭'],
+    [/^(?:ฮานอย|นอย|เวียดนาม|hanoi|vietnam)/,'🇻🇳'],
+    [/^(?:หุ้นจีน|จีน|เซี่ยงไฮ้|shanghai|china)/,'🇨🇳'],
+    [/^(?:นิเคอิ|นิคเคอิ|nikkei|ญี่ปุ่น)/,'🇯🇵'],
+    [/^(?:หุ้นไต้หวัน|ไต้หวัน|ไทเป|taiwan|taipei)/,'🇹🇼'],
+    [/^(?:หุ้นเกาหลี|เกาหลี|โคสปิ|kospi|korea)/,'🇰🇷'],
+    [/^(?:สิงคโปร์|สิงค์โปร์|singapore)/,'🇸🇬'],
+    [/^(?:หุ้นอินเดีย|อินเดีย|india|sensex)/,'🇮🇳'],
+    [/^(?:ดาวโจนส์|ดาวโจน|dowjones|ดาวโจนส์vip)/,'🇺🇸'],
+    [/^(?:ฮั่งเส็ง|ฮั่งเซ็ง|hangseng|หุ้นฮ่องกง)/,'🇭🇰'],
+    [/^(?:อังกฤษ|หุ้นอังกฤษ|สหราชอาณาจักร|uk|ftse|london)/,'🇬🇧'],
+    [/^(?:รัสเซีย|หุ้นรัสเซีย|russia|russian|moex|rts)/,'🇷🇺'],
+    [/^(?:เยอรมัน|เยอรมนี|หุ้นเยอรมัน|germany|german|dax)/,'🇩🇪'],
+    [/^(?:อียิปต์|egypt|egx)/,'🇪🇬'],
+    [/^(?:มาเลเซีย|malaysia|klse)/,'🇲🇾'],
+    [/^(?:พม่า|เมียนมา|myanmar)/,'🇲🇲'],
+    [/^(?:ฟิลิปปินส์|philippines|psei)/,'🇵🇭'],
+    [/^(?:ออสเตรเลีย|australia|asx)/,'🇦🇺']
+  ];
+  // รับชื่อที่มีคำนำหน้า เช่น หวยลาวสตาร์ / ผลลาว VIP โดยไม่ใช้ธงขาวเป็นค่าเริ่มต้น
+  const searchKey=key.replace(/^(?:ผลหวย|หวย|ผล|หุ้น|ตลาดหุ้น)+/g,'');
+  for(const [pattern,flag] of aliases)if(pattern.test(key)||pattern.test(searchKey))return flag;
+  if(/ลาว|เวียงจันทร์|สามัคคี/.test(key))return '🇱🇦';
+  if(/หุ้นไทย|หวยไทย|รัฐบาลไทย|สลากกินแบ่งรัฐบาล|ประเทศไทย|ออมสิน|ธกส|ธนาคารเพื่อการเกษตร|thaiset/.test(key))return '🇹🇭';
+  if(/อังกฤษ|สหราชอาณาจักร|ftse/.test(key))return '🇬🇧';
+  if(/อียิปต์|egypt|egx/.test(key))return '🇪🇬';
+  if(/รัสเซีย|russia|russian|moex/.test(key))return '🇷🇺';
+  if(/เยอรมัน|เยอรมนี|germany|german|dax/.test(key))return '🇩🇪';
+  for(const [prefix,flag] of Object.entries(flags))if(clean.startsWith(prefix))return flag;
+  // หากไม่ทราบประเทศจากชื่อ ใช้ธงที่มาจากแหล่งข้อมูลถ้ามี
+  const originalFlags=raw.match(/[\u{1F1E6}-\u{1F1FF}]{2}/u);
+  return originalFlags?.[0]||'';
+}
+
+function clearResults() {
+  resultIds.forEach(id => document.getElementById(id).textContent = '');
+  copyTexts = ['', ''];
+  copyBtns.forEach((btn,i)=>{btn.disabled=true;btn.classList.remove('copied');btn.textContent=i===0?'คัดลอก สูตร 1':'คัดลอก สูตร 2-3';});
+  document.getElementById('copyFallback').hidden=true;
+}
+document.getElementById('resetBtn').addEventListener('click',() => {
+  lotteryInput.value = ''; topInput.value = ''; downInput.value = ''; sourcedDraw=null; updateName();
+  clearResults(); hint.classList.remove('error');
+  hint.textContent = 'กรอกตัวเลขเพื่อเริ่มคำนวณ'; lotteryInput.focus();
+});
+[topInput,downInput].forEach(field => field.addEventListener('input',() => {
+  manualRevision++;document.getElementById('latestDraw').hidden=true;field.value = field.value.replace(/\D/g,'');
+  // เมื่อผู้ใช้แก้ไข 3 ตัวบน ให้ล้าง 2 ตัวล่างของงวดก่อนทุกครั้ง
+  // ไม่กระทบการเติมผลอัตโนมัติจาก WinTool37 ซึ่งกำหนดค่าทั้งสองช่องโดยตรง
+  if (field === topInput) downInput.value = '';
+  clearResults(); hint.classList.remove('error');
+  hint.textContent = 'กรอกตัวเลขเพื่อเริ่มคำนวณ';
+  if (field === topInput && topInput.value.length === 3 && downInput.value.length === 0) downInput.focus();
+  // Manual input requires an explicit click on the Calculate button.
+  // Only a verified WinTool37 lookup calls renderResults() automatically.
+}));
+// อ่านวันที่งวดที่มองเห็นอยู่ในตาราง "ผลย้อนหลัง" โดยตรง
+// เช่น 28 ต.ค. 69 (พ.ศ. 2569) -> 29/10/2026
+function nextDayFromHistoryCell(displayedDate){
+  const text=String(displayedDate||'').trim().replace(/\s+/g,' ');
+  const months={'ม.ค.':1,'ก.พ.':2,'มี.ค.':3,'เม.ย.':4,'พ.ค.':5,'มิ.ย.':6,
+    'ก.ค.':7,'ส.ค.':8,'ก.ย.':9,'ต.ค.':10,'พ.ย.':11,'ธ.ค.':12};
+  let m=text.match(/^(\d{1,2})\s+(ม\.ค\.|ก\.พ\.|มี\.ค\.|เม\.ย\.|พ\.ค\.|มิ\.ย\.|ก\.ค\.|ส\.ค\.|ก\.ย\.|ต\.ค\.|พ\.ย\.|ธ\.ค\.)\s+(\d{2,4})$/);
+  let day,month,year;
+  if(m){
+    day=Number(m[1]);month=months[m[2]];year=Number(m[3]);
+    year=year<100?2500+year-543:year>=2400?year-543:year;
+  }else{
+    m=text.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{2,4})$/);
+    if(!m)return nextDrawDay(text); // รองรับวันต้นทางรูปแบบ YYYY-MM-DD
+    day=Number(m[1]);month=Number(m[2]);year=Number(m[3]);
+    year=year>=2400?year-543:year<100?(year>=57?1957+year:2000+year):year;
+  }
+  const date=new Date(Date.UTC(year,month-1,day));
+  if(date.getUTCFullYear()!==year||date.getUTCMonth()!==month-1||date.getUTCDate()!==day)return '';
+  date.setUTCDate(date.getUTCDate()+1);
+  return String(date.getUTCDate()).padStart(2,'0')+'/'+String(date.getUTCMonth()+1).padStart(2,'0')+'/'+date.getUTCFullYear();
+}
+// สูตร 2-3 ใช้วันที่จากช่องผลย้อนหลังที่แสดงจริงเป็นอันดับแรก ไม่ใช้วันปัจจุบัน
+function copiedNextDrawDate(top,down){
+  const history=document.getElementById('latestDraw');
+  const row=document.getElementById('latestDrawRow');
+  // อ่านช่องวันที่แถวเดียวกับเลขล่าสุดที่ค้นพบก่อน ไม่อิงเฉพาะตัวแปรวันที่แยก
+  if(!history.hidden && row && row.cells.length>=3){
+    const dateFromRow=nextDayFromHistoryCell(row.cells[0].textContent);
+    if(dateFromRow)return dateFromRow;
+  }
+  // กรณีตารางถูกซ่อนเพราะกรอกใหม่ แต่ยังใช้เลขงวดต้นทางชุดเดิม
+  if(sourcedDraw && sourcedDraw.top===top && sourcedDraw.down===down){
+    return nextDrawDay(sourcedDraw.date);
+  }
+  if(history.dataset.top===top && history.dataset.down===down){
+    return nextDayFromHistoryCell(row?.cells[0]?.textContent)||nextDrawDay(history.dataset.drawDate);
+  }
+  return '';
+}
+function renderResults() {
+  const top=topInput.value,down=downInput.value;
+  if(!/^\d{3}$/.test(top)||!/^\d{2}$/.test(down)){clearResults();return;}
+  hint.classList.remove('error');hint.textContent='';
+  const one=computeOriginal(top,down);
+  const two=calculate(top,down);
+  for(const [id,value] of Object.entries({run1:one.run,win1:one.win,triple1:one.triple,pair1:one.pair,run:two.run,win:two.win,triple:two.triple,pair2:two.pair2})){
+    document.getElementById(id).textContent=value;
+  }
+  document.getElementById('method1').textContent=`${top} × 7% = ${two.p1}`;
+  document.getElementById('method2').textContent=`(${down} × 99%) + ${top.slice(-2)} = ${two.p2}`;
+  document.getElementById('percentPair').textContent=`${two.p1}/${two.p2}`;
+  document.getElementById('uniqueDigits').textContent=two.unique;
+  // Manual calculation may have no selected lottery; copy results nevertheless.
+  const raw=String(chosenName()||'');
+  const clean=formatLotteryName(raw);
+  const flag=lotteryFlag(raw);
+  const heading=flag?`${flag} ${clean||'ไม่ระบุชื่อหวย'} ${flag}`:(clean||'ไม่ระบุชื่อหวย');
+  const divider='➖➖➖➖➖➖➖➖';
+  const isLockedLao=/^(?:ลาว|เวียงจันทร์|สามัคคี|lao)/i.test(normalized(cleanLotteryName(raw)));
+  const nextDate=copiedNextDrawDate(top,down);
+  const dateLine=nextDate?`  วันที่ ${nextDate}`:'  วันที่ —';
+  copyTexts[0]=[
+    heading,
+    divider,
+    `🔅 วิน   ${one.win}`,
+    `🏃 รูด   ${one.run}`,
+    '',
+    'เลข 3 ตัว',
+    one.triple,
+    'เลข 2 ตัว',
+    one.pair,
+    divider,
+    'สูตร 1'
+  ].join('\n');
+  // สูตร 2–3: ธงอย่างละหนึ่งด้าน (สูงสุดสองธง), ไม่มีธงเก่าติดมากับชื่อ
+  // รักษาชื่อ "หวยรัฐบาลไทย" ตามชื่อหวยที่ผู้ใช้ต้องการในข้อความคัดลอก
+  const name23 = thaiDrawKind(raw)==='government' ? 'หวยรัฐบาลไทย' : (clean||'ไม่ระบุชื่อหวย');
+  const heading23 = flag ? `${flag} ${name23} ${flag}` : name23;
+  // Both copy buttons use the same source-draw date; locked Lao template remains unchanged.
+  copyTexts[1]=[
+    heading23,
+    dateLine,
+    divider,
+    `🔅 วิน   ${two.win}`,
+    `🏃 รูด   ${two.run}`,
+    '',
+    `🏆 สูตร ${two.p1}/${two.p2}`,
+    `           ( ${two.unique} )`,
+    divider
+  ].join('\n');
+  copyBtns.forEach((btn,i)=>{btn.disabled=false;btn.classList.remove('copied');btn.textContent=i===0?'คัดลอก สูตร 1':'คัดลอก สูตร 2-3';});
+  // Show that manually-entered results are ready for copying.
+  if (!externalMatch) hint.textContent='คำนวณแล้ว — กดคัดลอกผลได้';
+}
+document.getElementById('calcForm').addEventListener('submit',event=>{event.preventDefault();renderResults();if(copyBtns.every(btn=>btn.disabled)){hint.textContent='กรุณากรอก 3 ตัวบน และ 2 ตัวล่างให้ครบ';}});
+// Browsers may block clipboard access on file:// or embedded previews.
+// Try the Clipboard API first, then the native selection copy command.
+// If both are blocked, expose selectable text rather than silently failing.
+async function performCopy(value) {
+  if (navigator.clipboard && window.isSecureContext) {
+    try { await navigator.clipboard.writeText(value); return true; } catch (_) {}
+  }
+  const el=document.createElement('textarea');
+  el.value=value;el.setAttribute('readonly','');
+  el.style.cssText='position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;z-index:-1';
+  document.body.appendChild(el);
+  el.focus();el.select();el.setSelectionRange(0,el.value.length);
+  let ok=false;
+  try {ok=document.execCommand('copy');} catch (_) {}
+  el.remove();
+  return ok;
+}
+document.getElementById('selectCopyText').addEventListener('click',()=>{
+  const el=document.getElementById('copyFallbackText');el.focus();el.select();
+});
+copyBtns.forEach((btn,index)=>btn.addEventListener('click',async()=>{
+  // Refresh the current inputs before copying (also works without a searched lottery).
+  if(/^\d{3}$/.test(topInput.value)&&/^\d{2}$/.test(downInput.value))renderResults();
+  const value=copyTexts[index];
+  if(!value){hint.textContent='กรุณากรอก 3 ตัวบน และ 2 ตัวล่างให้ครบ';return;}
+  const ok=await performCopy(value);
+  if(ok){
+    document.getElementById('copyFallback').hidden=true;
+    btn.classList.add('copied');btn.textContent='คัดลอกแล้ว';
+  }else{
+    const fallback=document.getElementById('copyFallback');
+    const field=document.getElementById('copyFallbackText');
+    field.value=value;fallback.hidden=false;field.focus();field.select();
+    btn.textContent='เลือกข้อความเพื่อคัดลอก';
+  }
+}));
+</script>
+</body>
+</html>
