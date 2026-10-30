@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#EDF2FA">
-<title>สูตรสถิติ|🏠นำโชค6789</title>
+<title>สูตรสถิติ | บ้านนำโชค6789</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap');
 * { box-sizing:border-box; }
@@ -22,6 +22,23 @@ input:focus { border-color:#4755AC; box-shadow:0 0 0 3px #4755AC20; }
 .matched-lottery { background:#F3F5FF; border:1px solid #E1E7FC; border-radius:13px; padding:13px 11px; }
 .matched-label { text-align:center; font-size:16px; font-weight:600; color:#273C55; }
 .matched-name { color:#273C90; text-align:center; font-size:21px; font-weight:700; line-height:1.4; min-height:30px; margin:1px 0 0; }
+/* Show the six latest historical draws inside the matched lottery panel. */
+.matched-history { margin-top:12px; overflow:hidden; border:1px solid #DFE6F5; border-radius:10px; background:#fff; }
+.matched-history[hidden] { display:none !important; }
+.matched-history table { width:100%; border-collapse:collapse; table-layout:fixed; font-variant-numeric:tabular-nums; }
+.matched-history th,.matched-history td { text-align:center; padding:7px 3px; border-bottom:1px solid #EBEFF7; font-size:12px; line-height:1.35; }
+.matched-history th { background:#F8FAFF; color:#273C55; font-weight:600; white-space:nowrap; }
+.matched-history td { color:#172554; font-weight:300; }
+.matched-history tr:last-child td { border-bottom:0; }
+.matched-history th:first-child { width:13%; }
+.matched-history th:nth-child(2) { width:34%; }
+.matched-history th:nth-child(3) { width:28%; }
+.matched-history th:nth-child(4) { width:25%; }
+@media (max-width:480px) {
+ .matched-history th { font-size:12px; padding:7px 2px; }
+ .matched-history td { font-size:12px; padding:7px 2px; }
+}
+
 .freq-table { width:100%; border-collapse:collapse; text-align:center; font-variant-numeric:tabular-nums; }
 .data-block { margin-top:22px; }
 #numberInput { font-size:22px; letter-spacing:0.15px; font-weight:400; font-variant-numeric:tabular-nums; }
@@ -69,6 +86,12 @@ h2 { margin:0 0 14px; font-size:20px; text-align:center; color:#172554; }
  .answer-title,.answer-number,.set-label,.set-number { font-size:20px; }
  #numberInput { font-size:20px; padding:8px 4px; }
 }
+
+/* Historical draw rows 4–6: bold red text, keeping all cells at 12px. */
+.matched-history tbody tr:nth-child(n+4):nth-child(-n+6) td {
+  color:#DC2626;
+  font-weight:700;
+}
 </style>
 </head>
 <body>
@@ -83,6 +106,12 @@ h2 { margin:0 0 14px; font-size:20px; text-align:center; color:#172554; }
 <section class="matched-lottery" aria-label="ชื่อหวยที่ค้นพบ">
 <div class="matched-label">ค้นพบ</div>
 <div class="matched-name" id="matchedName">—</div>
+<div class="matched-history" id="matchedHistory" hidden>
+  <table aria-label="ผลย้อนหลัง 6 งวด">
+    <thead><tr><th scope="col">งวด</th><th scope="col">วันที่</th><th scope="col">3 ตัวบน</th><th scope="col">2 ตัวล่าง</th></tr></thead>
+    <tbody id="matchedHistoryBody"></tbody>
+  </table>
+</div>
 </section>
 <section class="data-block" aria-label="กรอกตัวเลข">
 <label for="numberInput">กรอกตัวเลข</label>
@@ -113,6 +142,7 @@ h2 { margin:0 0 14px; font-size:20px; text-align:center; color:#172554; }
 const $ = id => document.getElementById(id);
 const lotteryInput=$('lotteryName'),numberInput=$('numberInput'),statusNode=$('searchStatus');
 const freqBody=$('frequencyBody'),matchedName=$('matchedName');
+const matchedHistory=$('matchedHistory'),matchedHistoryBody=$('matchedHistoryBody');
 const copyButton=$('copyButton'),winnerNode=$('featuredDigits');
 const triplesNode=$('triples'),pairsNode=$('pairs');
 const digits='0123456789'.split('');
@@ -425,6 +455,7 @@ function getDirectory(){
 function setStatus(text='',error=false){statusNode.textContent=text;statusNode.classList.toggle('error',error);}
 function clearSearchResults(){
   matchedName.textContent='—';
+  matchedHistory.hidden=true;matchedHistoryBody.replaceChildren();
   selectedLotteryName='';latestDrawDate=null;nextDrawDate=null;
   numberInput.value='';renderFrequency();
 }
@@ -445,6 +476,15 @@ async function searchLottery(raw,token,revision){
     if(token!==activeLookup)return;
     const valid=rows.filter(r=>/^\d{3}$/.test(String(r.top3??''))&&/^\d{2}$/.test(String(r.bottom2??'')))
       .slice(0,6).map(r=>({draw_date:r.draw_date,top:String(r.top3),bottom:String(r.bottom2)}));
+    // Display six historical draws, while only draws #4–#6 feed the number input.
+    matchedHistoryBody.replaceChildren();
+    valid.forEach((draw,i)=>{
+      const row=document.createElement('tr');
+      const cells=[String(i+1),formatDrawDate(draw.draw_date)||'—',draw.top,draw.bottom];
+      cells.forEach(value=>{const cell=document.createElement('td');cell.textContent=value;row.append(cell);});
+      matchedHistoryBody.append(row);
+    });
+    matchedHistory.hidden=matchedHistoryBody.children.length===0;
     // Always refresh date metadata from this exact lottery's newest valid draw.
     latestDrawDate=valid.length?valid[0].draw_date:null;
     nextDrawDate=valid.length?predictNextDrawDate(valid,name):null;
@@ -501,6 +541,12 @@ async function copyWin(){
 }
 copyButton.addEventListener('click',copyWin);
 $('selectCopyText').addEventListener('click',()=>{$('copyFallbackText').focus();$('copyFallbackText').select();});
+// Receive the selected lottery from index.html and start the usual search automatically.
+const fromIndex=new URLSearchParams(window.location.search).get('lottery');
+if(fromIndex&&fromIndex.trim().length>=2){
+  lotteryInput.value=fromIndex.trim().slice(0,120);
+  queueSearch();
+}
 renderFrequency();
 </script>
 </body>

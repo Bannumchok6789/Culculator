@@ -140,6 +140,22 @@ input:focus{border-color:#4755AC;box-shadow:0 0 0 3px #4755AC20}
 .tool-link-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:9px}
 .tool-link-grid .reset{display:flex;align-items:center;justify-content:center;min-width:0;min-height:48px;margin-top:0;padding:9px 6px;text-align:center;text-decoration:none;line-height:1.35}
 @media(max-width:380px){.tool-link-grid{gap:7px}.tool-link-grid .reset{font-size:15px;padding:9px 4px}}
+
+/* Navigation: both companion links use matching accessible green styling. */
+.tool-link-grid .reset,
+.tool-link-grid .reset:visited {
+  background:#16803D;
+  border-color:#16803D;
+  color:#FFFFFF;
+}
+.tool-link-grid .reset:hover {
+  background:#166534;
+  border-color:#166534;
+}
+.tool-link-grid .reset:focus-visible {
+  outline:3px solid #86EFAC;
+  outline-offset:2px;
+}
 </style>
 </head>
 <body>
@@ -166,7 +182,7 @@ input:focus{border-color:#4755AC;box-shadow:0 0 0 3px #4755AC20}
 <button class="reset" type="button" id="resetBtn">รีเซ็ต</button>
 <div class="tool-link-grid" aria-label="เปิดหน้าเครื่องมือเพิ่มเติม">
   <a class="reset" href="./hanoi.html" target="_blank" rel="noopener noreferrer">ใบเปิด 3 ฮานอย</a>
-  <a class="reset" href="./Statistics.html" target="_blank" rel="noopener noreferrer">สูตรสถิติ</a>
+  <a class="reset" id="statisticsLink" href="./Statistics.html" target="_blank" rel="noopener noreferrer">สูตรสถิติ</a>
 </div>
 </form>
   <div class="copy-actions">
@@ -396,6 +412,15 @@ function findLottery(input){
   return bestScore>=50?best:null;
 }
 function chosenName(){return externalMatch || findLottery(lotteryInput.value)||lotteryInput.value.trim();}
+// Pass the currently searched lottery to Statistics when opening the companion page.
+const statisticsLink=document.getElementById('statisticsLink');
+function updateStatisticsDestination(){
+  const name=String(chosenName()||'').trim();
+  statisticsLink.href=name?'./Statistics.html?lottery='+encodeURIComponent(name):'./Statistics.html';
+}
+statisticsLink.addEventListener('click',updateStatisticsDestination);
+lotteryInput.addEventListener('input',updateStatisticsDestination);
+
 // อ่านเฉพาะข้อมูลหวยและผลรางวัลจาก Supabase ของ WinTool37
 // Publishable key เป็นคีย์สาธารณะที่ปรากฏในสคริปต์ต้นทาง ไม่ใช้ secret/service role
 const WINTOOL_DB='https://bixzsnyoqpfhoyrvshnf.supabase.co/rest/v1/';
@@ -469,6 +494,7 @@ async function lookupWinTool(raw,token,revision){
     if(!match){nameFeedback.textContent='ไม่พบชื่อหวยใน WinTool37 — สามารถกรอกเลขเองได้';return;}
     const lotteryName=String(match.lottery_name),lotteryKey=String(match.lottery_key);
     externalMatch=cleanLotteryName(lotteryName);
+    updateStatisticsDestination();
     // แสดงธงชาติของหวยที่ค้นพบหน้าชื่อและหลังชื่อ โดยไม่แก้ชื่อหวยในฐานข้อมูล
     const matchFlag=lotteryFlag(lotteryName)||lotteryFlag(raw)||(String(match.lottery_icon||'').match(/[\u{1F1E6}-\u{1F1FF}]{2}/u)||[])[0]||'';
     setMatchedNameWithFlag(formatLotteryName(lotteryName),matchFlag);
@@ -533,6 +559,7 @@ function updateName(){
   delete document.getElementById('latestDraw').dataset.down;
   sourcedDraw=null;
   externalMatch=null;externalCredit.hidden=true;externalCredit.replaceChildren();
+  updateStatisticsDestination();
   matchedName.textContent='—';
   matchedNote.hidden=true;matchedNote.textContent='';
   nameFeedback.textContent='';
