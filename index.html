@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#EDF2FA">
-<title>สูตรคำนวณหวย | นำโชค6789</title>
+<title>สูตรคำนวณหวย</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap');
 *{box-sizing:border-box}
@@ -156,10 +156,41 @@ input:focus{border-color:#4755AC;box-shadow:0 0 0 3px #4755AC20}
   outline:3px solid #86EFAC;
   outline-offset:2px;
 }
+
+/* Page entry gate: only the index page is gated (client-side demonstration). */
+#loginGate[hidden], #siteApp[hidden] {display:none!important}
+.login-panel{width:100%;max-width:440px;padding:32px 28px;text-align:center;margin:auto}
+.login-brand{color:#4755AC;font-family:Kanit,Prompt,sans-serif;font-size:22px;font-weight:700;margin:0 0 22px}
+.login-heading{font-size:23px;color:#172554;font-weight:700;margin:0 0 4px}
+.login-sub{font-size:14px;color:#64748B;margin:0 0 25px}
+.login-panel label{text-align:left;font-size:15px;margin:0 0 6px}
+.login-panel .login-field{text-align:left;font-size:18px;height:51px;margin:0 0 16px}
+.login-submit{display:block;width:100%;background:#16803D;border:1px solid #16803D;border-radius:11px;padding:12px 14px;font-family:inherit;color:#fff;font-size:18px;font-weight:600;cursor:pointer}
+.login-submit:disabled{opacity:.6;cursor:wait}
+.login-submit:hover{background:#166534;border-color:#166534}
+.login-error{min-height:22px;color:#B91C1C;font-size:13px;margin:10px 0 0}
+.login-userbar{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin:-10px 0 9px;font-size:13px;color:#64748B}
+.login-logout{font-size:13px;background:#EDF1F7;border:1px solid #DCE4F2;border-radius:8px;padding:6px 12px;color:#172554;font-family:inherit;cursor:pointer}
+.login-submit:focus-visible,.login-logout:focus-visible{outline:3px solid #93c5fd;outline-offset:2px}
+@media(max-width:480px){.login-panel{padding:30px 20px}.login-heading{font-size:22px}}
 </style>
 </head>
 <body>
-<main class="container">
+<main class="container login-panel" id="loginGate" aria-label="เข้าสู่ระบบ">
+  <h1 class="login-heading">เข้าสู่เว็บไซต์</h1>
+  <p class="login-brand">🏠 บ้านนำโชค6789</p>
+  <p class="login-sub">กรอกชื่อผู้ใช้และรหัสผ่านเพื่อเปิดหน้าเว็บ</p>
+  <form id="loginForm" autocomplete="on">
+    <label for="loginUsername">ชื่อผู้ใช้ (User)</label>
+    <input class="login-field" id="loginUsername" name="username" type="text" required autocomplete="username" autocapitalize="characters" spellcheck="false" placeholder="BN001">
+    <label for="loginPassword">รหัสผ่าน (Password)</label>
+    <input class="login-field" id="loginPassword" name="password" type="password" required autocomplete="current-password" placeholder="กรอกรหัสผ่าน">
+    <button type="submit" class="login-submit" id="loginSubmit">เข้าสู่เว็บไซต์</button>
+    <p class="login-error" id="loginError" role="alert" aria-live="polite"></p>
+  </form>
+</main>
+<main class="container" id="siteApp" hidden>
+<div class="login-userbar"><span>เข้าสู่ระบบ: BN001</span><button type="button" id="logoutBtn" class="login-logout">ออกจากระบบ</button></div>
 <h1>สูตรคำนวณหวย</h1>
 <p class="brand-subtitle">🏠 บ้านนำโชค6789</p>
 <form id="calcForm">
@@ -223,6 +254,58 @@ input:focus{border-color:#4755AC;box-shadow:0 0 0 3px #4755AC20}
 </section>
 
 </main>
+<script>
+/* This login is a client-side convenience gate, NOT server-side access control. */
+(() => {
+  'use strict';
+  const expectedUsername='BN001';
+  const expectedSha256='4672ac7b6dec63c1f1134d1cfa3d73a6d517f011ec053f3fcacd0ba9f9aaea15';
+  const sessionKey='BN_INDEX_SESSION_V2';
+  const gate=document.getElementById('loginGate');
+  const app=document.getElementById('siteApp');
+  const form=document.getElementById('loginForm');
+  const error=document.getElementById('loginError');
+  const user=document.getElementById('loginUsername');
+  const password=document.getElementById('loginPassword');
+  const submit=document.getElementById('loginSubmit');
+  function display(loggedIn){
+    gate.hidden=loggedIn;
+    app.hidden=!loggedIn;
+    if(loggedIn){error.textContent='';password.value='';}
+    else {password.value='';user.value=expectedUsername;user.focus();}
+  }
+  async function sha256(value){
+    if(!window.crypto?.subtle) throw new Error('เว็บเบราว์เซอร์นี้ไม่รองรับการตรวจสอบรหัสผ่าน โปรดใช้ Chrome หรือ Safari เวอร์ชันล่าสุด');
+    const digest=await window.crypto.subtle.digest('SHA-256',new TextEncoder().encode(value));
+    return [...new Uint8Array(digest)].map(x=>x.toString(16).padStart(2,'0')).join('');
+  }
+  form.addEventListener('submit',async(event)=>{
+    event.preventDefault();
+    if(submit.disabled)return;
+    submit.disabled=true;
+    error.textContent='';
+    try{
+      const name=user.value.trim().toUpperCase();
+      const hash=await sha256('BN-INDEX-AUTH|'+name+'|'+password.value);
+      if(name===expectedUsername && hash===expectedSha256){
+        try{sessionStorage.setItem(sessionKey,name);}catch(_){}
+        display(true);
+      }else{
+        error.textContent='ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง';
+        password.value='';password.focus();
+      }
+    }catch(e){error.textContent=e.message||'ไม่สามารถเข้าสู่ระบบได้';}
+    finally{submit.disabled=false;}
+  });
+  document.getElementById('logoutBtn').addEventListener('click',()=>{
+    try{sessionStorage.removeItem(sessionKey);}catch(_){}
+    display(false);
+  });
+  let remembered='';
+  try{remembered=sessionStorage.getItem(sessionKey)||'';}catch(_){}
+  display(remembered===expectedUsername);
+})();
+</script>
 <script>
 const lotteryInput = document.getElementById('lotteryName');
 
