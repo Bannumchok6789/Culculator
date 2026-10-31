@@ -148,7 +148,7 @@ const triplesNode=$('triples'),pairsNode=$('pairs');
 const digits='0123456789'.split('');
 let activeLookup=0,searchTimer=null,cachedDirectory=null;
 let latestDrawDate=null,nextDrawDate=null,selectedLotteryName='',manualRevision=0;
-// แสดง บห. เมื่อเลข 3 ตัวบนในงวดที่ 4–6 มีเลขซ้ำอย่างน้อยหนึ่งหลัก
+// แสดง บห. เมื่อเลข 3 ตัวบนในงวดที่ 4–6 มีเลขซ้ำอย่างน้อย 2 งวดขึ้นไป
 let hasDoubleInDraws4to6=false;
 
 // รายชื่อและชื่อย่อจากหน้าเว็บต้นฉบับ เพื่อให้การค้นหายังคงคุ้นเคย
@@ -478,8 +478,8 @@ async function searchLottery(raw,token,revision){
     if(token!==activeLookup)return;
     const valid=rows.filter(r=>/^\d{3}$/.test(String(r.top3??''))&&/^\d{2}$/.test(String(r.bottom2??'')))
       .slice(0,6).map(r=>({draw_date:r.draw_date,top:String(r.top3),bottom:String(r.bottom2)}));
-    // ตรวจเลข 3 ตัวบนเฉพาะงวดที่ 4–6 (นับจากงวดล่าสุด) หากมีเลขซ้ำให้เติม บห. ท้ายวิน
-    hasDoubleInDraws4to6=valid.slice(3,6).some(draw=>new Set(draw.top).size<3);
+    // ตรวจเลข 3 ตัวบนเฉพาะงวดที่ 4–6 (นับจากงวดล่าสุด) หากมีเลขซ้ำอย่างน้อย 2 งวดขึ้นไปให้เติม บห. ท้ายวิน
+    hasDoubleInDraws4to6=valid.slice(3,6).filter(draw=>new Set(draw.top).size<3).length>=2;
     // Display six historical draws, while only draws #4–#6 feed the number input.
     matchedHistoryBody.replaceChildren();
     valid.forEach((draw,i)=>{
