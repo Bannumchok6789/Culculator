@@ -1062,7 +1062,7 @@ function renderResults() {
   const bhTag=hasDoubleOrHamInDraws4to6(sourcedHistory)?' บห.':'';
   const statistics=calculateStatisticsResult(sourcedHistory);
   document.getElementById('statisticsRun').textContent=statistics.run;
-  document.getElementById('statisticsWin').textContent=statistics.win;
+  document.getElementById('statisticsWin').textContent=statistics.win+bhTag;
   document.getElementById('statisticsTriple').textContent=statistics.triple;
   document.getElementById('statisticsPair').textContent=statistics.pair;
   for(const [id,value] of Object.entries({run1:one.run,win1:one.win+bhTag,triple1:one.triple,pair1:one.pair,run:two.run,win:two.win+bhTag,triple:two.triple,pair2:two.pair2})){

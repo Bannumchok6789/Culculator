@@ -148,6 +148,8 @@ const triplesNode=$('triples'),pairsNode=$('pairs');
 const digits='0123456789'.split('');
 let activeLookup=0,searchTimer=null,cachedDirectory=null;
 let latestDrawDate=null,nextDrawDate=null,selectedLotteryName='',manualRevision=0;
+// แสดง บห. เมื่อเลข 3 ตัวบนในงวดที่ 4–6 มีเลขซ้ำอย่างน้อยหนึ่งหลัก
+let hasDoubleInDraws4to6=false;
 
 // รายชื่อและชื่อย่อจากหน้าเว็บต้นฉบับ เพื่อให้การค้นหายังคงคุ้นเคย
 const lotteryNames = [
@@ -320,7 +322,7 @@ function renderFrequency(){
   }
   const triples=result.base.length>=3?digitSets(result.base,3):[];
   const pairs=result.base.length>=2?digitSets(result.base,2):[];
-  winnerNode.textContent=result.display||'—';
+  winnerNode.textContent=result.display ? result.display+(hasDoubleInDraws4to6?' บห.':'') : '—';
   triplesNode.textContent=triples.join('-')||'—';
   pairsNode.textContent=pairs.join('-')||'—';
   copyButton.disabled=!result.display;
@@ -456,7 +458,7 @@ function setStatus(text='',error=false){statusNode.textContent=text;statusNode.c
 function clearSearchResults(){
   matchedName.textContent='—';
   matchedHistory.hidden=true;matchedHistoryBody.replaceChildren();
-  selectedLotteryName='';latestDrawDate=null;nextDrawDate=null;
+  selectedLotteryName='';latestDrawDate=null;nextDrawDate=null;hasDoubleInDraws4to6=false;
   numberInput.value='';renderFrequency();
 }
 async function searchLottery(raw,token,revision){
@@ -476,6 +478,8 @@ async function searchLottery(raw,token,revision){
     if(token!==activeLookup)return;
     const valid=rows.filter(r=>/^\d{3}$/.test(String(r.top3??''))&&/^\d{2}$/.test(String(r.bottom2??'')))
       .slice(0,6).map(r=>({draw_date:r.draw_date,top:String(r.top3),bottom:String(r.bottom2)}));
+    // ตรวจเลข 3 ตัวบนเฉพาะงวดที่ 4–6 (นับจากงวดล่าสุด) หากมีเลขซ้ำให้เติม บห. ท้ายวิน
+    hasDoubleInDraws4to6=valid.slice(3,6).some(draw=>new Set(draw.top).size<3);
     // Display six historical draws, while only draws #4–#6 feed the number input.
     matchedHistoryBody.replaceChildren();
     valid.forEach((draw,i)=>{
