@@ -456,7 +456,7 @@ function computeOriginal(top,down){
   const extra=win.includes('6')&&!win.includes('9')?'(9)':
     win.includes('9')&&!win.includes('6')?'(6)':'';
   // เลขเด่น 3/2 ตัวเป็นชุดที่เลือกจากตำแหน่งเลขวิน ไม่ใช่สูตรคำนวณเพิ่ม
-  const triples=[[0,2,4],[1,3,5],[0,3,5],[1,2,4],[0,1,5]]
+  const triples=[[0,2,4],[1,3,5],[0,3,5],[1,2,4]]
     .map(indices=>indices.map(i=>win[i]).join(''));
   const pairs=[[0,1],[0,2],[1,3],[2,4],[3,5]]
     .map(indices=>indices.map(i=>win[i]).join(''));
@@ -510,7 +510,7 @@ function calculate(top, down) {
     `${digits[1]}${digits[3]}${digits[5]}`,
     `${digits[1]}${digits[4]}${digits[1]}`,
     `${digits[0]}${digits[3]}${digits[5]}`
-  ].join(' - ');
+  ].join('-');
   const p1 = (Number(top)*0.07).toFixed(2);
   const p2 = (Number(down)*0.99 + Number(top.slice(-2))).toFixed(2);
   const pair2=[[0,1],[0,2],[1,3],[2,4],[3,5]].map(indices=>indices.map(i=>digits[i]).join('')).join('-');
