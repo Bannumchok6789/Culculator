@@ -407,6 +407,7 @@ const copyBtns = [document.getElementById('copy1'), document.getElementById('cop
 const resultIds = ['run1','win1','triple1','pair1','run','win','triple','pair2','method1','method2','percentPair','uniqueDigits'];
 let copyTexts = ['', ''];
 let sourcedDraw = null; // วันที่งวดที่ใช้คำนวณจาก WinTool37 เท่านั้น
+let sourcedHistory = []; // ประวัติวันออกสูงสุด 30 งวด ใช้ตรวจตารางวันออกประจำ
 
 // สูตรที่ล็อกไว้ของเราเท่านั้น — Matrix Mirror V3 (คงลำดับเลขวิน) และ 7% / 99%
 // ไม่อ้างอิงหรือเรียกใช้ฟังก์ชันคำนวณใด ๆ จากเว็บไซต์ต้นแบบ
@@ -669,6 +670,8 @@ async function lookupWinTool(raw,token,revision){
     nameFeedback.textContent='';
     const rows=await apiRows('lottery_results?select=draw_date,top3,bottom2&lottery_key=eq.'+encodeURIComponent(lotteryKey)+'&order=draw_date.desc&limit=30');
     if(token!==externalRequest||revision!==manualRevision)return;
+    sourcedHistory=rows.filter(x=>/^\d{3}$/.test(String(x.top3||''))&&/^\d{2}$/.test(String(x.bottom2||''))&&parseDrawDateUTC(x.draw_date)!==null)
+      .sort((a,b)=>parseDrawDateUTC(b.draw_date)-parseDrawDateUTC(a.draw_date)).slice(0,30);
     const latest=rows.find(x=>/^\d{3}$/.test(String(x.top3||''))&&/^\d{2}$/.test(String(x.bottom2||'')));
     if(!latest){matchedNote.hidden=false;matchedNote.textContent='พบชื่อหวย แต่ยังไม่มีผล 3 ตัวบน–2 ตัวล่างที่สมบูรณ์ในสถิติ';return;}
     topInput.value=String(latest.top3);
@@ -684,17 +687,6 @@ async function lookupWinTool(raw,token,revision){
     matchedNote.hidden=true;matchedNote.textContent='';
     nameFeedback.textContent='ค้นหาออนไลน์ไม่สำเร็จ';
   }
-}
-// วันที่บนโพย = วันถัดจากวันที่ของงวดต้นทาง ไม่ใช่วันเปิดเว็บไซต์
-function nextDrawDay(sourceDate){
-  const match=/^(\d{4})-(\d{2})-(\d{2})(?:$|[T\s])/.exec(String(sourceDate||'').trim());
-  if(!match)return '';
-  const year=Number(match[1]),month=Number(match[2]),day=Number(match[3]);
-  if(year<100||year>9998)return '';
-  const date=new Date(Date.UTC(year,month-1,day));
-  if(date.getUTCFullYear()!==year||date.getUTCMonth()!==month-1||date.getUTCDate()!==day)return '';
-  date.setUTCDate(date.getUTCDate()+1);
-  return String(date.getUTCDate()).padStart(2,'0')+'/'+String(date.getUTCMonth()+1).padStart(2,'0')+'/'+date.getUTCFullYear();
 }
 function formatLatestDate(date){
   const value=String(date||'').trim();
@@ -724,7 +716,7 @@ function updateName(){
   delete document.getElementById('latestDraw').dataset.drawDate;
   delete document.getElementById('latestDraw').dataset.top;
   delete document.getElementById('latestDraw').dataset.down;
-  sourcedDraw=null;
+  sourcedDraw=null;sourcedHistory=[];
   externalMatch=null;externalCredit.hidden=true;externalCredit.replaceChildren();
   updateStatisticsDestination();
   matchedName.textContent='—';
@@ -819,7 +811,7 @@ function clearResults() {
   document.getElementById('copyFallback').hidden=true;
 }
 document.getElementById('resetBtn').addEventListener('click',() => {
-  lotteryInput.value = ''; topInput.value = ''; downInput.value = ''; sourcedDraw=null; updateName();
+  lotteryInput.value = ''; topInput.value = ''; downInput.value = ''; sourcedDraw=null;sourcedHistory=[]; updateName();
   clearResults(); hint.classList.remove('error');
   hint.textContent = 'กรอกตัวเลขเพื่อเริ่มคำนวณ'; lotteryInput.focus();
 });
@@ -834,46 +826,119 @@ document.getElementById('resetBtn').addEventListener('click',() => {
   // Manual input requires an explicit click on the Calculate button.
   // Only a verified WinTool37 lookup calls renderResults() automatically.
 }));
-// อ่านวันที่งวดที่มองเห็นอยู่ในตาราง "ผลย้อนหลัง" โดยตรง
-// เช่น 28 ต.ค. 69 (พ.ศ. 2569) -> 29/10/2026
-function nextDayFromHistoryCell(displayedDate){
-  const text=String(displayedDate||'').trim().replace(/\s+/g,' ');
-  const months={'ม.ค.':1,'ก.พ.':2,'มี.ค.':3,'เม.ย.':4,'พ.ค.':5,'มิ.ย.':6,
-    'ก.ค.':7,'ส.ค.':8,'ก.ย.':9,'ต.ค.':10,'พ.ย.':11,'ธ.ค.':12};
-  let m=text.match(/^(\d{1,2})\s+(ม\.ค\.|ก\.พ\.|มี\.ค\.|เม\.ย\.|พ\.ค\.|มิ\.ย\.|ก\.ค\.|ส\.ค\.|ก\.ย\.|ต\.ค\.|พ\.ย\.|ธ\.ค\.)\s+(\d{2,4})$/);
-  let day,month,year;
-  if(m){
-    day=Number(m[1]);month=months[m[2]];year=Number(m[3]);
-    year=year<100?2500+year-543:year>=2400?year-543:year;
-  }else{
-    m=text.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{2,4})$/);
-    if(!m)return nextDrawDay(text); // รองรับวันต้นทางรูปแบบ YYYY-MM-DD
-    day=Number(m[1]);month=Number(m[2]);year=Number(m[3]);
-    year=year>=2400?year-543:year<100?(year>=57?1957+year:2000+year):year;
-  }
-  const date=new Date(Date.UTC(year,month-1,day));
-  if(date.getUTCFullYear()!==year||date.getUTCMonth()!==month-1||date.getUTCDate()!==day)return '';
-  date.setUTCDate(date.getUTCDate()+1);
-  return String(date.getUTCDate()).padStart(2,'0')+'/'+String(date.getUTCMonth()+1).padStart(2,'0')+'/'+date.getUTCFullYear();
+// ตรวจวันออกประจำจากประวัติผลย้อนหลังของหวยที่เลือก (สูงสุด 30 งวด)
+// จะไม่เดาวันงวดถัดไป หากข้อมูลยังไม่พอหรือรูปแบบวันออกไม่สม่ำเสมอ
+const DRAW_DAY_MS=86400000;
+function parseDrawDateUTC(raw){
+  const match=/^(\d{4})-(\d{2})-(\d{2})(?:$|[T\s])/.exec(String(raw||'').trim());
+  if(!match)return null;
+  const year=Number(match[1]),month=Number(match[2]),day=Number(match[3]);
+  if(year<2000||year>2200)return null;
+  const value=Date.UTC(year,month-1,day),date=new Date(value);
+  return date.getUTCFullYear()===year&&date.getUTCMonth()===month-1&&date.getUTCDate()===day?value:null;
 }
-// สูตร 2-3 ใช้วันที่จากช่องผลย้อนหลังที่แสดงจริงเป็นอันดับแรก ไม่ใช้วันปัจจุบัน
-function copiedNextDrawDate(top,down){
-  const history=document.getElementById('latestDraw');
-  const row=document.getElementById('latestDrawRow');
-  // อ่านช่องวันที่แถวเดียวกับเลขล่าสุดที่ค้นพบก่อน ไม่อิงเฉพาะตัวแปรวันที่แยก
-  if(!history.hidden && row && row.cells.length>=3){
-    const dateFromRow=nextDayFromHistoryCell(row.cells[0].textContent);
-    if(dateFromRow)return dateFromRow;
+function addDrawDays(value,days){return value+days*DRAW_DAY_MS;}
+function bangkokTodayUTC(){
+  const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Bangkok',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+  const values=Object.fromEntries(parts.filter(part=>part.type!=='literal').map(part=>[part.type,Number(part.value)]));
+  return Date.UTC(values.year,values.month-1,values.day);
+}
+function nextStartDate(newest){return Math.max(newest+DRAW_DAY_MS,bangkokTodayUTC());}
+function nextMonthlySchedule(startFrom,days){
+  const current=new Date(startFrom);
+  for(let offset=0;offset<24;offset++){
+    const monthStart=Date.UTC(current.getUTCFullYear(),current.getUTCMonth()+offset,1);
+    const year=new Date(monthStart).getUTCFullYear(),month=new Date(monthStart).getUTCMonth();
+    for(const day of days){
+      const candidate=Date.UTC(year,month,day),date=new Date(candidate);
+      if(date.getUTCMonth()===month&&date.getUTCDate()===day&&candidate>=startFrom)return candidate;
+    }
   }
-  // กรณีตารางถูกซ่อนเพราะกรอกใหม่ แต่ยังใช้เลขงวดต้นทางชุดเดิม
-  if(sourcedDraw && sourcedDraw.top===top && sourcedDraw.down===down){
-    return nextDrawDay(sourcedDraw.date);
+  return null;
+}
+function weekdayOccurrences(start,end,weekday){
+  let count=0;
+  for(let value=start;value<=end;value+=DRAW_DAY_MS){
+    if(new Date(value).getUTCDay()===weekday)count++;
   }
-  if(history.dataset.top===top && history.dataset.down===down){
-    return nextDayFromHistoryCell(row?.cells[0]?.textContent)||nextDrawDay(history.dataset.drawDate);
+  return count;
+}
+function nextScheduledDrawDate(history,name){
+  const dates=[...new Set((history||[]).map(row=>parseDrawDateUTC(row.draw_date)).filter(value=>value!==null))]
+    .sort((a,b)=>a-b);
+  if(dates.length<6)return '';
+  const oldest=dates[0],newest=dates[dates.length-1];
+  const startFrom=nextStartDate(newest);
+  const lottery=normalized(cleanLotteryName(name));
+  const kind=thaiDrawKind(name);
+
+  // หวยรัฐบาลไทย: กำหนดงวดวันที่ 1 และ 16 ของเดือน
+  if(kind==='government'){
+    const next=nextMonthlySchedule(startFrom,[1,16]);
+    return next?formatCopyDate(next):'';
+  }
+
+  // หวยที่มีวันประจำเดือนชัดเจน เช่น วันที่ 1 และ 16
+  const monthDayCounts=new Map();
+  dates.forEach(value=>{
+    const day=new Date(value).getUTCDate();
+    monthDayCounts.set(day,(monthDayCounts.get(day)||0)+1);
+  });
+  const monthlyDays=[...monthDayCounts.entries()]
+    .filter(([,count])=>count>=2)
+    .sort((a,b)=>b[1]-a[1]||a[0]-b[0])
+    .slice(0,2);
+  const monthlyCoverage=monthlyDays.reduce((sum,item)=>sum+item[1],0)/dates.length;
+  if(monthlyDays.length&&monthlyCoverage>=0.75){
+    const next=nextMonthlySchedule(startFrom,monthlyDays.map(item=>item[0]).sort((a,b)=>a-b));
+    if(next)return formatCopyDate(next);
+  }
+
+  // ตลาดหุ้น: วันทำการจันทร์–ศุกร์ (ไม่รวมวันหยุดตลาดเฉพาะประเทศ)
+  const isStock=/^(?:หุ้น|ตลาดหุ้น|นิเคอิ|นิคเคอิ|ฮั่งเส็ง|ฮั่งเซ็ง|ดาวโจนส์|จีน|สิงคโปร์|อังกฤษ|อินเดีย|ไต้หวัน|เกาหลี|รัสเซีย|เยอรมัน|เยอรมนี|อียิปต์|มาเลเซีย|พม่า|เมียนมา|ฟิลิปปินส์|ออสเตรเลีย)/.test(lottery);
+  if(kind==='stocks'||isStock){
+    let next=startFrom;
+    while([0,6].includes(new Date(next).getUTCDay()))next=addDrawDays(next,1);
+    return formatCopyDate(next);
+  }
+
+  // รอบทุก 14 วัน: ตรวจจากช่วงห่างล่าสุดที่ซ้ำกันต่อเนื่อง
+  const gaps=dates.slice(1).map((value,index)=>Math.round((value-dates[index])/DRAW_DAY_MS));
+  const recentGaps=gaps.slice(-4);
+  if(recentGaps.length>=3&&recentGaps.slice(-3).every(gap=>gap===14)){
+    let next=addDrawDays(newest,14);
+    while(next<startFrom)next=addDrawDays(next,14);
+    return formatCopyDate(next);
+  }
+
+  // สร้างตารางวันประจำสัปดาห์จากจำนวนครั้งที่พบในแต่ละวัน
+  const weekdayCounts=Array(7).fill(0);
+  dates.forEach(value=>weekdayCounts[new Date(value).getUTCDay()]++);
+  const scheduledWeekdays=[];
+  for(let weekday=0;weekday<7;weekday++){
+    const expected=weekdayOccurrences(oldest,newest,weekday);
+    const observed=weekdayCounts[weekday];
+    if(expected>0&&observed>=2&&observed/expected>=0.55)scheduledWeekdays.push(weekday);
+  }
+  if(!scheduledWeekdays.length)return '';
+  for(let offset=0;offset<=14;offset++){
+    const candidate=addDrawDays(startFrom,offset);
+    if(scheduledWeekdays.includes(new Date(candidate).getUTCDay()))return formatCopyDate(candidate);
   }
   return '';
 }
+function formatCopyDate(value){
+  const date=new Date(value);
+  return String(date.getUTCDate()).padStart(2,'0')+'/'+String(date.getUTCMonth()+1).padStart(2,'0')+'/'+date.getUTCFullYear();
+}
+// ใช้วันที่จากงวดต้นทางชุดเดียวกับตัวเลขที่นำมาคำนวณเท่านั้น
+function copiedNextDrawDate(top,down){
+  if(!sourcedDraw||sourcedDraw.top!==top||sourcedDraw.down!==down)return '';
+  const sourceDate=parseDrawDateUTC(sourcedDraw.date);
+  if(sourceDate===null||!sourcedHistory.some(row=>parseDrawDateUTC(row.draw_date)===sourceDate&&String(row.top3)===top&&String(row.bottom2)===down))return '';
+  return nextScheduledDrawDate(sourcedHistory,chosenName());
+}
+
 function renderResults() {
   const top=topInput.value,down=downInput.value;
   if(!/^\d{3}$/.test(top)||!/^\d{2}$/.test(down)){clearResults();return;}
