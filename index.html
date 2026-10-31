@@ -173,6 +173,9 @@ input:focus{border-color:#4755AC;box-shadow:0 0 0 3px #4755AC20}
 .login-logout{font-size:13px;background:#EDF1F7;border:1px solid #DCE4F2;border-radius:8px;padding:6px 12px;color:#172554;font-family:inherit;cursor:pointer}
 .login-submit:focus-visible,.login-logout:focus-visible{outline:3px solid #93c5fd;outline-offset:2px}
 @media(max-width:480px){.login-panel{padding:30px 20px}.login-heading{font-size:22px}}
+
+/* เพิ่มช่องว่างระหว่างปุ่มรีเซ็ตกับชื่อหวยที่แสดงผล */
+#resetBtn{margin-bottom:18px}
 </style>
 </head>
 <body>
@@ -195,6 +198,7 @@ input:focus{border-color:#4755AC;box-shadow:0 0 0 3px #4755AC20}
 <p class="brand-subtitle">🏠 บ้านนำโชค6789</p>
 <form id="calcForm">
 <div class="lottery-search"><label for="lotteryName">ค้นหาชื่อหวย</label><input id="lotteryName" type="search" autocomplete="off" spellcheck="false"><p class="name-feedback" id="nameFeedback" aria-live="polite" hidden></p></div>
+<button class="reset" type="button" id="resetBtn">รีเซ็ต</button>
 <div class="matched-lottery" aria-live="polite"><div class="matched-name" id="matchedName">—</div><div class="matched-note" id="matchedNote" hidden></div>
 <section class="history-section" id="latestDraw" hidden aria-label="ข้อมูลหวย">
 <div class="history-scroll"><table class="history-table" aria-label="ตารางข้อมูลหวย">
@@ -210,7 +214,6 @@ input:focus{border-color:#4755AC;box-shadow:0 0 0 3px #4755AC20}
 <div><label for="down2">2 ตัวล่าง</label><input id="down2" maxlength="2" inputmode="numeric" autocomplete="off"></div>
 </div>
 <button class="calc" type="submit">คำนวณ</button>
-<button class="reset" type="button" id="resetBtn">รีเซ็ต</button>
 <div class="tool-link-grid" aria-label="เปิดหน้าเครื่องมือเพิ่มเติม">
   <a class="reset" href="./hanoi.html" target="_blank" rel="noopener noreferrer">ใบเปิด 3 ฮานอย</a>
   <a class="reset" id="statisticsLink" href="./Statistics.html" target="_blank" rel="noopener noreferrer">สูตรสถิติ</a>
@@ -871,6 +874,10 @@ function nextScheduledDrawDate(history,name){
   const startFrom=nextStartDate(newest);
   const lottery=normalized(cleanLotteryName(name));
   const kind=thaiDrawKind(name);
+  const isStock=kind==='stocks'||/^(?:หุ้น|ตลาดหุ้น|นิเคอิ|นิคเคอิ|ฮั่งเส็ง|ฮั่งเซ็ง|ดาวโจนส์|จีน|สิงคโปร์|อังกฤษ|อินเดีย|ไต้หวัน|เกาหลี|รัสเซีย|เยอรมัน|เยอรมนี|อียิปต์|มาเลเซีย|พม่า|เมียนมา|ฟิลิปปินส์|ออสเตรเลีย)/.test(lottery);
+
+  // ตลาดหุ้น VIP: ออกทุกวัน รวมเสาร์–อาทิตย์ และไม่ใช้รูปแบบรายเดือน
+  if(isStock&&lottery.includes('vip'))return formatCopyDate(startFrom);
 
   // หวยรัฐบาลไทย: กำหนดงวดวันที่ 1 และ 16 ของเดือน
   if(kind==='government'){
@@ -894,9 +901,8 @@ function nextScheduledDrawDate(history,name){
     if(next)return formatCopyDate(next);
   }
 
-  // ตลาดหุ้น: วันทำการจันทร์–ศุกร์ (ไม่รวมวันหยุดตลาดเฉพาะประเทศ)
-  const isStock=/^(?:หุ้น|ตลาดหุ้น|นิเคอิ|นิคเคอิ|ฮั่งเส็ง|ฮั่งเซ็ง|ดาวโจนส์|จีน|สิงคโปร์|อังกฤษ|อินเดีย|ไต้หวัน|เกาหลี|รัสเซีย|เยอรมัน|เยอรมนี|อียิปต์|มาเลเซีย|พม่า|เมียนมา|ฟิลิปปินส์|ออสเตรเลีย)/.test(lottery);
-  if(kind==='stocks'||isStock){
+  // ตลาดหุ้นทั่วไป: วันทำการจันทร์–ศุกร์ (ไม่รวมวันหยุดตลาดเฉพาะประเทศ)
+  if(isStock){
     let next=startFrom;
     while([0,6].includes(new Date(next).getUTCDay()))next=addDrawDays(next,1);
     return formatCopyDate(next);
