@@ -208,22 +208,22 @@ input:focus{border-color:#4755AC;box-shadow:0 0 0 3px #4755AC20}
 <p class="history-credit">แหล่งข้อมูล: <a href="https://wintool37.netlify.app/" target="_blank" rel="noopener noreferrer">WinTool37 — สถิติย้อนหลัง 30 งวด</a></p>
 </section>
 </div>
+<p class="hint" id="hint">กรอกตัวเลขเพื่อเริ่มคำนวณ</p>
 <div id="externalCredit" class="external-credit" hidden></div>
 <div class="fields">
 <div><label for="top3">3 ตัวบน</label><input id="top3" maxlength="3" inputmode="numeric" autocomplete="off"></div>
 <div><label for="down2">2 ตัวล่าง</label><input id="down2" maxlength="2" inputmode="numeric" autocomplete="off"></div>
 </div>
 <button class="calc" type="submit">คำนวณ</button>
+  <div class="copy-actions">
+    <button type="button" class="copy" id="copy1" disabled>คัดลอก สูตร 1</button>
+    <button type="button" class="copy" id="copy23" disabled>คัดลอก สูตร 2-3</button>
+  </div>
 <div class="tool-link-grid" aria-label="เปิดหน้าเครื่องมือเพิ่มเติม">
   <a class="reset" href="./hanoi.html" target="_blank" rel="noopener noreferrer">ใบเปิด 3 ฮานอย</a>
   <a class="reset" id="statisticsLink" href="./Statistics.html" target="_blank" rel="noopener noreferrer">สูตรสถิติ</a>
 </div>
 </form>
-  <div class="copy-actions">
-    <button type="button" class="copy" id="copy1" disabled>คัดลอก สูตร 1</button>
-    <button type="button" class="copy" id="copy23" disabled>คัดลอก สูตร 2-3</button>
-  </div>
-<p class="hint" id="hint">กรอกตัวเลขเพื่อเริ่มคำนวณ</p>
 <section class="result" id="result" aria-live="polite">
   <div class="formula-columns">
    <div class="formula-group">
