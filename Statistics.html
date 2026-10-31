@@ -346,9 +346,6 @@ function formatDrawDate(raw){
 function bangkokToday(){
   return new Intl.DateTimeFormat('en-GB', {timeZone:'Asia/Bangkok',day:'2-digit',month:'2-digit',year:'numeric'}).format(new Date());
 }
-// Read dates directly from the selected lottery's fetched result history.
-// The dataset does NOT publish a verified future draw date, so predicted dates
-// MUST be marked as estimates and must never be presented as official schedules.
 const DAY_MS=86400000;
 function drawDateUTC(raw){
   const value=String(raw??'').trim();
@@ -374,7 +371,6 @@ function nextFirstOrSixteenth(time){
   if(day<16)return Date.UTC(year,month,16);
   return Date.UTC(year,month+1,1);
 }
-// Return a predicted ISO date only when enough consistent history exists.
 function predictNextDrawDate(drawHistory, lotteryName){
   const observed=[...new Set((drawHistory||[]).map(x=>drawDateUTC(x.draw_date)).filter(x=>x!==null))]
     .sort((a,b)=>b-a).slice(0,8);
@@ -383,16 +379,12 @@ function predictNextDrawDate(drawHistory, lotteryName){
   const gaps=observed.slice(0,-1).map((time,i)=>Math.round((time-observed[i+1])/DAY_MS));
   const recent=gaps.slice(0,5);
   const kind=thaiKind(lotteryName);
-  // Government lottery normally follows days 1 and 16; exceptional changes can occur.
   if(kind==='government'&&observed.filter(time=>[1,16].includes(new Date(time).getUTCDate())).length>=4)
     return isoUTC(nextFirstOrSixteenth(newest));
-  // Weekly draw on one stable weekday.
   if(recent.length>=3&&recent.slice(0,3).every(n=>n===7))
     return isoUTC(addUtcDays(newest,7));
-  // Stable every-two-weeks rhythm (e.g. a specific fortnightly lottery).
   if(recent.length>=3&&recent.slice(0,3).every(n=>n===14))
     return isoUTC(addUtcDays(newest,14));
-  // Stable twice-a-week rhythm: gaps alternate 3/4 days.
   if(recent.length>=4&&recent.slice(0,4).every(n=>n===3||n===4)){
     const weekdays=[...new Set(observed.slice(0,6).map(t=>new Date(t).getUTCDay()))];
     if(weekdays.length===2){
@@ -401,15 +393,12 @@ function predictNextDrawDate(drawHistory, lotteryName){
         if(weekdays.includes(new Date(candidate).getUTCDay()))return isoUTC(candidate);
     }
   }
-  // Stock markets and indexes trade on weekdays; historical results may omit holidays.
   const isStock=kind==='stocks'||/^(?:หุ้น|ตลาดหุ้น|นิเคอิ|นิคเคอิ|ฮั่งเส็ง|ฮั่งเซ็ง|ดาวโจนส์|จีน|สิงคโปร์|อังกฤษ|อินเดีย|ไต้หวัน|เกาหลี|รัสเซีย|เยอรมัน)/.test(cleanName(lotteryName));
   const allWeekdays=observed.every(t=>!isWeekend(t));
   if(isStock && allWeekdays && recent.length>=3 && recent.slice(0,4).filter(n=>n===1||n===2||n===3||n===4).length>=3)
     return isoUTC(nextBusinessDay(newest));
-  // A consistently daily lottery, including markets that also draw on weekends.
   if(recent.length>=3&&recent.slice(0,3).every(n=>n===1))
     return isoUTC(addUtcDays(newest,1));
-  // Unknown / irregular cycle: do not invent a date.
   return null;
 }
 function copyLotteryName(){
@@ -478,9 +467,10 @@ async function searchLottery(raw,token,revision){
     if(token!==activeLookup)return;
     const valid=rows.filter(r=>/^\d{3}$/.test(String(r.top3??''))&&/^\d{2}$/.test(String(r.bottom2??'')))
       .slice(0,6).map(r=>({draw_date:r.draw_date,top:String(r.top3),bottom:String(r.bottom2)}));
-    // ตรวจเลข 3 ตัวบนเฉพาะงวดที่ 4–6 (นับจากงวดล่าสุด) หากมีเลขซ้ำอย่างน้อย 2 งวดขึ้นไปให้เติม บห. ท้ายวิน
+    
+    // ตรวจสอบเลข 3 ตัวบนในงวดที่ 4–6 (ดัชนี 3, 4, 5) ว่ามีเลขเบิ้ล (เลขซ้ำ) ตั้งแต่ 2 งวดขึ้นไปหรือไม่
     hasDoubleInDraws4to6=valid.slice(3,6).filter(draw=>new Set(draw.top).size<3).length>=2;
-    // Display six historical draws, while only draws #4–#6 feed the number input.
+
     matchedHistoryBody.replaceChildren();
     valid.forEach((draw,i)=>{
       const row=document.createElement('tr');
@@ -489,7 +479,6 @@ async function searchLottery(raw,token,revision){
       matchedHistoryBody.append(row);
     });
     matchedHistory.hidden=matchedHistoryBody.children.length===0;
-    // Always refresh date metadata from this exact lottery's newest valid draw.
     latestDrawDate=valid.length?valid[0].draw_date:null;
     nextDrawDate=valid.length?predictNextDrawDate(valid,name):null;
     if(valid.length===6){
@@ -545,7 +534,6 @@ async function copyWin(){
 }
 copyButton.addEventListener('click',copyWin);
 $('selectCopyText').addEventListener('click',()=>{$('copyFallbackText').focus();$('copyFallbackText').select();});
-// Receive the selected lottery from index.html and start the usual search automatically.
 const fromIndex=new URLSearchParams(window.location.search).get('lottery');
 if(fromIndex&&fromIndex.trim().length>=2){
   lotteryInput.value=fromIndex.trim().slice(0,120);
