@@ -85,17 +85,17 @@ input:focus{border-color:#4755AC;box-shadow:0 0 0 3px #4755AC20}
 .formula-columns>.formula-group>.method-box{width:100%;min-width:0;box-sizing:border-box}
 @media(max-width:430px){.formula-columns{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}}
 
-/* สีประจำสูตรคงเดิม โดยวางสูตร 4 ไว้แถวล่างสุด */
-.formula-columns>.formula-f1{background:#F3E8FF;border-color:#E2CCFC}
-.formula-columns>.formula-f1 .group-title{color:#7E22CE}
-.formula-columns>.formula-f2{background:#FFF1E6;border-color:#F5D6B7}
-.formula-columns>.formula-f2 .group-title{color:#C45A13}
+/* สีประจำสูตร: สูตร 1 ชมพู, สูตร 2 ม่วง, สูตร 3 ฟ้า, สูตร 4 ส้ม */
+.formula-columns>.formula-f1{background:#FFF0F6;border-color:#FBCFE8}
+.formula-columns>.formula-f1 .group-title{color:#DB2777}
+.formula-columns>.formula-f2{background:#F3E8FF;border-color:#E2CCFC}
+.formula-columns>.formula-f2 .group-title{color:#7E22CE}
 .formula-columns>.formula-f3{background:#F2F7FF;border-color:#DCEBFF}
 .formula-columns>.formula-f3 .group-title{color:#22549B}
-.formula-columns>.formula-f4{background:#FFF0F6;border-color:#FBCFE8}
-.formula-columns>.formula-f4 .group-title{color:#DB2777}
+.formula-columns>.formula-f4{background:#FFF1E6;border-color:#F5D6B7}
+.formula-columns>.formula-f4 .group-title{color:#C45A13}
 .formula-columns>.formula-f4 .result-box{background:#fff}
-/* สูตรสถิติ: กรอบแยกสีเขียว วางกึ่งกลางใต้สูตร 2 */
+/* สูตรสถิติ: กรอบแยกสีเขียว วางใต้สูตร 2 (สีม่วง) */
 .formula-columns>.formula-stats{grid-column:2;grid-row:2;background:#ECFDF3;border:1px solid #BBF7D0;border-radius:10px;padding:10px 8px}
 .formula-columns>.formula-stats .group-title{color:#15803D}
 .formula-columns>.formula-stats .result-box{background:#fff}
@@ -223,7 +223,7 @@ input:focus{border-color:#4755AC;box-shadow:0 0 0 3px #4755AC20}
 </div>
 <button class="calc" type="submit">คำนวณ</button>
   <div class="copy-actions">
-    <button type="button" class="copy" id="copy1" disabled>คัดลอก สูตร 1</button>
+    <button type="button" class="copy" id="copy1" disabled>คัดลอก สูตร 1-2</button>
     <button type="button" class="copy" id="copy23" disabled>คัดลอก สูตร 2-3</button>
   </div>
 <div class="tool-link-grid" aria-label="เปิดหน้าเครื่องมือเพิ่มเติม">
@@ -235,28 +235,28 @@ input:focus{border-color:#4755AC;box-shadow:0 0 0 3px #4755AC20}
   <div class="formula-columns">
 
    <div class="formula-group formula-f1">
-    <h2 class="group-title">สูตร 1 (ม่วง)</h2>
+    <h2 class="group-title">สูตร 1 (ชมพู)</h2>
     <div class="result-box"><div class="result-title">รูด</div><div class="result-value run-value" id="run"></div></div>
     <div class="result-box"><div class="result-title">วิน</div><div class="result-value" id="win"></div></div>
     <div class="result-box"><div class="result-title">เลข 3 ตัว</div><div class="result-value set-value" id="triple"></div></div>
     <div class="result-box"><div class="result-title">เลข 2 ตัว</div><div class="result-value set-value" id="pair2"></div></div>
    </div>
    <div class="formula-group formula-f2">
-    <h2 class="group-title">สูตร 2 (ส้ม)</h2>
-    <div class="result-box"><div class="result-title">รูด</div><div class="result-value run-value" id="run1"></div></div>
-    <div class="result-box"><div class="result-title">วิน</div><div class="result-value" id="win1"></div></div>
-    <div class="result-box"><div class="result-title">เลข 3 ตัว</div><div class="result-value set-value" id="triple1"></div></div>
-    <div class="result-box"><div class="result-title">เลข 2 ตัว</div><div class="result-value set-value" id="pair1"></div></div>
-   </div>
-   <div class="formula-group formula-f3">
-    <h2 class="group-title">สูตร 3 (ฟ้า)</h2>
+    <h2 class="group-title">สูตร 2 (ม่วง)</h2>
     <div class="method-box"><p class="method-title">ขั้นตอนที่ 1</p><p class="method-expression" id="method1"></p></div>
     <div class="method-box"><p class="method-title">ขั้นตอนที่ 2</p><p class="method-expression" id="method2"></p></div>
     <div class="result-box"><div class="result-title">ผลคำนวณ</div><div class="result-value" id="percentPair"></div></div>
     <div class="result-box"><div class="result-title">วิน</div><div class="result-value" id="uniqueDigits"></div></div>
    </div>
+   <div class="formula-group formula-f3">
+    <h2 class="group-title">สูตร 3 (ฟ้า)</h2>
+    <div class="result-box"><div class="result-title">รูด</div><div class="result-value run-value" id="run1"></div></div>
+    <div class="result-box"><div class="result-title">วิน</div><div class="result-value" id="win1"></div></div>
+    <div class="result-box"><div class="result-title">เลข 3 ตัว</div><div class="result-value set-value" id="triple1"></div></div>
+    <div class="result-box"><div class="result-title">เลข 2 ตัว</div><div class="result-value set-value" id="pair1"></div></div>
+   </div>
    <div class="formula-group formula-f4">
-    <h2 class="group-title">สูตร 4 (ชมพู)</h2>
+    <h2 class="group-title">สูตร 4 (ส้ม)</h2>
     <div class="result-box"><div class="result-title">รูด</div><div class="result-value run-value" id="f4run"></div></div>
     <div class="result-box"><div class="result-title">วิน</div><div class="result-value" id="f4win"></div></div>
     <div class="result-box"><div class="result-title">เลข 3 ตัว</div><div class="result-value set-value" id="f4triple"></div></div>
@@ -861,7 +861,7 @@ function lotteryFlag(name){
 function clearResults() {
   resultIds.forEach(id => document.getElementById(id).textContent = '');
   copyTexts = ['', ''];
-  copyBtns.forEach((btn,i)=>{btn.disabled=true;btn.classList.remove('copied');btn.textContent=i===0?'คัดลอก สูตร 1':'คัดลอก สูตร 2-3';});
+  copyBtns.forEach((btn,i)=>{btn.disabled=true;btn.classList.remove('copied');btn.textContent=i===0?'คัดลอก สูตร 1-2':'คัดลอก สูตร 2-3';});
   document.getElementById('copyFallback').hidden=true;
 }
 document.getElementById('resetBtn').addEventListener('click',() => {
@@ -1087,30 +1087,26 @@ function renderResults() {
   const isLockedLao=/^(?:ลาว|เวียงจันทร์|สามัคคี|lao)/i.test(normalized(cleanLotteryName(raw)));
   const nextDate=copiedNextDrawDate(top,down);
   const dateLine=nextDate?`  วันที่ ${nextDate}`:'  วันที่ —';
-  // ปุ่มคัดลอก สูตร 1 ต้องตรงกับคอลัมน์สีม่วง (Matrix Mirror V3)
-  copyTexts[0]=[
-    heading,
-    dateLine,
-    divider,
-    `🔅 วิน   ${two.win+bhTag}`,
-    `🏃 รูด   ${two.run}`,
-    '',
-    'เลข 3 ตัว',
-    two.triple,
-    'เลข 2 ตัว',
-    two.pair2,
-    divider,
-    'สูตรคำนวณ V.1'
-  ].join('\n');
-  // ปุ่มคัดลอก สูตร 2-3 ต้องรวมคอลัมน์สีส้ม (สูตร 2) และสีฟ้า (สูตร 3)
-  // รักษาชื่อ "หวยรัฐบาลไทย" ตามชื่อหวยที่ผู้ใช้ต้องการในข้อความคัดลอก
+  // กำหนดบรรทัดวันที่ก่อนนำไปใช้ในข้อความคัดลอกทั้งสองปุ่ม
+  const dateLine23=nextDate?`วันที่ ${nextDate}`:'วันที่ —';
+  // ใช้ชื่อหวยมาตรฐานในข้อความคัดลอก
   const name23 = thaiDrawKind(raw)==='government' ? 'หวยรัฐบาลไทย' : (clean||'ไม่ระบุชื่อหวย');
   const heading23 = flag ? `${flag} ${name23} ${flag}` : name23;
-  // ปุ่มคัดลอก 2-3: แสดงเฉพาะรูด/วินจากสูตร 2 (สีส้ม)
-  // และผลตัวเลขจากสูตร 3 (สีฟ้า) โดยใช้ชื่อหวยและวันที่จากข้อมูลจริง
-  const dateLine23=nextDate?`วันที่ ${nextDate}`:'วันที่ —';
-  // รูปแบบปุ่มคัดลอก 2-3 ตามตัวอย่างที่ผู้ใช้ยืนยัน
-  // ใช้รูด/วินจากสูตร 2 และผลเปอร์เซ็นต์พร้อมชุดตัวเลขจากสูตร 3
+  // ปุ่มคัดลอก สูตร 1-2: ใช้รูปแบบสรุปเดียวกับตัวอย่างที่ผู้ใช้ให้มา
+  // แสดงรูด/วินของสูตร 1 และผลสูตรในบรรทัดเดียว
+  copyTexts[0]=[
+    heading23,
+    dateLine23,
+    divider,
+    `🏃 รูด   ${two.run}`,
+    `🔅 วิน   ${two.win+bhTag}`,
+    '',
+    `🏆 สูตร ${two.p1}/${two.p2}`,
+    `            (${two.unique+bhTag})`,
+    divider
+  ].join('\n');
+  // ปุ่มคัดลอก สูตร 2-3: ใช้รูด/วินจากสูตร 3 (สีฟ้า: one)
+  // และผลเปอร์เซ็นต์/ชุดวินจากสูตร 2 (สีม่วง: two) ตามรูปแบบเดียวกับปุ่มแรก
   copyTexts[1]=[
     heading23,
     dateLine23,
@@ -1122,7 +1118,7 @@ function renderResults() {
     `            (${two.unique+bhTag})`,
     divider
   ].join('\n');
-  copyBtns.forEach((btn,i)=>{btn.disabled=false;btn.classList.remove('copied');btn.textContent=i===0?'คัดลอก สูตร 1':'คัดลอก สูตร 2-3';});
+  copyBtns.forEach((btn,i)=>{btn.disabled=false;btn.classList.remove('copied');btn.textContent=i===0?'คัดลอก สูตร 1-2':'คัดลอก สูตร 2-3';});
   // Show that manually-entered results are ready for copying.
   if (!externalMatch) hint.textContent='คำนวณแล้ว — กดคัดลอกผลได้';
 }

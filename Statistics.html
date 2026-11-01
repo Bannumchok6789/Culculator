@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#EDF2FA">
-<title>สูตรสถิติ | นำโชค6789</title>
+<title>สูตรสถิติ | บ้านนำโชค6789</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap');
 * { box-sizing:border-box; }
@@ -55,15 +55,13 @@ h2 { margin:0 0 14px; font-size:20px; text-align:center; color:#172554; }
 .freq-table td:first-child { background:#F7F9FE; font-size:20px; font-weight:300; white-space:nowrap; }
 /* แถวที่ 2: สีแดงเฉพาะเลข 0–9 ไม่เปลี่ยนสีพื้นหลังหรือช่องจำนวน */
 .freq-table tr.featured td:not(:first-child) { color:#DC2626; font-weight:300; }
-/* Unified, compact results panel: WIN / 3-digit / 2-digit in one card */
-.result-panel { max-width:650px; margin:18px auto 0; padding:8px 20px; background:#F7F9FE; border:1px solid #E1E7FC; border-radius:15px; }
-.answer { text-align:center; margin:0; padding:10px 0 13px; }
-.answer-title { font-size:20px; color:#273C55; font-weight:600; margin:0 0 3px; line-height:1.5; }
-.answer-number { color:#DC2626; font-size:20px; line-height:1.55; font-weight:300; min-height:0; letter-spacing:.2px; overflow-wrap:anywhere; font-variant-numeric:tabular-nums; }
-.set-results { display:flex; flex-direction:column; margin:0; }
-.set-row { text-align:center; background:transparent; border:0; border-top:1px solid #E1E7FC; padding:11px 3px 12px; border-radius:0; }
-.set-label { color:#273C55; font-size:20px; font-weight:600; margin:0 0 3px; line-height:1.5; }
-.set-number { color:#172554; font-size:20px; font-weight:300; line-height:1.55; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; word-break:break-word; }
+/* Gray result panel with three matching white rounded result cards. */
+.result-panel { max-width:650px; margin:18px auto 0; padding:10px; background:#D1D5DB; border:1px solid #C5CBD3; border-radius:16px; display:flex; flex-direction:column; gap:8px; }
+.answer,.set-row { width:100%; min-height:88px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; margin:0; padding:9px 12px; background:#FFFFFF; border:1px solid #FFFFFF; border-radius:12px; }
+.answer-title,.set-label { color:#273C55; font-size:18px; font-weight:600; margin:0 0 3px; line-height:1.4; }
+.answer-number { color:#DC2626; font-size:20px; line-height:1.45; font-weight:500; min-height:0; letter-spacing:.2px; overflow-wrap:anywhere; font-variant-numeric:tabular-nums; }
+.set-results { display:flex; flex-direction:column; gap:8px; margin:0; }
+.set-number { color:#172554; font-size:19px; font-weight:400; line-height:1.45; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; word-break:break-word; }
 .copy { display:block; width:100%; max-width:350px; margin:8px auto 0; border:1px solid #000; background:#000; color:#fff; border-radius:11px; padding:12px; font-size:18px; font-weight:600; cursor:pointer; }
 .copy:disabled { color:#718096; background:#CDD5E2; border-color:#CDD5E2; cursor:not-allowed; }
 .copy.copied { color:#fff; background:#3B82F6; border-color:#3B82F6; }
@@ -82,8 +80,10 @@ h2 { margin:0 0 14px; font-size:20px; text-align:center; color:#172554; }
  .freq-table th:first-child { width:76px; font-size:20px; font-weight:300; }
  .freq-table td { font-size:20px; font-weight:300; }
  .freq-table td:first-child { font-size:20px; font-weight:300; }
- .result-panel { padding:7px 12px; }
- .answer-title,.answer-number,.set-label,.set-number { font-size:20px; }
+ .result-panel { padding:9px; gap:7px; }
+ .answer,.set-row { min-height:84px; padding:8px 9px; border-radius:11px; }
+ .answer-title,.set-label { font-size:17px; }
+ .answer-number,.set-number { font-size:18px; }
  #numberInput { font-size:20px; padding:8px 4px; }
 }
 
@@ -148,8 +148,7 @@ const triplesNode=$('triples'),pairsNode=$('pairs');
 const digits='0123456789'.split('');
 let activeLookup=0,searchTimer=null,cachedDirectory=null;
 let latestDrawDate=null,nextDrawDate=null,selectedLotteryName='',manualRevision=0;
-// แสดง บห. เมื่อเลข 3 ตัวบนในงวดที่ 4–6 มีเลขซ้ำอย่างน้อย 2 งวดขึ้นไป
-let hasDoubleInDraws4to6=false;
+let doubleHamDetected=false;
 
 // รายชื่อและชื่อย่อจากหน้าเว็บต้นฉบับ เพื่อให้การค้นหายังคงคุ้นเคย
 const lotteryNames = [
@@ -322,9 +321,9 @@ function renderFrequency(){
   }
   const triples=result.base.length>=3?digitSets(result.base,3):[];
   const pairs=result.base.length>=2?digitSets(result.base,2):[];
-  winnerNode.textContent=result.display ? result.display+(hasDoubleInDraws4to6?' บห.':'') : '—';
-  triplesNode.textContent=triples.join('-')||'—';
-  pairsNode.textContent=pairs.join('-')||'—';
+  winnerNode.textContent=result.display ? result.display+(doubleHamDetected?' บห.':'') : '';
+  triplesNode.textContent=triples.join('-')||'';
+  pairsNode.textContent=pairs.join('-')||'';
   copyButton.disabled=!result.display;
   copyButton.textContent='คัดลอก';copyButton.classList.remove('copied');
   $('copyFallback').hidden=true;
@@ -346,6 +345,9 @@ function formatDrawDate(raw){
 function bangkokToday(){
   return new Intl.DateTimeFormat('en-GB', {timeZone:'Asia/Bangkok',day:'2-digit',month:'2-digit',year:'numeric'}).format(new Date());
 }
+// Read dates directly from the selected lottery's fetched result history.
+// The dataset does NOT publish a verified future draw date, so predicted dates
+// MUST be marked as estimates and must never be presented as official schedules.
 const DAY_MS=86400000;
 function drawDateUTC(raw){
   const value=String(raw??'').trim();
@@ -371,6 +373,7 @@ function nextFirstOrSixteenth(time){
   if(day<16)return Date.UTC(year,month,16);
   return Date.UTC(year,month+1,1);
 }
+// Return a predicted ISO date only when enough consistent history exists.
 function predictNextDrawDate(drawHistory, lotteryName){
   const observed=[...new Set((drawHistory||[]).map(x=>drawDateUTC(x.draw_date)).filter(x=>x!==null))]
     .sort((a,b)=>b-a).slice(0,8);
@@ -379,12 +382,16 @@ function predictNextDrawDate(drawHistory, lotteryName){
   const gaps=observed.slice(0,-1).map((time,i)=>Math.round((time-observed[i+1])/DAY_MS));
   const recent=gaps.slice(0,5);
   const kind=thaiKind(lotteryName);
+  // Government lottery normally follows days 1 and 16; exceptional changes can occur.
   if(kind==='government'&&observed.filter(time=>[1,16].includes(new Date(time).getUTCDate())).length>=4)
     return isoUTC(nextFirstOrSixteenth(newest));
+  // Weekly draw on one stable weekday.
   if(recent.length>=3&&recent.slice(0,3).every(n=>n===7))
     return isoUTC(addUtcDays(newest,7));
+  // Stable every-two-weeks rhythm (e.g. a specific fortnightly lottery).
   if(recent.length>=3&&recent.slice(0,3).every(n=>n===14))
     return isoUTC(addUtcDays(newest,14));
+  // Stable twice-a-week rhythm: gaps alternate 3/4 days.
   if(recent.length>=4&&recent.slice(0,4).every(n=>n===3||n===4)){
     const weekdays=[...new Set(observed.slice(0,6).map(t=>new Date(t).getUTCDay()))];
     if(weekdays.length===2){
@@ -393,12 +400,15 @@ function predictNextDrawDate(drawHistory, lotteryName){
         if(weekdays.includes(new Date(candidate).getUTCDay()))return isoUTC(candidate);
     }
   }
+  // Stock markets and indexes trade on weekdays; historical results may omit holidays.
   const isStock=kind==='stocks'||/^(?:หุ้น|ตลาดหุ้น|นิเคอิ|นิคเคอิ|ฮั่งเส็ง|ฮั่งเซ็ง|ดาวโจนส์|จีน|สิงคโปร์|อังกฤษ|อินเดีย|ไต้หวัน|เกาหลี|รัสเซีย|เยอรมัน)/.test(cleanName(lotteryName));
   const allWeekdays=observed.every(t=>!isWeekend(t));
   if(isStock && allWeekdays && recent.length>=3 && recent.slice(0,4).filter(n=>n===1||n===2||n===3||n===4).length>=3)
     return isoUTC(nextBusinessDay(newest));
+  // A consistently daily lottery, including markets that also draw on weekends.
   if(recent.length>=3&&recent.slice(0,3).every(n=>n===1))
     return isoUTC(addUtcDays(newest,1));
+  // Unknown / irregular cycle: do not invent a date.
   return null;
 }
 function copyLotteryName(){
@@ -417,9 +427,9 @@ function copyText(){
     'วิน :  '+winnerNode.textContent,
     '',
     '          3 ตัว ',
-    triplesNode.textContent==='—'?'':triplesNode.textContent,
+    triplesNode.textContent,
     '          2 ตัว ',
-    pairsNode.textContent==='—'?'':pairsNode.textContent,
+    pairsNode.textContent,
     '➖➖➖➖➖➖➖',
     '     - สูตรสถิติ -'
   ];
@@ -447,7 +457,7 @@ function setStatus(text='',error=false){statusNode.textContent=text;statusNode.c
 function clearSearchResults(){
   matchedName.textContent='—';
   matchedHistory.hidden=true;matchedHistoryBody.replaceChildren();
-  selectedLotteryName='';latestDrawDate=null;nextDrawDate=null;hasDoubleInDraws4to6=false;
+  selectedLotteryName='';latestDrawDate=null;nextDrawDate=null;doubleHamDetected=false;
   numberInput.value='';renderFrequency();
 }
 async function searchLottery(raw,token,revision){
@@ -467,10 +477,7 @@ async function searchLottery(raw,token,revision){
     if(token!==activeLookup)return;
     const valid=rows.filter(r=>/^\d{3}$/.test(String(r.top3??''))&&/^\d{2}$/.test(String(r.bottom2??'')))
       .slice(0,6).map(r=>({draw_date:r.draw_date,top:String(r.top3),bottom:String(r.bottom2)}));
-    
-    // ตรวจสอบเลข 3 ตัวบนในงวดที่ 4–6 (ดัชนี 3, 4, 5) ว่ามีเลขเบิ้ล (เลขซ้ำ) ตั้งแต่ 2 งวดขึ้นไปหรือไม่
-    hasDoubleInDraws4to6=valid.slice(3,6).filter(draw=>new Set(draw.top).size<3).length>=2;
-
+    // Display six historical draws, while only draws #4–#6 feed the number input.
     matchedHistoryBody.replaceChildren();
     valid.forEach((draw,i)=>{
       const row=document.createElement('tr');
@@ -479,14 +486,20 @@ async function searchLottery(raw,token,revision){
       matchedHistoryBody.append(row);
     });
     matchedHistory.hidden=matchedHistoryBody.children.length===0;
+    // Always refresh date metadata from this exact lottery's newest valid draw.
     latestDrawDate=valid.length?valid[0].draw_date:null;
     nextDrawDate=valid.length?predictNextDrawDate(valid,name):null;
+    const checkedDraws=valid.slice(3,6);
+    const doubleHamRows=checkedDraws.filter(draw=>draw.top[0]===draw.top[2]).length;
+    doubleHamDetected=checkedDraws.length===3 && doubleHamRows>=2;
     if(valid.length===6){
-      if(manualRevision!==revision){setStatus('ข้อมูลย้อนหลังพร้อมใช้งาน แต่คงตัวเลขที่แก้ไขไว้');return;}
+      if(manualRevision!==revision){renderFrequency();setStatus('ข้อมูลย้อนหลังพร้อมใช้งาน แต่คงตัวเลขที่แก้ไขไว้');return;}
       numberInput.value=valid.slice(3,6).map(d=>d.top+d.bottom).join('');
       renderFrequency();
       setStatus();
     }else{
+      doubleHamDetected=false;
+      renderFrequency();
       setStatus(`พบผลที่มีเลขครบ ${valid.length} งวด (ต้องมีครบ 6 งวดจึงจะเติมอัตโนมัติ)`,true);
     }
   }catch(err){
@@ -513,7 +526,7 @@ lotteryInput.addEventListener('keydown',event=>{
   }
 });
 async function copyWin(){
-  if(!winnerNode.textContent||winnerNode.textContent==='—')return;
+  if(!winnerNode.textContent)return;
   const value=copyText();
   let done=false;
   if(navigator.clipboard&&window.isSecureContext){
@@ -534,6 +547,7 @@ async function copyWin(){
 }
 copyButton.addEventListener('click',copyWin);
 $('selectCopyText').addEventListener('click',()=>{$('copyFallbackText').focus();$('copyFallbackText').select();});
+// Receive the selected lottery from index.html and start the usual search automatically.
 const fromIndex=new URLSearchParams(window.location.search).get('lottery');
 if(fromIndex&&fromIndex.trim().length>=2){
   lotteryInput.value=fromIndex.trim().slice(0,120);
