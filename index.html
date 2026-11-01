@@ -995,16 +995,21 @@ function copiedNextDrawDate(top,down){
   if(sourceDate===null||!sourcedHistory.some(row=>parseDrawDateUTC(row.draw_date)===sourceDate&&String(row.top3)===top&&String(row.bottom2)===down))return '';
   return nextScheduledDrawDate(sourcedHistory,chosenName());
 }
-// สูตรสถิติ: ตรวจเฉพาะงวดที่ 4–6 เมื่อนับย้อนหลังจากงวดล่าสุด
-// ต้องพบเลขเบิ้ลอย่างน้อย 2 งวดจาก 3 งวดนี้ จึงเติม บห.
-function hasDoubleOnAtLeastTwoOfDraws4to6(history){
+// กติกา บห.: ตรวจงวดที่ 4–6 ย้อนจากงวดล่าสุด
+// เบิ้ล = เลขหลักติดกันซ้ำ (เช่น 799, 566, 122)
+// หาม = หลักร้อยและหลักหน่วยซ้ำ (เช่น 626, 121, 909)
+// แต่ละงวดนับได้สูงสุด 1 ครั้ง และต้องเข้าอย่างน้อย 2 ใน 3 งวด
+function hasDoubleOrHamOnAtLeastTwoOfDraws4to6(history){
   const lastSixDraws=(history||[]).slice(0,6);
   const drawsToCheck=lastSixDraws.slice(3,6);
-  const doubleDays=drawsToCheck.filter(row=>{
+  const qualifyingDraws=drawsToCheck.filter(row=>{
     const digits=String(row.top3||'');
-    return /^\d{3}$/.test(digits) && new Set(digits).size<3;
+    if(!/^\d{3}$/.test(digits))return false;
+    const isDouble=digits[0]===digits[1] || digits[1]===digits[2];
+    const isHam=digits[0]===digits[2];
+    return isDouble || isHam;
   }).length;
-  return drawsToCheck.length===3 && doubleDays>=2;
+  return drawsToCheck.length===3 && qualifyingDraws>=2;
 }
 
 // ใช้วิธีเดียวกับหน้า Statistics: นำเลขบน 3 ตัวและล่าง 2 ตัว
@@ -1059,8 +1064,8 @@ function renderResults() {
   const one=computeOriginal(top,down);
   const two=calculate(top,down);
   const four=calculateFormula4(top,down);
-  // ใช้กติกา บห. เดียวกันกับเลขวินของทุกสูตร: งวด 4–6 ต้องเบิ้ลอย่างน้อย 2 งวดจาก 3 งวด
-  const bhTag=hasDoubleOnAtLeastTwoOfDraws4to6(sourcedHistory)?' บห.':'';
+  // ใช้กติกา บห. เดียวกันกับเลขวินของทุกสูตร: งวด 4–6 ต้องเป็นเบิ้ลหรือหามอย่างน้อย 2 งวดจาก 3 งวด
+  const bhTag=hasDoubleOrHamOnAtLeastTwoOfDraws4to6(sourcedHistory)?' บห.':'';
   const statistics=calculateStatisticsResult(sourcedHistory);
   document.getElementById('statisticsRun').textContent=statistics.run;
   document.getElementById('statisticsWin').textContent=statistics.win+bhTag;
