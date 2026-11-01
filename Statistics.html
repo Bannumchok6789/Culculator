@@ -305,6 +305,10 @@ function digitSets(base,size){
   visit(0,[]);
   return combos.slice(0,patterns.length);
 }
+function winnerDisplayText(result){
+  // Keep the on-screen winner and copied winner text identical, including the บห. suffix.
+  return result.display ? result.display+(doubleHamDetected?' บห.':'') : '';
+}
 function renderFrequency(){
   // All calculations read ONLY the current input field, never the hidden draw history.
   const value=numberInput.value.replace(/\D/g,'').slice(0,15);
@@ -321,7 +325,7 @@ function renderFrequency(){
   }
   const triples=result.base.length>=3?digitSets(result.base,3):[];
   const pairs=result.base.length>=2?digitSets(result.base,2):[];
-  winnerNode.textContent=result.display ? result.display+(doubleHamDetected?' บห.':'') : '';
+  winnerNode.textContent=winnerDisplayText(result);
   triplesNode.textContent=triples.join('-')||'';
   pairsNode.textContent=pairs.join('-')||'';
   copyButton.disabled=!result.display;
@@ -424,7 +428,7 @@ function copyText(){
     title,
     '  วันที่'+(next||'รอยืนยัน'),
     '➖➖➖➖➖➖➖',
-    'วิน :  '+winnerNode.textContent,
+    'วิน :  '+winnerDisplayText(assembleWin(numberInput.value.replace(/\D/g,'').slice(0,15))),
     '',
     '          3 ตัว ',
     triplesNode.textContent,
@@ -490,8 +494,15 @@ async function searchLottery(raw,token,revision){
     latestDrawDate=valid.length?valid[0].draw_date:null;
     nextDrawDate=valid.length?predictNextDrawDate(valid,name):null;
     const checkedDraws=valid.slice(3,6);
-    const doubleHamRows=checkedDraws.filter(draw=>draw.top[0]===draw.top[2]).length;
-    doubleHamDetected=checkedDraws.length===3 && doubleHamRows>=2;
+    // Count a draw when it has an adjacent double (AAB/ABB) OR a ham (ABA).
+    // Examples: 799 is a double; 626 is a ham.
+    const doubleOrHamRows=checkedDraws.filter(draw=>{
+      const top=draw.top;
+      const hasDouble=top[0]===top[1] || top[1]===top[2];
+      const hasHam=top[0]===top[2];
+      return hasDouble || hasHam;
+    }).length;
+    doubleHamDetected=checkedDraws.length===3 && doubleOrHamRows>=2;
     if(valid.length===6){
       if(manualRevision!==revision){renderFrequency();setStatus('ข้อมูลย้อนหลังพร้อมใช้งาน แต่คงตัวเลขที่แก้ไขไว้');return;}
       numberInput.value=valid.slice(3,6).map(d=>d.top+d.bottom).join('');
