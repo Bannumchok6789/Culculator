@@ -57,9 +57,12 @@ h2 { margin:0 0 14px; font-size:20px; text-align:center; color:#172554; }
 .freq-table tr.featured td:not(:first-child) { color:#DC2626; font-weight:300; }
 /* Gray result panel with three matching white rounded result cards. */
 .result-panel { max-width:650px; margin:18px auto 0; padding:10px; background:#D1D5DB; border:1px solid #C5CBD3; border-radius:16px; display:flex; flex-direction:column; gap:8px; }
-.answer,.set-row { width:100%; min-height:88px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; margin:0; padding:9px 12px; background:#FFFFFF; border:1px solid #FFFFFF; border-radius:12px; }
+.answer,.set-row,.run-row { width:100%; min-height:88px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; margin:0; padding:9px 12px; background:#FFFFFF; border:1px solid #FFFFFF; border-radius:12px; }
 .answer-title,.set-label { color:#273C55; font-size:18px; font-weight:600; margin:0 0 3px; line-height:1.4; }
+.win-lottery-name { color:#273C55; font-size:22px; font-weight:700; margin:0 0 2px; line-height:1.35; }
 .answer-number { color:#DC2626; font-size:20px; line-height:1.45; font-weight:500; min-height:0; letter-spacing:.2px; overflow-wrap:anywhere; font-variant-numeric:tabular-nums; }
+.run-row { border-color:#DCE4F2; }
+.run-number { color:#DC2626; font-size:21px; font-weight:600; line-height:1.45; font-variant-numeric:tabular-nums; }
 .set-results { display:flex; flex-direction:column; gap:8px; margin:0; }
 .set-number { color:#172554; font-size:19px; font-weight:400; line-height:1.45; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; word-break:break-word; }
 .copy { display:block; width:100%; max-width:350px; margin:8px auto 0; border:1px solid #000; background:#000; color:#fff; border-radius:11px; padding:12px; font-size:18px; font-weight:600; cursor:pointer; }
@@ -81,8 +84,9 @@ h2 { margin:0 0 14px; font-size:20px; text-align:center; color:#172554; }
  .freq-table td { font-size:20px; font-weight:300; }
  .freq-table td:first-child { font-size:20px; font-weight:300; }
  .result-panel { padding:9px; gap:7px; }
- .answer,.set-row { min-height:84px; padding:8px 9px; border-radius:11px; }
+ .answer,.set-row,.run-row { min-height:84px; padding:8px 9px; border-radius:11px; }
  .answer-title,.set-label { font-size:17px; }
+ .win-lottery-name { font-size:19px; }
  .answer-number,.set-number { font-size:18px; }
  #numberInput { font-size:20px; padding:8px 4px; }
 }
@@ -127,7 +131,8 @@ h2 { margin:0 0 14px; font-size:20px; text-align:center; color:#172554; }
 </table>
 </div>
 <div class="result-panel" aria-label="ผลวินและชุดเลขในกรอบเดียว">
-  <div class="answer"><p class="answer-title">วิน</p><div class="answer-number" id="featuredDigits" aria-live="polite">—</div></div>
+  <div class="answer"><p class="win-lottery-name" id="winLotteryName"></p><p class="answer-title" id="winTitle">วิน</p><div class="answer-number" id="featuredDigits" aria-live="polite">—</div></div>
+  <div class="set-row run-row" aria-label="เลขรูดจากสองตัวหน้าเลขวิน"><p class="set-label">รูด</p><div class="run-number" id="rollingDigits" aria-live="polite">—</div></div>
   <div class="set-results" aria-label="ชุดเลขจากวิน">
     <div class="set-row"><p class="set-label">3 ตัว</p><div class="set-number" id="triples" aria-live="polite">—</div></div>
     <div class="set-row"><p class="set-label">2 ตัว</p><div class="set-number" id="pairs" aria-live="polite">—</div></div>
@@ -143,8 +148,8 @@ const $ = id => document.getElementById(id);
 const lotteryInput=$('lotteryName'),numberInput=$('numberInput'),statusNode=$('searchStatus');
 const freqBody=$('frequencyBody'),matchedName=$('matchedName');
 const matchedHistory=$('matchedHistory'),matchedHistoryBody=$('matchedHistoryBody');
-const copyButton=$('copyButton'),winnerNode=$('featuredDigits');
-const triplesNode=$('triples'),pairsNode=$('pairs');
+const copyButton=$('copyButton'),winnerNode=$('featuredDigits'),winTitle=$('winTitle'),winLotteryName=$('winLotteryName');
+const triplesNode=$('triples'),pairsNode=$('pairs'),rollingNode=$('rollingDigits');
 const digits='0123456789'.split('');
 let activeLookup=0,searchTimer=null,cachedDirectory=null;
 let latestDrawDate=null,nextDrawDate=null,selectedLotteryName='',manualRevision=0;
@@ -255,7 +260,7 @@ function bestMatch(raw,items){
 function lotteryFlag(name){
   const x=normalize(name);
   if(/^(?:ลาว|เวียงจันทร์|สามัคคี|lao)/.test(x))return '🇱🇦';
-  if(/^(?:นอย|เวียดนาม|hanoi)/.test(x))return '🇻🇳';
+  if(/^(?:ฮานอย|นอย|เวียดนาม|hanoi)/.test(x))return '🇻🇳';
   if(/^(?:นิเคอิ|nikkei)/.test(x))return '🇯🇵';
   if(/^(?:หุ้นจีน|จีน|เซี่ยงไฮ้)/.test(x))return '🇨🇳';
   if(/^(?:ฮั่งเส็ง|ฮั่งเซ็ง)/.test(x))return '🇭🇰';
@@ -326,6 +331,7 @@ function renderFrequency(){
   const triples=result.base.length>=3?digitSets(result.base,3):[];
   const pairs=result.base.length>=2?digitSets(result.base,2):[];
   winnerNode.textContent=winnerDisplayText(result);
+  rollingNode.textContent=result.base.length>=2?result.base.slice(0,2).join('-'):'';
   triplesNode.textContent=triples.join('-')||'';
   pairsNode.textContent=pairs.join('-')||'';
   copyButton.disabled=!result.display;
@@ -426,13 +432,14 @@ function copyText(){
   const next=formatDrawDate(nextDrawDate);
   const lines=[
     title,
-    '  วันที่'+(next||'รอยืนยัน'),
+    '  วันที่ '+(next||'รอยืนยัน'),
     '➖➖➖➖➖➖➖',
-    'วิน :  '+winnerDisplayText(assembleWin(numberInput.value.replace(/\D/g,'').slice(0,15))),
+    'วิน   '+winnerDisplayText(assembleWin(numberInput.value.replace(/\D/g,'').slice(0,15))),
+    'รูด   '+(assembleWin(numberInput.value.replace(/\D/g,'').slice(0,15)).base.slice(0,2).join('-')||''),
     '',
-    '          3 ตัว ',
+    'เลข 3 ตัว',
     triplesNode.textContent,
-    '          2 ตัว ',
+    'เลข 2 ตัว',
     pairsNode.textContent,
     '➖➖➖➖➖➖➖',
     '     - สูตรสถิติ -'
@@ -458,10 +465,16 @@ function getDirectory(){
   return cachedDirectory;
 }
 function setStatus(text='',error=false){statusNode.textContent=text;statusNode.classList.toggle('error',error);}
+function updateWinTitle(){
+  const name=copyLotteryName();
+  winTitle.textContent='วิน';
+  winLotteryName.textContent=name?displayName(name):'';
+}
 function clearSearchResults(){
   matchedName.textContent='—';
   matchedHistory.hidden=true;matchedHistoryBody.replaceChildren();
   selectedLotteryName='';latestDrawDate=null;nextDrawDate=null;doubleHamDetected=false;
+  updateWinTitle();
   numberInput.value='';renderFrequency();
 }
 async function searchLottery(raw,token,revision){
@@ -475,6 +488,7 @@ async function searchLottery(raw,token,revision){
     const name=cleanName(match.lottery_name);
     selectedLotteryName=name;
     matchedName.textContent=displayName(name);
+    updateWinTitle();
     const key=String(match.lottery_key||'');
     if(!key){setStatus('ไม่พบรหัสข้อมูลหวย',true);return;}
     const rows=await apiRows('lottery_results?select=draw_date,top3,bottom2&lottery_key=eq.'+encodeURIComponent(key)+'&order=draw_date.desc&limit=30');
