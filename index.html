@@ -245,7 +245,7 @@ input:focus{border-color:#4755AC;box-shadow:0 0 0 3px #4755AC20}
 </div>
 <button class="calc" type="submit">คำนวณ</button>
   <div class="copy-actions">
-    <button type="button" class="copy" id="copy1" disabled>คัดลอกสูตร 1-2</button>
+    <button type="button" class="copy" id="copy1" disabled>คัดลอกสูตร 1</button>
     <button type="button" class="copy" id="copy23" disabled>คัดลอกสูตร 2-3</button>
     <button type="button" class="copy" id="copy13" disabled>คัดลอกสูตร 1-3</button>
     <button type="button" class="copy" id="copy4" disabled>คัดลอกสูตร 4</button>
@@ -893,7 +893,7 @@ function lotteryFlag(name){
 function clearResults() {
   resultIds.forEach(id => document.getElementById(id).textContent = '');
   copyTexts = ['', '', '', ''];
-  const labels=['คัดลอก สูตร 2-3','คัดลอก สูตร 2-4','คัดลอก สูตร 3-4','คัดลอก สูตร 1'];
+  const labels=['คัดลอกสูตร 1','คัดลอกสูตร 2-3','คัดลอกสูตร 1-3','คัดลอกสูตร 4'];
   copyBtns.forEach((btn,i)=>{btn.disabled=true;btn.classList.remove('copied');btn.textContent=labels[i];});
   document.getElementById('copyFallback').hidden=true;
 }
@@ -1134,19 +1134,20 @@ function renderResults() {
   const heading23 = flag ? `${flag} ${name23} ${flag}` : name23;
   // ทุกปุ่มคัดลอกระบุชื่อสูตรและสีให้ตรงกับสูตรที่แสดงบนหน้าจอ
   // สูตร 1 = ชมพู (four), สูตร 2 = ฟ้า (two.p1/p2), สูตร 3 = ม่วง (two.run/win), สูตร 4 = ส้ม (one)
+  // ปุ่มคัดลอกสูตร 1: ใช้รูปแบบมาตรฐานเดียวกันกับหวยทุกประเภท
   copyTexts[0]=[
     heading23,
     dateLine23,
     divider,
-    'สูตร V.1 (ชมพู)',
-    `🏃 รูด   ${four.run}`,
-    `🔅 วิน   ${four.win+bhTag}`,
+    `🏃🏻‍♂️รูด   ${four.run}`,
+    `🔅วิน   ${four.win+bhTag}`,
     '',
-    'สูตร V.2 (ฟ้า)',
-    `🏆 สูตร ${two.p1}/${two.p2}`,
-    `🔅 วิน   (${two.unique+bhTag})`,
-    '',
-    divider
+    '🥇เลข 3 ตัว',
+    four.triple,
+    '🥇เลข 2 ตัว',
+    four.pair,
+    divider,
+    'สูตร v.1 (ใบชมพู)'
   ].join('\n');
   copyTexts[1]=[
     heading23,
@@ -1186,7 +1187,7 @@ function renderResults() {
     '',
     divider
   ].join('\n');
-  const labels=['คัดลอกสูตร 1-2','คัดลอกสูตร 2-3','คัดลอกสูตร 1-3','คัดลอกสูตร 4'];
+  const labels=['คัดลอกสูตร 1','คัดลอกสูตร 2-3','คัดลอกสูตร 1-3','คัดลอกสูตร 4'];
   copyBtns.forEach((btn,i)=>{btn.disabled=false;btn.classList.remove('copied');btn.textContent=labels[i];});
   // Show that manually-entered results are ready for copying.
   if (!externalMatch) hint.textContent='คำนวณแล้ว — กดคัดลอกผลได้';
