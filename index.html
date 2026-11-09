@@ -159,10 +159,10 @@ input:focus{border-color:#4755AC;box-shadow:0 0 0 3px #4755AC20}
 .matched-lottery .history-table tbody td:nth-child(2),
 .matched-lottery .history-table tbody td:nth-child(3){color:#DC2626!important}
 
-/* Two companion tool links below Reset; equal widths on desktop and mobile */
-.tool-link-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:9px}
+/* Three companion tool links in one row on desktop and mobile */
+.tool-link-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:9px}
 .tool-link-grid .reset{display:flex;align-items:center;justify-content:center;min-width:0;min-height:48px;margin-top:0;padding:9px 6px;text-align:center;text-decoration:none;line-height:1.35}
-@media(max-width:380px){.tool-link-grid{gap:7px}.tool-link-grid .reset{font-size:15px;padding:9px 4px}}
+@media(max-width:380px){.tool-link-grid{gap:5px}.tool-link-grid .reset{font-size:clamp(11px,3.4vw,14px);padding:9px 2px}}
 
 /* Navigation: both companion links use matching accessible green styling. */
 .tool-link-grid .reset,
@@ -253,6 +253,7 @@ input:focus{border-color:#4755AC;box-shadow:0 0 0 3px #4755AC20}
 <div class="tool-link-grid" aria-label="เปิดหน้าเครื่องมือเพิ่มเติม">
   <a class="reset" href="./hanoi.html" target="_blank" rel="noopener noreferrer">ใบเปิด 3 ฮานอย</a>
   <a class="reset" id="statisticsLink" href="./Statistics.html" target="_blank" rel="noopener noreferrer">สูตรสถิติ</a>
+  <a class="reset" href="./laopatthana.html" target="_blank" rel="noopener noreferrer">สูตรลาวพัฒนา</a>
 </div>
 </form>
 <section class="result" id="result" aria-live="polite">

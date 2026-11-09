@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🇱🇦 ลาวพัฒนา | บ้านนำโชค6789 🇱🇦</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Kanit:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { background: radial-gradient(circle at top left, #1e1b4b, #0f172a, #090d16); min-height: 100vh; color: #f8fafc; font-family: 'Prompt', sans-serif; }
+        .glass-card { background: rgba(30, 41, 59, 0.65); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); }
+        .glass-input { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.12); color: #ffffff; }
+        .glass-input:focus { border-color: #fbbf24; outline: none; }
+        
+        /* One typography definition for every calculation line. */
+        .step-label { display:block; color:#cbd5e1; font-size:20px; font-weight:300; text-align:center; }
+        .step-result-row {
+            display:flex; justify-content:center; align-items:baseline;
+            flex-wrap:nowrap; gap:0.35em; width:100%; min-width:0;
+            overflow-x:auto; overflow-y:hidden;
+            font-family:'Kanit',sans-serif; font-size:22px;
+            font-weight:300; font-style:normal; line-height:1.4; letter-spacing:0;
+        }
+        .step-result-row > .calc-method,
+        .step-result-row > .calc-result {
+            font:inherit; letter-spacing:inherit; flex:0 0 auto;
+            white-space:nowrap; overflow-wrap:normal;
+        }
+        .calc-method { color:#ffffff; text-align:right; }
+        .calc-result { color:#FFE29A; text-align:left; }
+        .win-pair { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+        .win-box { text-align:center; padding:16px 10px; min-width:0; }
+        .win-title { font-family:'Kanit',sans-serif; font-size:20px; font-weight:400; color:#cbd5e1; }
+        .win-digits { font-family:'Kanit',sans-serif; font-size:22px; font-weight:600; color:#FFE29A; overflow-wrap:anywhere; min-height:31px; }
+        @media(max-width:390px){ .win-pair { grid-template-columns:1fr; } }
+        [id$="Alt"]:empty { display:none; }
+
+        .btn-gold { background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%); color: #0f172a; font-weight: 700; transition: all 0.3s ease; }
+        .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5); }
+        
+        .btn-reset { background: rgba(51, 65, 85, 0.6); border: 1px solid rgba(148, 163, 184, 0.2); color: #cbd5e1; font-weight: 600; transition: all 0.3s ease; }
+        .btn-reset:hover { background: rgba(71, 85, 105, 0.8); color: #ffffff; transform: translateY(-1px); }
+
+        #toast { visibility: hidden; min-width: 250px; background-color: #397FA8; color: #fff; text-align: center; border-radius: 12px; padding: 12px 24px; position: fixed; z-index: 50; left: 50%; bottom: 30px; transform: translateX(-50%); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
+        #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
+        .external-credit { text-align: center; font-size: 12px; color: #94a3b8; margin: 8px 0; }
+        .external-credit a { color: #fbbf24; text-decoration: underline; }
+        .external-credit[hidden] { display: none; }
+        .matched-lottery { margin: 10px 0; padding: 10px; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; background: rgba(15, 23, 42, 0.5); text-align: center; }
+        .matched-label { font-size: 12px; color: #94a3b8; }
+        .matched-name { font-size: 20px; font-weight: 700; color: #fbbf24; min-height: 27px; }
+        .matched-note { font-size: 11px; color: #cbd5e1; margin-top: 2px; }
+        .matched-note[hidden] { display: none; }
+        .name-feedback { text-align: center; font-size: 12px; color: #6BA6C5; margin-top: 4px; }
+        .name-feedback[hidden] { display: none; }
+        .copy-btn { background: #334155; border: 1px solid #475569; color: #fff; transition: all 0.2s; }
+        .copy-btn:hover { background: #475569; }
+        .copy-btn.copied { background: #0ea5e9; border-color: #0ea5e9; }
+
+        /* General text: 18px. Headings retain their existing Tailwind sizes. */
+        body :is(p, label, input, button, .name-feedback, #toast-message) { font-size:18px; }
+        /* Preserve small metadata labels. */
+        .external-credit, .external-credit a, .matched-label { font-size:12px; }
+        .matched-note { font-size:11px; }
+        .matched-name { font-size:20px; }
+
+        /* High-contrast, soft champagne-gold results on dark inner cards. */
+        .step-result-row > .calc-result { font-weight:600; color:#FFE29A; }
+        .win-digits { font-weight:600; color:#FFE29A; }
+
+        /* Ice-blue glass outer frame; preserve all existing inner cards and logic. */
+        body {
+            background: radial-gradient(circle at 12% 8%, #ffffff 0%, transparent 37%),
+                        radial-gradient(circle at 92% 65%, #c8eaff 0%, transparent 43%),
+                        linear-gradient(145deg, #f6fcff 0%, #e5f4ff 52%, #dcefff 100%);
+            color: #173b58;
+        }
+        .site-glass-frame {
+            background: rgba(224, 247, 255, 0.42);
+            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(16px);
+            border: 2px solid rgba(164, 221, 250, 0.85);
+            border-radius: 20px;
+            padding: clamp(14px, 3.5vw, 25px);
+            box-shadow: 0 0 26px rgba(113, 197, 243, 0.35),
+                        0 15px 38px rgba(57, 124, 170, 0.12),
+                        inset 0 1px 0 rgba(255,255,255,0.88);
+        }
+        /* Strong, clean contrast for the two header titles on pale ice-blue glass. */
+        .site-glass-frame > header h1 > span.bg-gradient-to-r {
+            background-image: none;
+            color: #063A78;
+            -webkit-text-fill-color: #063A78;
+            text-shadow: 0 1px 0 rgba(255,255,255,.85);
+        }
+        .site-glass-frame > header p {
+            color: #07558D;
+            text-shadow: 0 1px 0 rgba(255,255,255,.85);
+        }
+        @media (max-width: 390px) { .site-glass-frame { padding: 12px; } }
+
+        /* Crisp styling ONLY for calculation steps and the sections below them. */
+        #result .glass-card { background:#FFFFFF; backdrop-filter:none; -webkit-backdrop-filter:none; border:2px solid #9AD5F4; box-shadow:0 4px 12px rgba(32,104,157,.10); }
+        #result .step-label, #result .win-title { color:#173E61; font-weight:600; }
+        #result .calc-method { color:#183F60; font-weight:500; }
+        #result .step-result-row > .calc-result, #result .win-digits { color:#075B99; font-weight:700; }
+        #result .copy-btn { background:#155F99; border:2px solid #0C5085; color:#FFFFFF; }
+        #result .copy-btn:hover { background:#0B4C7C; }
+        #result .copy-btn.copied { background:#147C91; border-color:#147C91; }
+        /* Only the calculation steps through the copy button: deep black text. */
+        #result .step-label, #result .win-title,
+        #result .calc-method, #result .step-result-row > .calc-result,
+        #result .win-digits { color:#101010 !important; }
+        #result .copy-btn { background:#D9F1FF !important; border:2px solid #17212B !important; color:#101010 !important; }
+        #result .copy-btn:hover { background:#BDE7FF !important; }
+        #result .copy-btn.copied { background:#B8E8D5 !important; border-color:#17212B !important; color:#101010 !important; }
+    </style>
+</head>
+<body class="p-4 md:p-8 min-h-screen flex flex-col justify-between">
+    <div id="toast" class="flex items-center gap-2"><i class="fa-solid fa-circle-exclamation text-xl"></i><span id="toast-message">แจ้งเตือน</span></div>
+    
+    <div class="mx-auto w-full max-w-[650px] space-y-6 site-glass-frame">
+        <header class="text-center mb-6">
+            <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight font-kanit"><span class="inline-block" style="color:initial;-webkit-text-fill-color:initial">🇱🇦</span> <span class="bg-clip-text text-transparent bg-gradient-to-r from-amber-200 via-amber-400 to-yellow-500">ลาวพัฒนา</span> <span class="inline-block" style="color:initial;-webkit-text-fill-color:initial">🇱🇦</span></h1>
+            <p class="mt-2 text-xl md:text-2xl font-semibold text-amber-200 font-kanit">🏠 บ้านนำโชค6789</p>
+        </header>
+
+        <!-- โซนบน: ค้นหาชื่อหวย ตามด้วยป้อนข้อมูลตัวเลข -->
+        <div class="grid grid-cols-1 gap-6">
+            <!-- ค้นหาชื่อหวย -->
+            <div class="glass-card rounded-3xl p-6 flex flex-col justify-between space-y-4">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2 border-b border-slate-700/60 pb-3">
+                        <i class="fa-solid fa-magnifying-glass text-amber-400"></i> ค้นหาชื่อหวย
+                    </h2>
+                    <div class="space-y-3">
+                        <div class="lottery-search">
+                            <input id="lotteryName" type="search" autocomplete="off" spellcheck="false" placeholder="พิมพ์ชื่อหวย..." class="w-full py-2.5 px-3 rounded-xl glass-input text-sm">
+                            <p class="name-feedback" id="nameFeedback" aria-live="polite" hidden></p>
+                        </div>
+                        <div class="matched-lottery" aria-live="polite">
+                            <div class="matched-label">ค้นพบ</div>
+                            <div class="matched-name" id="matchedName">—</div>
+                            <div class="matched-note" id="matchedNote" hidden></div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <button type="button" id="resetBtn" class="w-full btn-reset py-2.5 rounded-xl text-sm flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rotate-right"></i> รีเซ็ตข้อมูล
+                    </button>
+                    <div id="externalCredit" class="external-credit" hidden></div>
+                </div>
+            </div>
+
+            <!-- ป้อนข้อมูลตัวเลข -->
+            <div class="glass-card rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2 border-b border-slate-700/60 pb-3">
+                        <i class="fa-solid fa-keyboard text-amber-400"></i> ป้อนข้อมูลตัวเลข
+                    </h2>
+                    <form id="calcForm" class="space-y-3">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-300 mb-1" for="top">เลข 3 ตัวบน *</label>
+                                <input type="text" id="top" maxlength="3" pattern="\d{3}" inputmode="numeric" placeholder="" class="w-full text-center text-2xl tracking-widest font-bold py-3 px-4 rounded-xl glass-input" required autocomplete="off">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-300 mb-1" for="bottom">เลข 2 ตัวล่าง *</label>
+                                <input type="text" id="bottom" maxlength="2" pattern="\d{2}" inputmode="numeric" placeholder="" class="w-full text-center text-2xl tracking-widest font-bold py-3 px-4 rounded-xl glass-input" required autocomplete="off">
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full btn-gold py-3.5 rounded-xl font-bold text-base flex items-center justify-center gap-2 mt-4 shadow-lg">
+                            <i class="fa-solid fa-calculator"></i> คำนวณผลลัพธ์
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- โซนล่าง: ผลลัพธ์การคำนวณ -->
+        <main class="w-full">
+            <div id="result-placeholder" class="hidden glass-card rounded-3xl p-12 text-center flex flex-col items-center justify-center min-h-[250px]">
+                <div class="w-20 h-20 rounded-full bg-slate-800/80 flex items-center justify-center text-slate-600 mb-4"><i class="fa-solid fa-square-poll-vertical text-3xl"></i></div>
+                <h3 class="text-lg font-semibold text-slate-300">พร้อมสำหรับการคำนวณ</h3>
+                <p class="text-sm text-slate-500 mt-1">กรอกชื่อหวยหรือกรอกตัวเลขเพื่อเริ่มต้น</p>
+            </div>
+            
+            <div id="result" class="space-y-6">
+                <!-- ส่วนแสดงขั้นตอนการคำนวณ 4 กรอบ -->
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="glass-card rounded-2xl p-4 border-amber-500/20 text-center flex flex-col justify-center space-y-2">
+                        <span id="formulaLabel1" class="step-label">ขั้นตอนที่ 1</span>
+                        <div class="step-result-row">
+                            <div id="calcMethod1" class="text-size-calc calc-method"></div>
+                            <div id="calcStep1" class="text-size-calc calc-result"></div>
+                        </div>
+                        <div id="calcStep1Alt" class="hidden"></div>
+                    </div>
+                    <div class="glass-card rounded-2xl p-4 border-amber-500/20 text-center flex flex-col justify-center space-y-2">
+                        <span id="formulaLabel2" class="step-label">ขั้นตอนที่ 2</span>
+                        <div class="step-result-row">
+                            <div id="calcMethod2" class="text-size-calc calc-method"></div>
+                            <div id="calcStep2" class="text-size-calc calc-result"></div>
+                        </div>
+                        <div id="calcStep2Alt" class="hidden"></div>
+                    </div>
+                    <div class="glass-card rounded-2xl p-4 border-amber-500/20 text-center flex flex-col justify-center space-y-2">
+                        <span id="formulaLabel3" class="step-label">ขั้นตอนที่ 3</span>
+                        <div class="step-result-row">
+                            <div id="calcMethod3" class="text-size-calc calc-method"></div>
+                            <div id="calcStep3" class="text-size-calc calc-result"></div>
+                        </div>
+                        <div id="calcStep3Alt" class="hidden"></div>
+                    </div>
+                    <div class="glass-card rounded-2xl p-4 border-amber-500/20 text-center flex flex-col justify-center space-y-2">
+                        <span id="formulaLabel4" class="step-label">ขั้นตอนที่ 4</span>
+                        <div class="step-result-row">
+                            <div id="calcMethod4" class="text-size-calc calc-method"></div>
+                            <div id="calcStep4" class="text-size-calc calc-result"></div>
+                        </div>
+                        <div id="calcStep4Alt" class="hidden"></div>
+                    </div>
+                </div>
+
+                <!-- วินรวมจากผลขั้นตอน 1+2 และ 3+4 -->
+                <div class="win-pair" aria-live="polite">
+                    <div class="glass-card rounded-2xl win-box">
+                        <div class="win-title">วิน 1–2</div>
+                        <div id="win12" class="win-digits"></div>
+                    </div>
+                    <div class="glass-card rounded-2xl win-box">
+                        <div class="win-title">วิน 3–4</div>
+                        <div id="win34" class="win-digits"></div>
+                    </div>
+                </div>
+
+                <!-- ปุ่มคัดลอกผลลัพธ์ -->
+                <button type="button" id="copyBtn" class="w-full py-4 rounded-xl font-bold text-lg copy-btn flex items-center justify-center gap-2 shadow-lg">
+                    <i class="fa-regular fa-copy"></i> คัดลอกผลลัพธ์
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        'use strict';
+        function showToast(msg) {
+            const t = document.getElementById("toast");
+            document.getElementById("toast-message").textContent = msg;
+            t.classList.add("show");
+            setTimeout(() => t.classList.remove("show"), 3000);
+        }
+
+        const topInput = document.getElementById('top');
+        const downInput = document.getElementById('bottom');
+        const copyBtn = document.getElementById('copyBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        let copyText = '';
+
+        const lotteryInput = document.getElementById('lotteryName');
+        const matchedName = document.getElementById('matchedName');
+        const matchedNote = document.getElementById('matchedNote');
+        const nameFeedback = document.getElementById('nameFeedback');
+        const externalCredit = document.getElementById('externalCredit');
+        let externalMatch = null;
+        let requestNumber = 0, manualRevision = 0, searchTimer = null, remoteDirectoryPromise = null;
+
+        const lotteryNames = [
+          ['ฮานอยปกติ','นอยปกติ','ฮานอยธรรมดา','นอยธรรมดา','ฮานอย'],
+          ['ฮานอยพิเศษ','นอยพิเศษ','ฮานอยพิเศส','นอยพิเสด'],
+          ['ฮานอย VIP','นอยvip','ฮานอยวีไอพี','นอยวีไอพี'],
+          ['ฮานอย Extra','นอยextra','ฮานอยเอ็กซ์ตร้า','นอยเอ็กตร้า'],
+          ['ฮานอย TV','นอยtv','ฮานอยทีวี','นอยทีวี'],
+          ['ฮานอยกาชาด','นอยกาชาด'],
+          ['ฮานอยเฉพาะกิจ','นอยเฉพาะกิจ'],
+          ['ฮานอยพัฒนา','นอยพัฒนา'],
+          ['ลาว VIP','ลาวvip','ลาววีไอพี'],
+          ['ลาวสามัคคี','สามัคคี','ลาวสามัคคีปกติ'],
+          ['ลาวสามัคคี VIP','ลาวสามัคคีvip','สามัคคีวีไอพี'],
+          ['ลาวพัฒนา','ลาวพัดทะนา'],
+          ['ลาวอาเซียน','ลาวอาเชียน'],
+          ['ลาวเที่ยง','ลาวพัฒนาเที่ยง'],
+          ['ลาวสตาร์','ลาวสตา','ลาวstar'],
+          ['ลาวสตาร์ VIP','ลาวสตาvip','ลาวstarvip'],
+          ['ลาว HD','ลาวhd','ลาวเอชดี'],
+          ['ลาวกาชาด','กาชาดลาว'],
+          ['ลาวเวียงจันทร์','เวียงจันทร์'],
+          ['นิเคอิเช้า','นิเคอิรอบเช้า','นิเคอิ'],
+          ['นิเคอิ VIP เช้า','นิเคอิvipเช้า','นิเคอิวีไอพีเช้า'],
+          ['นิเคอิบ่าย','นิเคอิรอบบ่าย','นิคเคอิบ่าย'],
+          ['นิเคอิ VIP บ่าย','นิเคอิvipบ่าย','นิเคอิวีไอพีบ่าย'],
+          ['หุ้นจีนเช้า','จีนเช้า','หุ้นจีน'],
+          ['หุ้นจีน VIP เช้า','จีนvipเช้า','หุ้นจีนวีไอพีเช้า'],
+          ['หุ้นจีนบ่าย','จีนบ่าย'],
+          ['หุ้นจีน VIP บ่าย','จีนvipบ่าย','หุ้นจีนวีไอพีบ่าย'],
+          ['ฮั่งเส็งเช้า','ฮั่งเซ็งเช้า','ฮั่งเส็ง'],
+          ['ฮั่งเส็ง VIP เช้า','ฮั่งเส็งvipเช้า'],
+          ['ฮั่งเส็งบ่าย','ฮั่งเซ็งบ่าย'],
+          ['ฮั่งเส็ง VIP บ่าย','ฮั่งเส็งvipบ่าย','ฮั่งเซ็งวีไอพีบ่าย'],
+          ['หุ้นไทยเช้า','ไทยเช้า'],
+          ['หุ้นไทยเที่ยง','ไทยเที่ยง'],
+          ['หุ้นไทยบ่าย','ไทยบ่าย'],
+          ['หุ้นไทยเย็น','ไทยเย็น'],
+          ['หุ้นอินเดีย','อินเดีย'],
+          ['อังกฤษ VIP','อังกฤษvip','อังกฤษวีไอพี'],
+          ['สิงคโปร์','สิงค์โปร์','สิงคโป','สิงคโปร์ปกติ'],
+          ['สิงคโปร์ VIP','สิงค์โปร์vip','สิงคโปร์วีไอพี'],
+          ['ดาวโจนส์','ดาวโจน','ดาวโจนส์ปกติ'],
+          ['ดาวโจนส์ VIP','ดาวโจนส์vip','ดาวโจนวีไอพี'],
+          ['อียิปต์','หวยอียิปต์','หุ้นอียิปต์','egypt'],
+          ['อียิปต์ VIP','อียิปต์vip','อียิปต์วีไอพี']
+        ];
+        const flags = {'ลาว':'🇱🇦','ไทย':'🇹🇭','ฮานอย':'🇻🇳','จีน':'🇨🇳','นิเคอิ':'🇯🇵','ไต้หวัน':'🇹🇼','เกาหลี':'🇰🇷','สิงคโปร์':'🇸🇬','อินเดีย':'🇮🇳','ดาวโจนส์':'🇺🇸','ฮั่งเส็ง':'🇭🇰','อังกฤษ':'🇬🇧','อียิปต์':'🇪🇬','รัสเซีย':'🇷🇺','เยอรมัน':'🇩🇪'};
+        
+        function normalized(s) { return s.toLowerCase().replace(/วีไอพี/g,'vip').replace(/[\s._\-()]/g,'').replace(/์/g,'').replace(/สิงค์/g,'สิง').trim(); }
+        function editDistance(a,b){const prev=Array.from({length:b.length+1},(_,i)=>i);for(let i=1;i<=a.length;i++){let diag=prev[0];prev[0]=i;for(let j=1;j<=b.length;j++){const old=prev[j];prev[j]=Math.min(prev[j]+1,prev[j-1]+1,diag+(a[i-1]===b[j-1]?0:1));diag=old;}}return prev[b.length];}
+        
+        function findLottery(input){
+          const query=normalized(cleanLotteryName(input));
+          if(!query)return null;
+          const vip=query.includes('vip'), afternoon=query.includes('บ่าย'),morning=query.includes('เช้า');
+          let best=null,bestScore=-Infinity;
+          for(const variants of lotteryNames){
+            const title=variants[0],t=normalized(title);
+            if(vip!==t.includes('vip'))continue;
+            if((afternoon||morning) && (afternoon!==t.includes('บ่าย')||morning!==t.includes('เช้า')))continue;
+            for(const alias of variants){const name=normalized(alias);let score;
+              if(query===name)score=100;
+              else if(name.startsWith(query))score=85+query.length/100;
+              else if(query.startsWith(name))score=77+name.length/100;
+              else if(name.includes(query)&&query.length>=3)score=72+query.length/100;
+              else {const dist=editDistance(query,name);score=60-10*dist-Math.abs(query.length-name.length);}
+              if(score>bestScore){bestScore=score;best=title;}
+            }
+          }
+          return bestScore>=50?best:null;
+        }
+
+        const countryFlagPattern=/[\u{1F1E6}-\u{1F1FF}]{2}/gu;
+        function cleanLotteryName(raw){ return String(raw||'').replace(countryFlagPattern,'').replace(/\s+/g,' ').trim(); }
+        
+        function flagFor(name){
+          const raw=String(name||'');
+          const clean=cleanLotteryName(raw);
+          const key=normalized(clean);
+          const aliases=[
+            [/^(?:ลาว|เวียงจันทร์|สามัคคี|lao)/,'🇱🇦'],
+            [/^(?:หุ้นไทย|ไทย|thaiset)/,'🇹🇭'],
+            [/^(?:ฮานอย|นอย|เวียดนาม|hanoi|vietnam)/,'🇻🇳'],
+            [/^(?:หุ้นจีน|จีน|เซี่ยงไฮ้|shanghai|china)/,'🇨🇳'],
+            [/^(?:นิเคอิ|นิคเคอิ|nikkei|ญี่ปุ่น)/,'🇯🇵'],
+            [/^(?:หุ้นไต้หวัน|ไต้หวัน|ไทเป|taiwan|taipei)/,'🇹🇼'],
+            [/^(?:หุ้นเกาหลี|เกาหลี|โคสปิ|kospi|korea)/,'🇰🇷'],
+            [/^(?:สิงคโปร์|สิงค์โปร์|singapore)/,'🇸🇬'],
+            [/^(?:หุ้นอินเดีย|อินเดีย|india|sensex)/,'🇮🇳'],
+            [/^(?:ดาวโจนส์|ดาวโจน|dowjones|ดาวโจนส์vip)/,'🇺🇸'],
+            [/^(?:ฮั่งเส็ง|ฮั่งเซ็ง|hangseng|หุ้นฮ่องกง)/,'🇭🇰'],
+            [/^(?:อังกฤษ|หุ้นอังกฤษ|สหราชอาณาจักร|uk|ftse|london)/,'🇬🇧'],
+            [/^(?:รัสเซีย|หุ้นรัสเซีย|russia|russian|moex|rts)/,'🇷🇺'],
+            [/^(?:เยอรมัน|เยอรมนี|หุ้นเยอรมัน|germany|german|dax)/,'🇩🇪'],
+            [/^(?:อียิปต์|egypt|egx)/,'🇪🇬']
+          ];
+          const searchKey=key.replace(/^(?:ผลหวย|หวย|ผล|หุ้น|ตลาดหุ้น)+/g,'');
+          for(const [pattern,flag] of aliases)if(pattern.test(key)||pattern.test(searchKey))return flag;
+          for(const [prefix,flag] of Object.entries(flags))if(clean.startsWith(prefix))return flag;
+          const originalFlags=raw.match(countryFlagPattern);
+          return originalFlags?.[0]||'';
+        }
+
+        function copyLotteryHeading(raw){
+          const clean=cleanLotteryName(raw)||'ไม่ระบุชื่อหวย';
+          const flag=flagFor(raw);
+          return flag ? `${flag} ${clean} ${flag}` : clean;
+        }
+
+        function currentLotteryName(){ return externalMatch||findLottery(lotteryInput.value)||lotteryInput.value.trim(); }
+
+        const WINTOOL_DB='https://bixzsnyoqpfhoyrvshnf.supabase.co/rest/v1/';
+        const WINTOOL_PUBLIC_KEY='sb_publishable_n5ovnGDXxoLmJMSSX3nOww_lWJBkWxK';
+        
+        async function apiRows(path){
+          const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),9000);
+          try{
+            const response=await fetch(WINTOOL_DB+path,{headers:{apikey:WINTOOL_PUBLIC_KEY,Accept:'application/json'},cache:'no-store',signal:controller.signal});
+            if(!response.ok)throw Error('HTTP '+response.status);
+            const rows=await response.json();
+            if(!Array.isArray(rows))throw Error('ข้อมูลไม่ถูกต้อง');
+            return rows;
+          }finally{clearTimeout(timer);}
+        }
+
+        function fetchDirectory(){
+          if(!remoteDirectoryPromise)remoteDirectoryPromise=apiRows('lotteries?select=lottery_key,lottery_name,lottery_icon,is_active&is_active=eq.true&order=lottery_name.asc&limit=500').catch(e=>{remoteDirectoryPromise=null;throw e;});
+          return remoteDirectoryPromise;
+        }
+
+        function bestRemoteMatch(raw,rows){
+          const q=normalized(cleanLotteryName(raw)),vip=q.includes('vip'),aft=q.includes('บ่าย'),morn=q.includes('เช้า');
+          if(q.length<2)return null;
+          let best=null,score=-Infinity;
+          for(const row of rows){
+            const title=String(row.lottery_name||''),name=normalized(cleanLotteryName(title));
+            if(!name||vip!==name.includes('vip'))continue;
+            if((aft||morn)&&(aft!==name.includes('บ่าย')||morn!==name.includes('เช้า')))continue;
+            const variants=['extra','tv','hd','พิเศษ','กาชาด','เฉพาะกิจ','สามัคคี','สตาร์'];
+            if(variants.some(v=>q.includes(v)!==name.includes(v)))continue;
+            const aliases=[name];
+            const local=findLottery(raw);if(local&&normalized(local)===name)aliases.push(q);
+            for(const alias of aliases){
+              const distance=editDistance(q,alias);
+              const value=q===alias?100:alias.startsWith(q)?80:q.startsWith(alias)?75:distance<=2&&q.length>=4?66-8*distance:-100;
+              if(value>score){score=value;best=row;}
+            }
+          }
+          return score>=50?best:null;
+        }
+
+        function setCredit(){
+          const a=document.createElement('a');
+          a.href='https://wintool37.netlify.app/';a.target='_blank';a.rel='noopener noreferrer';
+          a.textContent='แหล่งข้อมูล: WinTool37 — สถิติย้อนหลัง 30 งวด';
+          externalCredit.replaceChildren(a);externalCredit.hidden=false;
+        }
+
+        async function searchWinTool(raw,token,revision){
+          try{
+            const directory=await fetchDirectory();
+            if(token!==requestNumber||revision!==manualRevision)return;
+            const match=bestRemoteMatch(raw,directory);
+            if(!match){nameFeedback.hidden=false;nameFeedback.textContent='ไม่พบชื่อหวยในฐานข้อมูล';return;}
+            const title=cleanLotteryName(match.lottery_name),key=String(match.lottery_key);
+            externalMatch=title;
+            matchedName.textContent=copyLotteryHeading(title);
+            const rows=await apiRows('lottery_results?select=draw_date,top3,bottom2&lottery_key=eq.'+encodeURIComponent(key)+'&order=draw_date.desc&limit=30');
+            if(token!==requestNumber||revision!==manualRevision)return;
+            const latest=rows.find(x=>/^\d{3}$/.test(String(x.top3??''))&&/^\d{2}$/.test(String(x.bottom2??'')));
+            if(!latest){matchedNote.hidden=false;matchedNote.textContent='พบชื่อหวย แต่ยังไม่มีผลย้อนหลังที่สมบูรณ์';return;}
+            topInput.value=String(latest.top3);downInput.value=String(latest.bottom2);
+            matchedNote.hidden=false;matchedNote.textContent='ผลย้อนหลังล่าสุด: '+String(latest.draw_date||'ไม่ระบุวันที่');
+            nameFeedback.hidden=true;nameFeedback.textContent='';
+            setCredit();
+            calculate();
+          }catch(error){
+            if(token!==requestNumber||revision!==manualRevision)return;
+            nameFeedback.hidden=false;nameFeedback.textContent='ค้นหาออนไลน์ไม่สำเร็จ — สามารถกรอกเลขเองได้';
+          }
+        }
+
+        lotteryInput.addEventListener('input',()=>{
+          manualRevision++;
+          const token=++requestNumber,raw=lotteryInput.value.trim();
+          clearTimeout(searchTimer);externalMatch=null;
+          externalCredit.hidden=true;externalCredit.replaceChildren();
+          matchedName.textContent='—';matchedNote.hidden=true;matchedNote.textContent='';
+          nameFeedback.hidden=true;nameFeedback.textContent='';
+          if(raw.length>=2)searchTimer=setTimeout(()=>searchWinTool(raw,token,manualRevision),400);
+        });
+
+        // ฟังก์ชันแปลงเลข 6 เป็น 9 และ 9 เป็น 6
+        function swapSixAndNine(str) {
+            return str.replace(/[69]/g, match => match === '6' ? '9' : '6');
+        }
+
+        function calculate() {
+            var top = topInput.value.trim();
+            var bottom = downInput.value.trim();
+            if (!/^\d{3}$/.test(top) || !/^\d{2}$/.test(bottom)) {
+                showToast("กรุณากรอกเลข 3 ตัวบนและ 2 ตัวล่างให้ถูกต้อง");
+                return;
+            }
+
+            const topVal = Number(top);
+            const bottomVal = Number(bottom);
+
+            // แสดงวิธีคำนวณของแต่ละขั้นตอน โดยคงสูตรคำนวณเดิม
+            document.getElementById("calcMethod1").textContent = `${top} + ${bottom}% × 15 =`;
+            document.getElementById("calcMethod2").textContent = `${top} + ${bottom}% ÷ 15 =`;
+            document.getElementById("calcMethod3").textContent = `${top} + ${bottom}% × 99 =`;
+            document.getElementById("calcMethod4").textContent = `${top} + ${bottom}% × 99 ÷ 15 =`;
+
+            // สูตรใหม่: คำนวณจากเลข 2 ตัว แล้วบวกเลข 3 ตัวบนเป็นขั้นตอนสุดท้าย
+            const calc1 = (bottomVal / 100 * 15) + topVal;
+            const calc2 = (bottomVal / 100 / 15) + topVal;
+            const calc3 = (bottomVal / 100 * 99) + topVal;
+            const calc4 = (bottomVal / 100 * 99 / 15) + topVal;
+
+            const val1 = calc1.toFixed(2);
+            const val2 = calc2.toFixed(2);
+            const val3 = calc3.toFixed(2);
+            const val4 = calc4.toFixed(2);
+
+            // แสดงทศนิยม 2 ตำแหน่ง พร้อมเลขชุดเดียวในวงเล็บ
+            // ตัดจุดและเลขซ้ำ แล้วเติมเลขคู่ 6/9 เฉพาะตัวที่ยังไม่มี
+            function displayResult(value) {
+                const digits = value.replace(/\./g, '');
+                let unique = [...new Set(digits)].join('');
+                if (unique.includes('6') && !unique.includes('9')) unique += '9';
+                else if (unique.includes('9') && !unique.includes('6')) unique += '6';
+                return `${value} (${unique})`;
+            }
+
+            const display1 = displayResult(val1);
+            const display2 = displayResult(val2);
+            const display3 = displayResult(val3);
+            const display4 = displayResult(val4);
+
+            // รวมเลขชุดในวงเล็บของสองขั้นตอน โดยคงลำดับแรกที่พบและตัดเลขซ้ำ
+            function uniqueWinPair(first, second) {
+                const digits = [first, second].map(v => v.replace(/\./g, '')).join('');
+                let unique = [...new Set(digits)].join('');
+                if (unique.includes('6') && !unique.includes('9')) unique += '9';
+                else if (unique.includes('9') && !unique.includes('6')) unique += '6';
+                return unique;
+            }
+            const win12 = uniqueWinPair(val1, val2);
+            const win34 = uniqueWinPair(val3, val4);
+            document.getElementById('win12').textContent = win12;
+            document.getElementById('win34').textContent = win34;
+
+            // แสดงผลลัพธ์เป็นทศนิยม 2 ตำแหน่ง
+            document.getElementById("calcStep1").textContent = display1;
+            document.getElementById("calcStep1Alt").textContent = '';
+
+            document.getElementById("calcStep2").textContent = display2;
+            document.getElementById("calcStep2Alt").textContent = '';
+
+            document.getElementById("calcStep3").textContent = display3;
+            document.getElementById("calcStep3Alt").textContent = '';
+
+            document.getElementById("calcStep4").textContent = display4;
+            document.getElementById("calcStep4Alt").textContent = '';
+
+            document.getElementById("result-placeholder").classList.add("hidden");
+            document.getElementById("result").classList.remove("hidden");
+
+            const lotteryName = currentLotteryName() || 'ไม่ระบุชื่อหวย';
+            copyText = [
+                copyLotteryHeading(lotteryName),
+                '➖➖➖➖➖➖➖➖',
+                `ขั้นตอนที่ 1: ${display1}`,
+                `ขั้นตอนที่ 2: ${display2}`,
+                `ขั้นตอนที่ 3: ${display3}`,
+                `ขั้นตอนที่ 4: ${display4}`,
+                `วิน 1–2: ${win12}`,
+                `วิน 3–4: ${win34}`,
+                '➖➖➖➖➖➖➖➖',
+                'บ้านนำโชค6789 | ลาวพัฒนา'
+            ].join('\n');
+
+            copyBtn.classList.remove('copied');
+            copyBtn.innerHTML = '<i class="fa-regular fa-copy"></i> คัดลอกผลลัพธ์';
+        }
+
+        function resetForm() {
+            manualRevision++;
+            lotteryInput.value = '';
+            topInput.value = '';
+            downInput.value = '';
+            externalMatch = null;
+            externalCredit.hidden = true;
+            externalCredit.replaceChildren();
+            matchedName.textContent = '—';
+            matchedNote.hidden = true;
+            matchedNote.textContent = '';
+            nameFeedback.hidden = true;
+            nameFeedback.textContent = '';
+            copyText = '';
+            document.getElementById('win12').textContent = '';
+            document.getElementById('win34').textContent = '';
+            
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`calcMethod${i}`).textContent = "";
+                document.getElementById(`calcStep${i}`).textContent = "";
+            }
+            document.getElementById("result").classList.remove("hidden");
+            document.getElementById("result-placeholder").classList.add("hidden");
+            showToast("ล้างข้อมูลเรียบร้อยแล้ว");
+        }
+
+        resetBtn.addEventListener('click', resetForm);
+
+        document.getElementById('calcForm').addEventListener('submit', event => {
+            event.preventDefault();
+            calculate();
+        });
+
+        topInput.addEventListener('input', () => {
+            manualRevision++;
+            topInput.value = topInput.value.replace(/\D/g,'').slice(0,3);
+            
+            if (topInput.value.length === 3) {
+                downInput.focus();
+            } else {
+                downInput.value = '';
+            }
+        });
+
+        downInput.addEventListener('input', () => {
+            manualRevision++;
+            downInput.value = downInput.value.replace(/\D/g,'').slice(0,2);
+        });
+
+        copyBtn.addEventListener('click', async () => {
+            if (!copyText) return;
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(copyText);
+                } else {
+                    const el = document.createElement('textarea');
+                    el.value = copyText;
+                    document.body.appendChild(el);
+                    el.select();
+                    document.execCommand('copy');
+                    el.remove();
+                }
+                copyBtn.classList.add('copied');
+                copyBtn.innerHTML = '<i class="fa-solid fa-check"></i> คัดลอกแล้ว';
+                showToast("คัดลอกข้อความสำเร็จ!");
+            } catch (e) {
+                showToast("คัดลอกไม่สำเร็จ");
+            }
+        });
+    </script>
+</body>
+</html>
