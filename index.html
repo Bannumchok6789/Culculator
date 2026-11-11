@@ -494,7 +494,7 @@ function computeOriginal(top,down){
   const extra=win.includes('6')&&!win.includes('9')?'(9)':
     win.includes('9')&&!win.includes('6')?'(6)':'';
   // เลขเด่น 3/2 ตัวเป็นชุดที่เลือกจากตำแหน่งเลขวิน ไม่ใช่สูตรคำนวณเพิ่ม
-  const triples=[[0,2,4],[1,3,5],[0,3,5],[1,2,4]]
+  const triples=[[0,2,4],[1,3,5],[0,3,5],[1,2,4],[0,1,5]]
     .map(indices=>indices.map(i=>win[i]).join(''));
   const pairs=[[0,1],[0,2],[1,3],[2,4],[3,5]]
     .map(indices=>indices.map(i=>win[i]).join(''));
@@ -523,11 +523,12 @@ function calculateFormula4(top, down) {
   const jao3_2=`${winArray[1]}${winArray[3]}${winArray[4]}`;
   const jao3_3=`${winArray[0]}${winArray[2]}${winArray[5]}`;
   const jao3_4=`${winArray[3]}${winArray[4]}${winArray[5]}`;
+  const jao3_5=`${winArray[0]}${winArray[1]}${winArray[5]}`;
   // กฎ 6/9 ของสูตร 4: เติมเฉพาะท้ายเลขวินในวงเล็บ โดยไม่เปลี่ยนชุดคำนวณเดิม
   const winDigits=winArray.join('');
   const extra69=winDigits.includes('6')&&!winDigits.includes('9')?'(9)':
     winDigits.includes('9')&&!winDigits.includes('6')?'(6)':'';
-  return {run:`${run1}-${run2}`,win:winArray.join('')+extra69,pair:[jao2_1,jao2_2,jao2_3,jao2_4,jao2_5].join('-'),triple:[jao3_1,jao3_2,jao3_3,jao3_4].join('-')};
+  return {run:`${run1}-${run2}`,win:winArray.join('')+extra69,pair:[jao2_1,jao2_2,jao2_3,jao2_4,jao2_5].join('-'),triple:[jao3_1,jao3_2,jao3_3,jao3_4,jao3_5].join('-')};
 }
 
 function calculate(top, down) {
@@ -549,13 +550,13 @@ function calculate(top, down) {
   // สูตร V.2 (ฟ้า): ชุดเลข 3/2 ตัวต้องใช้เลขวินสีฟ้า (unique) เป็นฐาน
   // จัดตำแหน่งตามแพตเทิร์นเดียวกับสีชมพู โดยไม่แตะการคำนวณของสูตรสีม่วงหรือสูตรอื่น
   const blueBase = unique.slice(0,6).split('');
-  const blueTriple = [[0,2,4],[1,3,5],[0,3,5],[1,2,4]]
+  const blueTriple = [[0,2,4],[1,3,5],[0,3,5],[1,2,4],[0,1,5]]
     .map(indices=>indices.map(i=>blueBase[i] ?? '').join('')).join('-');
   const bluePair = [[0,1],[0,2],[1,3],[2,4],[3,5]]
     .map(indices=>indices.map(i=>blueBase[i] ?? '').join('')).join('-');
   // ชุดเดิมของสูตรสีม่วงยังคงใช้ digits ตามเดิม
   const purpleBase = digits.slice(0,6).map(String);
-  const triple = [[0,2,4],[1,3,5],[0,3,5],[1,2,4]]
+  const triple = [[0,2,4],[1,3,5],[0,3,5],[1,2,4],[0,1,5]]
     .map(indices=>indices.map(i=>purpleBase[i]).join('')).join('-');
   const pair2=[[0,1],[0,2],[1,3],[2,4],[3,5]]
     .map(indices=>indices.map(i=>purpleBase[i]).join('')).join('-');
@@ -1069,7 +1070,7 @@ function calculateStatisticsResult(history){
     if(base.length<6)base.push(partner);
     else supplement='('+partner+')';
   }
-  const threePatterns=[[0,2,4],[1,3,5],[0,3,5],[1,2,4]];
+  const threePatterns=[[0,2,4],[1,3,5],[0,3,5],[1,2,4],[0,1,5]];
   const twoPatterns=[[0,1],[0,2],[1,3],[2,4],[3,5]];
   function digitSets(size){
     const patterns=size===3?threePatterns:twoPatterns;

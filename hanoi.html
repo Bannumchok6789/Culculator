@@ -1,6 +1,39 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
+<style>html{visibility:hidden}</style>
+<script>
+/* Shared browser-session gate. This is client-side access control only. */
+(() => {
+  'use strict';
+  const key='BN_INDEX_SESSION_V2';
+  const activityKey=key+'_LAST_ACTIVITY';
+  const idleLimit=20*60*1000;
+  function authorized(){
+    try {
+      const stamp=Number(localStorage.getItem(activityKey));
+      const now=Date.now();
+      return localStorage.getItem(key)==='BN001' && Number.isFinite(stamp) && stamp>0 && now>=stamp && now-stamp<idleLimit;
+    } catch (_) { return false; }
+  }
+  function login(){ window.location.replace('./index.html'); }
+  if(!authorized()){login();return;}
+  document.documentElement.style.visibility='visible';
+  function check(){if(!authorized())login();}
+  function activity(){
+    if(!authorized()){login();return;}
+    const now=Date.now();
+    try {if(now-Number(localStorage.getItem(activityKey))>=1000)localStorage.setItem(activityKey,String(now));}catch(_){login();}
+  }
+  for(const type of ['pointermove','pointerdown','keydown','input','touchstart','scroll','wheel'])
+    document.addEventListener(type,activity,{passive:true});
+  window.addEventListener('focus',check);
+  window.addEventListener('pageshow',check);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)check();});
+  window.addEventListener('storage',e=>{if(e.key===key||e.key===activityKey)check();});
+  setInterval(check,1000);
+})();
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>บ้านนำโชค 6789 | ใบเปิด 3 ฮานอย</title>
