@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<script>
+/* Shared client-side session guard for the index page. */
+(() => {
+  'use strict';
+  const sessionKey = 'BN_INDEX_SESSION_V2';
+  const activityKey = sessionKey + '_LAST_ACTIVITY';
+  const username = 'BN001';
+  const idleLimitMs = 20 * 60 * 1000;
+  const returnToLogin = () => { window.location.replace('./index.html'); };
+  function isValidSession() {
+    try {
+      const last = Number(localStorage.getItem(activityKey));
+      const now = Date.now();
+      return localStorage.getItem(sessionKey) === username &&
+        Number.isFinite(last) && last > 0 && now >= last && now - last < idleLimitMs;
+    } catch (_) { return false; }
+  }
+  if (!isValidSession()) { returnToLogin(); return; }
+  // Activity on this companion page maintains the same 20-minute idle window.
+  let lastWrite = 0;
+  function recordActivity() {
+    if (!isValidSession()) { returnToLogin(); return; }
+    const now = Date.now();
+    if (now - lastWrite < 1000) return;
+    try { localStorage.setItem(activityKey, String(now)); lastWrite = now; }
+    catch (_) { returnToLogin(); }
+  }
+  for (const type of ['pointermove', 'pointerdown', 'keydown', 'input', 'touchstart', 'scroll', 'wheel']) {
+    document.addEventListener(type, recordActivity, {passive:true});
+  }
+  window.addEventListener('storage', event => {
+    if (event.key === sessionKey || event.key === activityKey || event.key === null) {
+      if (!isValidSession()) returnToLogin();
+    }
+  });
+  window.addEventListener('focus', () => { if (!isValidSession()) returnToLogin(); });
+  window.addEventListener('pageshow', () => { if (!isValidSession()) returnToLogin(); });
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && !isValidSession()) returnToLogin();
+  });
+  setInterval(() => { if (!isValidSession()) returnToLogin(); }, 1000);
+})();
+</script>
+
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0a1325">
+<title>🏠 บ้านนำโชค 6789 | ใบเปิดหุ้น</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&display=swap');
+:root{color-scheme:dark;font-family:Prompt,system-ui,sans-serif;color:#f0f7ff;background:#091121}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;padding:24px 14px;display:grid;place-items:center;background:radial-gradient(ellipse at 15% 0%,#1c4750 0%,transparent 45%),radial-gradient(ellipse at 95% 100%,#25274c 0%,transparent 45%),#091121}
+main{width:min(100%,650px)}h1{font-size:clamp(23px,4.8vw,35px);text-align:center;line-height:1.5;margin:0 0 24px;font-weight:800;letter-spacing:-.4px}
+.panel{background:linear-gradient(145deg,#14253a,#101a2d);border:1px solid #344b65;border-radius:22px;padding:clamp(18px,4vw,30px);box-shadow:0 25px 75px #0005}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}label{display:block;font-size:14px;color:#bed1df;margin-bottom:8px}input{display:block;width:100%;border-radius:13px;background:#091629;border:1px solid #435b72;color:white;font:700 clamp(23px,5vw,31px) Prompt,system-ui,sans-serif;text-align:center;letter-spacing:3px;padding:13px 8px;outline:none}input:focus{border-color:#6de1c9;box-shadow:0 0 0 3px #6de1c920}
+button{font:600 15px Prompt,system-ui,sans-serif;cursor:pointer;border:0;border-radius:12px;padding:14px 16px}button:hover{filter:brightness(1.1)}#calc{width:100%;margin-top:22px;color:#092f33;background:linear-gradient(100deg,#74e6c9,#8bb5fa)}.error{min-height:20px;color:#ffb7ba;font-size:13px;margin:7px 0 0}
+.work{border-top:1px solid #34495e;margin-top:14px;padding-top:20px}h2{font-size:16px;margin:0 0 13px;color:#b9ccdf;font-weight:600}.line{font-size:clamp(17px,4.3vw,23px);font-weight:500;padding:12px 14px;margin:9px 0;border:1px solid #3b5369;border-radius:12px;background:#0d1b2f;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}.line{min-height:62px;display:block;align-content:center}.line strong{color:#91efdb;font-weight:800}
+.final{margin-top:20px;padding:22px 15px;border:1px solid #4f9998;border-radius:17px;text-align:center;background:linear-gradient(125deg,#173e49,#283352)}.final h2{color:#d0f9ec;font-size:20px;margin-bottom:9px}.digits{color:#ff404d;font-size:30px;font-weight:700;letter-spacing:1.5px;overflow-wrap:anywhere}.copy{display:block;margin:16px auto 0;background:#273d57;color:#e5f5ff;width:100%;border:1px solid #456279}
+@media(max-width:420px){.grid{gap:10px}.panel{padding:18px 15px}h1{font-size:23px}}
+
+/* White compact input and result boxes */
+input{background:#fff;color:#172238;border-color:#dce4ee;color-scheme:light}
+input:focus{border-color:#39bda6;box-shadow:0 0 0 3px #39bda633}
+.line{background:#fff;color:#172238;border-color:#dce4ee;border-radius:9px;padding:10px 13px;min-height:62px}
+.line strong{color:#172238}
+.final{background:#fff;border:1px solid #dce4ee;border-radius:12px;padding:16px 12px}
+.final h2{color:#172238}
+.digits{color:#ff404d;font-size:30px;font-weight:700}
+/* Compact fixed-size entry fields */
+input{height:53px;min-height:53px;padding:0 8px;border-radius:9px;font-size:20px;font-weight:500;line-height:normal;letter-spacing:1px}
+/* Fixed 40px display rows, before and after calculation */
+.line{height:40px;min-height:40px;padding:0 10px;margin:7px 0;border-radius:8px;display:flex;align-items:center;font-size:16px;line-height:1.2;white-space:nowrap}
+/* Preserve win font at 30px bold; reserve a consistent display height */
+.digits{min-height:40px;line-height:40px}
+
+/* Navy & gold edition: consistent 53px fields */
+:root{color-scheme:dark;color:#fff7e9;background:#14213D}
+body{background:radial-gradient(ellipse at 10% 0%,#263a61 0%,transparent 45%),radial-gradient(ellipse at 96% 100%,#25324e 0%,transparent 48%),#14213D}
+h1{color:#fff9e8;text-shadow:0 2px 18px #0004}
+.panel{background:linear-gradient(145deg,#1b2d4e,#14213D);border:1px solid #6e6b65;box-shadow:0 24px 70px #070d2080}
+label,h2{color:#f1d69b}
+input{height:53px;min-height:53px;background:#fff;color:#14213D;border:1px solid #e5e5e5;border-radius:9px;font-size:20px;font-weight:500;padding:0 8px}
+input:focus{border-color:#E9B75D;box-shadow:0 0 0 3px #E9B75D55}
+#calc{background:#E9B75D;color:#14213D;font-weight:700;height:48px;padding:0 16px}
+.work{border-color:#4f5b71}
+.line{height:53px;min-height:53px;max-height:53px;padding:0 13px;margin:8px 0;background:#fff;border-color:#e5e5e5;border-radius:9px;color:#14213D;display:flex;align-items:center;font-size:16px;line-height:1.2;white-space:nowrap;overflow-x:auto;overflow-y:hidden}
+.line strong{color:#14213D}
+.final{height:53px;min-height:53px;max-height:53px;margin-top:18px;padding:0 12px;background:#fff;border:1px solid #e5e5e5;border-radius:9px;display:flex;align-items:center;justify-content:space-between;gap:10px;overflow:hidden;text-align:left}
+.final h2{font-size:16px;color:#14213D;margin:0;flex:0 0 auto;line-height:1.2}
+.digits{font-size:30px;font-weight:700;color:#FF404D;letter-spacing:0.25px;min-height:0;line-height:1.1;text-align:right;overflow-wrap:normal;overflow-x:auto;white-space:nowrap}
+.copy{background:#283b5b;color:#f5dfb2;border:1px solid #a7894c}
+.error{color:#ffb6b6}
+@media(max-width:420px){.final{padding:0 9px}.final h2{font-size:14px}.digits{font-size:30px;letter-spacing:0}}
+
+/* Refined spacing and centered win output */
+.panel{padding:clamp(20px,4vw,30px)}
+.grid{gap:12px}
+label{margin-bottom:7px;font-weight:600}
+input{box-shadow:0 2px 4px #0a153014;transition:border-color .2s,box-shadow .2s}
+#calc{border-radius:10px;margin-top:18px}
+.work{margin-top:12px;padding-top:17px}
+.work h2,.win-section h2{margin:0 0 9px;font-size:15px;font-weight:600;color:#E9B75D}
+.line{margin:7px 0;border:1px solid #e4e8f0;box-shadow:0 2px 5px #09112116}
+.win-section{margin-top:17px}
+.final{margin:0;justify-content:center;text-align:center;padding:0 12px;border:1px solid #e4e8f0;box-shadow:0 2px 5px #09112116}
+.digits{width:100%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:30px;line-height:1;font-weight:700;letter-spacing:0.5px;overflow:hidden;font-variant-numeric:tabular-nums}
+.copy{margin-top:14px;border-radius:10px}
+@media(max-width:420px){.panel{padding:18px 14px}.digits{font-size:30px}.final{padding:0 8px}}
+/* เลขวินใช้ขนาดและน้ำหนักเท่ากับตัวเลขในช่องกรอก */
+.digits{font-size:20px;font-weight:500;letter-spacing:1px}
+@media(max-width:420px){.digits{font-size:20px;letter-spacing:1px}}
+/* ตัวหนังสือวิธีคำนวณแบบบาง และเลขวินตัวหนา */
+.line,.line strong{font-weight:400}
+.digits{font-weight:700}
+</style>
+</head>
+<body><main>
+<h1>🏠 บ้านนำโชค 6789 | ใบเปิดหุ้น</h1>
+<section class="panel">
+<div class="grid"><div><label for="upper">เลข 3 ตัวบน</label><input id="upper" type="text" inputmode="numeric" maxlength="3" placeholder="" autocomplete="off" aria-label="เลข 3 ตัวบน"></div><div><label for="lower">เลข 2 ตัวล่าง</label><input id="lower" type="text" inputmode="numeric" maxlength="2" placeholder="" autocomplete="off" aria-label="เลข 2 ตัวล่าง"></div></div>
+<button id="calc">คำนวณ</button><div class="error" id="error" role="alert"></div>
+<div class="work" aria-live="polite"><h2>วิธีคำนวณ</h2><div class="line" id="step1"></div><div class="line" id="step2"></div><div class="line" id="step3"></div></div>
+<div class="win-section"><h2>เลขวิน</h2><div class="final" aria-live="polite"><div class="digits" id="final"></div></div></div>
+<button class="copy" id="copy">คัดลอกผลลัพธ์</button>
+</section>
+</main>
+<script>
+const $=id=>document.getElementById(id);let copyText='';
+function calculate(){
+ const upper=$('upper').value.trim(),lower=$('lower').value.trim();
+ if(!/^\d{3}$/.test(upper)||!/^\d{2}$/.test(lower)){$('error').textContent='กรุณากรอกเลข 3 ตัวบน และ 2 ตัวล่างให้ครบ';return;}
+ $('error').textContent='';
+ const top=upper.slice(-2),a=Number(top),b=Number(lower),sum=a+b,percent=Number((sum*0.06).toFixed(10)),total=Number((sum+percent).toFixed(10));
+ const fmt=n=>String(n);
+ $('step1').innerHTML=`${top} + ${lower} = <strong>${fmt(sum)}</strong>`;
+ $('step2').innerHTML=`${fmt(sum)} × 0.06 = <strong>${fmt(percent)}</strong>`;
+ $('step3').innerHTML=`${fmt(sum)} + ${fmt(percent)} = <strong>${fmt(total)}</strong>`;
+ const digits=[...new Set((fmt(sum)+fmt(percent)+fmt(total)).replace(/\D/g,''))];
+ for(const d of ['6','9'])if(!digits.includes(d))digits.push(d);
+ $('final').textContent=digits.join('');
+ copyText=`${top} + ${lower} = ${fmt(sum)}\n${fmt(sum)} × 0.06 = ${fmt(percent)}\n${fmt(sum)} + ${fmt(percent)} = ${fmt(total)}\nเลขวิน ${digits.join('')}`;
+}
+$('calc').addEventListener('click',calculate);
+for(const id of ['upper','lower']) $(id).addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();calculate();}});
+function resetResults(){['step1','step2','step3','final'].forEach(id=>$(id).textContent='');copyText='';}
+for(const id of ['upper','lower']){
+ $(id).addEventListener('input',e=>{
+  e.target.value=e.target.value.replace(/\D/g,'');
+  $('error').textContent='';
+  if(id==='upper'){
+   $('lower').value='';
+   if(e.target.value.length===3)$('lower').focus();
+  }
+  resetResults();
+ });
+}
+$('copy').addEventListener('click',async()=>{if(!copyText){$('error').textContent='กรุณากรอกตัวเลขให้ครบก่อนคัดลอก';return;}try{
+ const today=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Bangkok',day:'2-digit',month:'2-digit',year:'numeric'}).format(new Date());
+ const formatted=`ใบเปิดหุ้น  :\nวันที่ ${today}\n➖➖➖➖➖➖➖➖\n${copyText.split('\n').slice(0,3).join('\n')}\n\n${copyText.split('\n')[3]}\n➖➖➖➖➖➖➖➖`;
+ await navigator.clipboard.writeText(formatted);$('copy').textContent='คัดลอกแล้ว ✓';setTimeout(()=>$('copy').textContent='คัดลอกผลลัพธ์',1600)}catch{$('error').textContent='ไม่สามารถคัดลอกอัตโนมัติได้';}});
+</script></body></html>
