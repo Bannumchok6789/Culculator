@@ -270,7 +270,7 @@
     copy.addEventListener('click', async () => {
         if (!currentWin) return;
         try {
-            const txt = 'ใบเปิด 3 นอยเย็น/สา/พัฒ\n🏃รูด   ' + currentRun + '\n🔅วิน   ' + currentWin;
+            const txt = '\u{1F1FB}\u{1F1F3} ใบเปิด 3 นอย /สา/พัฒ \u{1F1FB}\u{1F1F3}\n🏃รูด   ' + currentRun + '\n🔅วิน   ' + currentWin;
             if (navigator.clipboard && window.isSecureContext) {
                 await navigator.clipboard.writeText(txt);
             } else {
