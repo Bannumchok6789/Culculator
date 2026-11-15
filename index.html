@@ -1128,10 +1128,13 @@ function renderResults() {
   const heading=flag?`${flag} ${clean||'ไม่ระบุชื่อหวย'} ${flag}`:(clean||'ไม่ระบุชื่อหวย');
   const divider='➖➖➖➖➖➖➖➖';
   const isLockedLao=/^(?:ลาว|เวียงจันทร์|สามัคคี|lao)/i.test(normalized(cleanLotteryName(raw)));
-  const nextDate=copiedNextDrawDate(top,down);
-  const dateLine=nextDate?`  วันที่ ${nextDate}`:'  วันที่ —';
+  // หากกรอกเลขคำนวณเอง ให้ใช้วันที่ปัจจุบันตามเวลาท้องถิ่นของผู้ใช้
+  const now=new Date();
+  const today=[String(now.getDate()).padStart(2,'0'),String(now.getMonth()+1).padStart(2,'0'),now.getFullYear()].join('/');
+  const nextDate=copiedNextDrawDate(top,down)||today;
+  const dateLine=`  วันที่ ${nextDate}`;
   // กำหนดบรรทัดวันที่ก่อนนำไปใช้ในข้อความคัดลอกทั้งสองปุ่ม
-  const dateLine23=nextDate?`วันที่ ${nextDate}`:'วันที่ —';
+  const dateLine23=`วันที่ ${nextDate}`;
   // ใช้ชื่อหวยมาตรฐานในข้อความคัดลอก
   const name23 = thaiDrawKind(raw)==='government' ? 'หวยรัฐบาลไทย' : (clean||'ไม่ระบุชื่อหวย');
   const heading23 = flag ? `${flag} ${name23} ${flag}` : name23;
