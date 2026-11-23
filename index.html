@@ -470,7 +470,66 @@ body::after{display:none!important}
 html.night body{background:transparent!important}
 html.night body::before{background-color:#202b36;background-blend-mode:multiply}
 @supports not (scrollbar-gutter:stable){html{overflow-y:scroll!important}}
-</style><style id="compactFooter184">#siteApp .nav-footer button{display:flex;align-items:center;justify-content:center;gap:8px;min-height:40px;white-space:nowrap}#siteApp .nav-footer .nav-icon{width:20px;height:20px;flex:none;margin:0}#siteApp.compact-nav .nav-footer .footer-label{display:none}#siteApp.compact-nav .nav-footer button{width:40px!important;height:40px!important;min-height:40px!important;max-width:40px!important;border-radius:50%!important;padding:0!important;margin:0 auto 6px!important;gap:0}#siteApp.compact-nav .nav-footer{display:flex;flex-direction:column;align-items:center}@media(max-width:800px){#siteApp.compact-nav .nav-footer{flex-direction:row;justify-content:flex-end;gap:6px}#siteApp.compact-nav .nav-footer button{margin:0!important}}</style></head>
+</style><style id="compactFooter185">#siteApp .nav-footer button{display:flex;align-items:center;justify-content:center;gap:8px;min-height:40px;white-space:nowrap}#siteApp .nav-footer .nav-icon{width:20px;height:20px;flex:none;margin:0}#siteApp.compact-nav .nav-footer .footer-label{display:none}#siteApp.compact-nav .nav-footer button{width:40px!important;height:40px!important;min-height:40px!important;max-width:40px!important;border-radius:50%!important;padding:0!important;margin:0 auto 6px!important;gap:0}#siteApp.compact-nav .nav-footer{display:flex;flex-direction:column;align-items:center}@media(max-width:800px){#siteApp.compact-nav .nav-footer{flex-direction:row;justify-content:flex-end;gap:6px}#siteApp.compact-nav .nav-footer button{margin:0!important}}</style><style id="mobileFix185">
+@media (max-width:700px){
+  #siteApp{padding:10px!important;gap:12px!important;border-radius:28px!important}
+  .workspace-nav{position:static!important;min-height:0!important;padding:18px 14px 14px!important;border-radius:28px!important}
+  .workspace-brand-block{padding:6px 0 10px!important;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center!important}
+  .workspace-brand-block .glass-logo{display:grid!important;width:84px!important;height:84px!important;margin:0 auto 12px!important;border-radius:24px!important}
+  .workspace-brand-block .nav-brand{font-size:clamp(18px,7vw,28px)!important;line-height:1.2!important;text-align:center!important}
+  .workspace-brand-block .nav-sub{margin:4px 0 0!important;font-size:12px!important;letter-spacing:2px!important;text-align:center!important}
+  .workspace-version{display:block!important;font-size:11px!important;margin-top:5px!important;text-align:center!important}
+  .workspace-nav nav,
+  .workspace-nav .tool-link-grid,
+  #siteApp.compact-nav .workspace-nav nav,
+  #siteApp.compact-nav .workspace-nav .tool-link-grid{display:grid!important;grid-template-columns:1fr!important;overflow:visible!important;gap:10px!important}
+  .workspace-nav a,
+  .workspace-nav button,
+  .workspace-nav .tool-link-grid .reset,
+  .nav-current,
+  .login-logout,
+  #siteApp.compact-nav .workspace-nav a,
+  #siteApp.compact-nav .nav-footer button{
+    width:100%!important;max-width:none!important;min-width:0!important;height:auto!important;
+    min-height:52px!important;justify-content:flex-start!important;align-items:center!important;
+    padding:12px 14px!important;gap:10px!important;text-align:left!important;
+    white-space:normal!important;overflow-wrap:anywhere!important;word-break:break-word!important;
+    font-size:clamp(14px,4.8vw,18px)!important;line-height:1.25!important;border-radius:18px!important;
+  }
+  .workspace-nav .nav-icon,.nav-footer .nav-icon{width:22px!important;height:22px!important;flex:none!important}
+  .nav-text,.footer-label{display:block!important;flex:1 1 auto!important;min-width:0!important;white-space:normal!important}
+  .nav-footer,#siteApp.compact-nav .nav-footer{display:grid!important;grid-template-columns:1fr!important;gap:10px!important;margin-top:12px!important;padding-top:12px!important}
+  #siteApp.compact-nav .workspace-nav .nav-text,
+  #siteApp.compact-nav .workspace-brand-block .nav-brand,
+  #siteApp.compact-nav .workspace-brand-block .nav-sub,
+  #siteApp.compact-nav .workspace-version,
+  #siteApp.compact-nav .nav-footer .footer-label{display:block!important}
+  #siteApp.compact-nav .workspace-brand-block{display:flex!important;min-height:0!important}
+  #siteApp.compact-nav .glass-logo{width:84px!important;height:84px!important}
+  .workspace-main{padding:4px 2px 8px!important}
+  .workspace-heading,.unified-header{padding:16px 14px!important}
+}
+@media (max-width:480px){
+  body{padding:8px!important}
+  #siteApp{padding:8px!important;border-radius:26px!important}
+  .workspace-nav{padding:14px 12px!important}
+  .workspace-brand-block .glass-logo{width:72px!important;height:72px!important;border-radius:20px!important}
+  .workspace-brand-block .nav-brand{font-size:clamp(17px,8vw,24px)!important}
+  .workspace-nav a,
+  .workspace-nav button,
+  .workspace-nav .tool-link-grid .reset,
+  .nav-current,
+  .login-logout{min-height:48px!important;font-size:clamp(14px,5vw,17px)!important;border-radius:18px!important}
+}
+@media (max-width:370px){
+  .workspace-nav a,
+  .workspace-nav button,
+  .workspace-nav .tool-link-grid .reset,
+  .nav-current,
+  .login-logout{font-size:14px!important;padding:11px 12px!important}
+  .workspace-brand-block .nav-sub{font-size:10px!important;letter-spacing:1.5px!important}
+}
+</style></head>
 <body>
 <main class="container login-panel" id="loginGate" aria-label="เข้าสู่ระบบ">
   <div class="glass-logo" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><path d="M7 23 24 8l17 15M12 21v19h24V21" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><rect x="19" y="24" width="10" height="10" rx="1" fill="currentColor"/></svg></div><h1 class="login-brand">บ้านนำโชค6789</h1>
@@ -485,7 +544,7 @@ html.night body::before{background-color:#202b36;background-blend-mode:multiply}
     <p class="login-error" id="loginError" role="alert" aria-live="polite"></p>
   </form>
 </main>
-<main class="container" id="siteApp" hidden><aside class="workspace-nav"><div class="workspace-brand-block"><div class="glass-logo" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><path d="M7 23 24 8l17 15M12 21v19h24V21" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><rect x="19" y="24" width="10" height="10" rx="1" fill="currentColor"/></svg></div><div class="nav-brand">บ้านนำโชค6789</div><p class="nav-sub">Workspace</p><div class="workspace-version">Version 18.4</div></div><nav aria-label="เมนูหลัก"><a class="nav-current" href="#calcForm" aria-current="page"><svg class="nav-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M7 7h10M8 11h1m3 0h1m3 0h1M8 15h1m3 0h1m3 0h1"/></svg>สูตรคำนวณ</a><div class="tool-link-grid" aria-label="เปิดหน้าเครื่องมือเพิ่มเติม">
+<main class="container" id="siteApp" hidden><aside class="workspace-nav"><div class="workspace-brand-block"><div class="glass-logo" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><path d="M7 23 24 8l17 15M12 21v19h24V21" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><rect x="19" y="24" width="10" height="10" rx="1" fill="currentColor"/></svg></div><div class="nav-brand">บ้านนำโชค6789</div><p class="nav-sub">Workspace</p><div class="workspace-version">Version 18.5</div></div><nav aria-label="เมนูหลัก"><a class="nav-current" href="#calcForm" aria-current="page"><svg class="nav-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M7 7h10M8 11h1m3 0h1m3 0h1M8 15h1m3 0h1m3 0h1"/></svg>สูตรคำนวณ</a><div class="tool-link-grid" aria-label="เปิดหน้าเครื่องมือเพิ่มเติม">
   <a class="reset" href="./hanoi.html" target="_blank" rel="noopener noreferrer"><svg class="nav-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5M3 16l9 5 9-5"/></svg>ใบเปิด 3 ฮานอย</a>
   <a class="reset" href="./stockmarket.html" target="_blank" rel="noopener noreferrer"><svg class="nav-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="13" width="4" height="8" rx="1"/><rect x="10" y="8" width="4" height="13" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>ใบเปิดหุ้น</a>
   <a class="reset" id="statisticsLink" href="./Statistics.html" target="_blank" rel="noopener noreferrer"><svg class="nav-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-7 4 4 8-9m-6 0h6v6"/></svg>สูตรสถิติ</a>
