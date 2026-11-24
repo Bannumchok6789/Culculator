@@ -3171,7 +3171,7 @@ button,input,select{font:inherit}
 .chip.f2{background:#eff6ff;border-color:#bfdbfe;color:#0369a1}
 .chip.f3{background:#faf5ff;border-color:#ddd6fe;color:#7e22ce}
 .handle{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:12px;border:1px solid #dbe2ea;background:#fff;color:#334155;cursor:pointer;font-size:20px;line-height:1}
-.handle:hover{background:#f8fafc}.handle{touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;-webkit-touch-callout:none}.item.dragging{opacity:.65;outline:2px solid #64748b;outline-offset:-2px}.item.dragging .handle{cursor:grabbing}
+.row-controls{display:flex;gap:6px;align-items:center}.expand-btn{width:40px;height:40px;border-radius:10px;border:1px solid #dbe2ea;background:white;color:#334155;display:grid;place-items:center;cursor:pointer}.expand-btn svg{width:20px;height:20px}.handle svg{width:22px;height:22px;pointer-events:none}.handle:hover{background:#f8fafc}.handle{touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;-webkit-touch-callout:none}.item.dragging{opacity:.65;outline:2px solid #64748b;outline-offset:-2px}.item.dragging .handle{cursor:grabbing}.item.drop-before{box-shadow:0 -3px 0 #176b45}.item.drop-after{box-shadow:0 3px 0 #176b45}
 .item-panel{border-top:1px solid #eef2f7;padding:12px 14px 14px;background:#fcfcfd}
 .grid{display:grid;grid-template-columns:1.45fr 110px auto;gap:10px;align-items:end}
 .group{display:flex;flex-direction:column;gap:6px}
@@ -3191,7 +3191,7 @@ button,input,select{font:inherit}
   .hero{display:block}
   .hero h2{font-size:23px}
   .grid{grid-template-columns:1fr}
-  .item-head{grid-template-columns:minmax(0,1fr) 40px}
+  .item-head{grid-template-columns:minmax(0,1fr) auto}
   .headline{align-items:flex-start}
 }
 </style>
@@ -3200,7 +3200,7 @@ button,input,select{font:inherit}
     <div class="hero">
       <div>
         <h2>ตารางส่งอัตโนมัติ</h2>
-        <p>Minimal Clean · เลือกสูตรรายรายการ · กดค้างที่สามขีดแล้วลากขึ้น–ลง · แตะหนึ่งครั้งเพื่อตั้งค่า</p>
+        <p>Minimal Clean · กดลูกศรเพื่อตั้งค่า · กดสามขีดค้างแล้วลากเพื่อจัดลำดับ</p>
       </div>
     </div>
     <section class="section login-box" id="login">
@@ -3256,7 +3256,7 @@ function render(){
           ${formulaChips(r.formulas)}
         </div>
       </div>
-      <button class="handle" type="button" aria-label="ตั้งค่ารายการ" title="แตะเพื่อตั้งค่า หรือกดลากเพื่อจัดลำดับ">☰</button>
+      <div class="row-controls"><button class="expand-btn" type="button" aria-label="เปิดหรือปิดรายละเอียด" aria-expanded="${isOpen}" title="ตั้งค่ารายการ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${isOpen?'M6 15l6-6 6 6':'M6 9l6 6 6-6'}"/></svg></button><button class="handle" type="button" aria-label="ลากจัดลำดับ" title="กดค้างแล้วลากขึ้นลง"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button></div>
     </div>
     <div class="item-panel" ${isOpen?'':'hidden'}>
       <div class="grid">
@@ -3283,52 +3283,30 @@ function render(){
     const handle=item.querySelector('.handle');
     item.querySelector('.item-title-text').textContent=name;
     let gesture=null, suppressClick=false;
-    handle.onclick=()=>{if(suppressClick){suppressClick=false;return;}state.openIndex=isOpen?null:i;render();};
+    item.querySelector('.expand-btn').onclick=()=>{state.openIndex=isOpen?null:i;render();};
+    handle.onclick=e=>{e.preventDefault();};
     handle.addEventListener('contextmenu',e=>e.preventDefault());
-    handle.addEventListener('pointerdown',e=>{
-      if(!e.isPrimary||e.button!==0)return;
-      suppressClick=false;
-      gesture={id:e.pointerId,startY:e.clientY,y:e.clientY,from:i,to:i,active:false,frame:0};
-      handle.setPointerCapture(e.pointerId);
-    });
-    function dragPosition(){
-      if(!gesture?.active)return;
-      const g=gesture;
+    function start(id,y){if(gesture)return; suppressClick=false;gesture={id,startY:y,y,to:i,active:false,frame:0};}
+    function mark(){
+      const g=gesture;if(!g?.active)return;
       const siblings=[...rows.children].filter(x=>x!==item);
-      let target=siblings.find(x=>g.y<x.getBoundingClientRect().top+x.getBoundingClientRect().height/2);
-      if(target)rows.insertBefore(item,target);else rows.append(item);
-      g.to=[...rows.children].indexOf(item);
+      const target=siblings.find(x=>g.y<x.getBoundingClientRect().top+x.getBoundingClientRect().height/2);
+      g.to=target?siblings.indexOf(target):siblings.length;
+      for(const x of rows.children)x.classList.remove('drop-before','drop-after');
+      if(target)target.classList.add('drop-before');else siblings.at(-1)?.classList.add('drop-after');
     }
-    function dragScroll(){
-      if(!gesture?.active)return;
-      const y=gesture.y,h=window.innerHeight,edge=64;
-      if(y<edge)window.scrollBy(0,-Math.ceil((edge-y)/4));
-      else if(y>h-edge)window.scrollBy(0,Math.ceil((y-h+edge)/4));
-      dragPosition();gesture.frame=requestAnimationFrame(dragScroll);
-    }
-    handle.addEventListener('pointermove',e=>{
-      if(!gesture||gesture.id!==e.pointerId)return;
-      gesture.y=e.clientY;
-      if(!gesture.active&&Math.abs(e.clientY-gesture.startY)>=8){gesture.active=true;suppressClick=true;item.classList.add('dragging');gesture.frame=requestAnimationFrame(dragScroll);}
-      if(gesture.active){e.preventDefault();dragPosition();}
-    });
-    function finishDrag(e,cancel){
-      if(!gesture||gesture.id!==e.pointerId)return;
-      const g=gesture;gesture=null;cancelAnimationFrame(g.frame);
-      if(handle.hasPointerCapture(e.pointerId))handle.releasePointerCapture(e.pointerId);
-      if(!g.active)return;
-      suppressClick=true;item.classList.remove('dragging');
-      if(!cancel&&g.from!==g.to){
-        const opened=state.rows[state.openIndex];
-        const [moved]=state.rows.splice(g.from,1);state.rows.splice(g.to,0,moved);
-        state.openIndex=opened?state.rows.indexOf(opened):null;
-        status('จัดลำดับใหม่แล้ว — กรุณาบันทึกตารางเวลา');
-      }
-      render();
-    }
-    handle.addEventListener('pointerup',e=>finishDrag(e,false));
-    handle.addEventListener('pointercancel',e=>finishDrag(e,true));
-    handle.addEventListener('lostpointercapture',e=>finishDrag(e,true));
+    function scrollDrag(){if(!gesture?.active)return;const y=gesture.y,h=window.innerHeight;if(y<64)window.scrollBy(0,-Math.ceil((64-y)/4));else if(y>h-64)window.scrollBy(0,Math.ceil((y-h+64)/4));mark();gesture.frame=requestAnimationFrame(scrollDrag);}
+    function update(id,y,e){if(!gesture||gesture.id!==id)return;gesture.y=y;if(!gesture.active&&Math.abs(y-gesture.startY)>=5){gesture.active=true;suppressClick=true;item.classList.add('dragging');gesture.frame=requestAnimationFrame(scrollDrag);}if(gesture.active){if(e.cancelable)e.preventDefault();mark();}}
+    function finish(id,cancel){if(!gesture||gesture.id!==id)return;const g=gesture;gesture=null;cancelAnimationFrame(g.frame);item.classList.remove('dragging');for(const x of rows.children)x.classList.remove('drop-before','drop-after');if(!g.active)return;suppressClick=true;if(!cancel&&i!==g.to){const opened=state.rows[state.openIndex];const [moved]=state.rows.splice(i,1);state.rows.splice(g.to,0,moved);state.openIndex=opened?state.rows.indexOf(opened):null;status('จัดลำดับใหม่แล้ว — กรุณาบันทึกตารางเวลา');render();}}
+    handle.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'||e.button!==0)return;start(e.pointerId,e.clientY);try{handle.setPointerCapture(e.pointerId)}catch(_){} });
+    handle.addEventListener('pointermove',e=>{if(e.pointerType!=='touch')update(e.pointerId,e.clientY,e)});
+    handle.addEventListener('pointerup',e=>finish(e.pointerId,false));
+    handle.addEventListener('pointercancel',e=>finish(e.pointerId,true));
+    handle.addEventListener('lostpointercapture',e=>finish(e.pointerId,true));
+    handle.addEventListener('touchstart',e=>{const t=e.changedTouches[0];if(t)start('t'+t.identifier,t.clientY)},{passive:true});
+    handle.addEventListener('touchmove',e=>{for(const t of e.changedTouches)update('t'+t.identifier,t.clientY,e)},{passive:false});
+    handle.addEventListener('touchend',e=>{for(const t of e.changedTouches){if(gesture?.active&&e.cancelable)e.preventDefault();finish('t'+t.identifier,false)}},{passive:false});
+    handle.addEventListener('touchcancel',e=>{for(const t of e.changedTouches)finish('t'+t.identifier,true)});
     const select=item.querySelector('.js-select');
     state.directory.forEach(d=>{const o=document.createElement('option');o.value=d.key;o.textContent=d.name;select.append(o)});
     if(!state.directory.some(d=>d.key===r.key)){const o=document.createElement('option');o.value=r.key;o.textContent='รายการไม่อยู่ในฐานข้อมูล: '+r.key;select.append(o)}
