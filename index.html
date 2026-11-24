@@ -3128,15 +3128,22 @@ renderFrequency();
 (()=>{
 const app=document.getElementById('siteApp'),main=app.querySelector('.workspace-main'),links=[...app.querySelectorAll('nav a')];
 const host=document.createElement('section');host.id='workspaceTools';host.hidden=true;app.append(host);const views=new Map();
+function buildAutomationPanel(view){
+const root=view.attachShadow({mode:'open'});
+root.innerHTML=`<style>:host{display:block}*{box-sizing:border-box}main{font:inherit;color:inherit;padding:12px}h2{margin:0 0 12px}section{background:rgba(255,255,255,.76);color:#17364a;border:1px solid #fff;border-radius:16px;padding:16px;margin:12px 0}button,input,select{font:inherit;padding:9px;border:1px solid #b9cad4;border-radius:9px;min-width:0}button{cursor:pointer;background:#fff;color:#17364a}button.primary{background:#17664b;color:white}button:disabled{opacity:.5} .line{display:grid;grid-template-columns:minmax(100px,1fr) 110px auto auto auto;gap:8px;align-items:center;margin:10px 0}pre{white-space:pre-wrap;overflow-wrap:anywhere}small{display:block}#status{white-space:pre-wrap} @media(max-width:650px){.line{grid-template-columns:1fr 1fr}.line select{grid-column:1/-1}}[hidden]{display:none!important}</style><main><h2>จัดการระบบอัตโนมัติ</h2><section id="login"><label>รหัสแอดมิน <input id="pass" type="password" autocomplete="off" placeholder="รหัสที่ตั้งใน Cloudflare"></label> <button id="enter" class="primary">เข้าสู่ระบบ</button></section><p id="status" role="status"></p><div id="panel" hidden><section><strong id="mode"></strong><p>ตรวจทุก 5 นาที ภายใน 60 นาทีหลังเวลาที่ตั้ง · สูตร V.1 + V.3</p><div id="rows"></div><button id="add">+ เพิ่มรายการหวย</button> <button id="save" class="primary">บันทึกตารางเวลา</button> <button id="exit">ล็อกหน้าจัดการ</button></section><section><h3>ตัวอย่างข้อความ (ยังไม่ส่ง LINE)</h3><pre id="preview">เลือกรายการเพื่อดูตัวอย่าง</pre></section></div></main>`;
+const el=id=>root.getElementById(id);let state=null,pass='';const status=t=>el('status').textContent=t;
+async function api(action,extra={}){const r=await fetch('https://bannumchok6789-line.potae-crazy.workers.dev/admin',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+pass},body:JSON.stringify({action,...extra}),cache:'no-store'});const d=await r.json();if(!r.ok||!d.ok)throw Error(d.error||'เชื่อมต่อไม่สำเร็จ');return d.result;}
+function render(){el('mode').textContent=state.active?'ระบบตารางรวมเปิดแล้ว':'ตารางรวมยังไม่เปิด — ระบบเดิมยังทำงาน';el('rows').replaceChildren();state.rows.forEach((r,i)=>{const line=document.createElement('div');line.className='line';const sel=document.createElement('select');for(const d of state.directory){const o=document.createElement('option');o.value=d.key;o.textContent=d.name;sel.append(o)}sel.value=r.key;sel.onchange=()=>{r.key=sel.value};const time=document.createElement('input');time.type='time';time.value=r.time;time.onchange=()=>r.time=time.value;const label=document.createElement('label'), cb=document.createElement('input');cb.type='checkbox';cb.checked=r.enabled;cb.onchange=()=>r.enabled=cb.checked;label.append(cb,' เปิด');const preview=document.createElement('button');preview.textContent='ดูตัวอย่าง';preview.onclick=async()=>{el('preview').textContent='กำลังโหลด...';try{const v=await api('preview',{key:r.key});el('preview').textContent=v.text}catch(e){el('preview').textContent=e.message}};const del=document.createElement('button');del.textContent='ลบ';del.onclick=()=>{state.rows.splice(i,1);render()};line.append(sel,time,label,preview,del);el('rows').append(line);const last=state.last[r.key];if(last){const s=document.createElement('small');s.textContent=last.time+' — '+last.status;el('rows').append(s)}})}
+el('enter').onclick=async()=>{pass=el('pass').value;el('pass').value='';el('enter').disabled=true;status('กำลังเชื่อมต่อ...');try{state=await api('state');render();el('panel').hidden=false;el('login').hidden=true;status('เชื่อมต่อสำเร็จ')}catch(e){pass='';status(e.message)}finally{el('enter').disabled=false}};
+el('add').onclick=()=>{const d=state.directory.find(d=>!state.rows.some(r=>r.key===d.key));if(d){state.rows.push({key:d.key,time:'08:00',enabled:true});render()}};
+el('save').onclick=async()=>{el('save').disabled=true;try{status(await api('save',{rows:state.rows}))}catch(e){status(e.message)}finally{el('save').disabled=false}};
+el('exit').onclick=()=>{pass='';state=null;el('rows').replaceChildren();el('preview').textContent='';el('panel').hidden=true;el('login').hidden=false;status('ล็อกแล้ว')};
+}
 function highlight(i){links.forEach((a,j)=>{if(i===j)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')})}
 function show(i){if(app.hidden)return;main.hidden=i!==0;host.hidden=i===0;highlight(i);if(!i){views.forEach(v=>v.hidden=true);return;}
 let view=views.get(i);if(i===5){
 if(!view){view=document.createElement('div');view.className='native-tool';view.style.cssText='width:100%;min-height:650px';
-const heading=document.createElement('h2');heading.textContent='จัดการระบบอัตโนมัติ';
-const note=document.createElement('p');note.textContent='สำหรับเจ้าของระบบเท่านั้น · ใช้บัญชี Google เดิม หากหน้าจอไม่โหลด ให้ตรวจสอบการเข้าสู่ระบบ Google และการอนุญาตคุกกี้ของเบราว์เซอร์';
-const frame=document.createElement('iframe');frame.title='จัดการระบบอัตโนมัติ';frame.id='automationAdminFrame';frame.style.cssText='width:100%;height:850px;border:0;border-radius:16px;display:block';
-frame.src='https://script.google.com/macros/s/AKfycbxIz18kl0A1uf4ezosEHKisZn3PhcGxw4dnyjqYCnZsDwfSQaZ2gOGtyVqUkIPAYstC/exec?embed=1';
-view.append(heading,note,frame);host.append(view);views.set(i,view);}
+buildAutomationPanel(view);host.append(view);views.set(i,view);}
 views.forEach((v,j)=>v.hidden=j!==i);return;}
 if(!view){view=document.createElement('div');view.className='native-tool';host.append(view);const root=view.attachShadow({mode:'open'});root.append(document.getElementById('native-template-'+i).content.cloneNode(true));views.set(i,view);
 const scoped={getElementById:id=>root.getElementById(id),createElement:tag=>document.createElement(tag),body:document.body,execCommand:(...args)=>document.execCommand(...args)};
@@ -3151,12 +3158,6 @@ if(i===3){
  } else if(!name){delete view.dataset.lastMainLottery;}
 }
 }
-window.addEventListener('message',e=>{
-const frame=document.getElementById('automationAdminFrame');
-if(window.top!==window || location.origin!=='https://bannumchok6789.github.io' || app.hidden || host.hidden || !frame || frame.parentElement.hidden || e.data!=='BN_ADMIN_READY' || !e.source)return;
-let origin;try{origin=new URL(e.origin);if(origin.protocol!=='https:' || !(origin.hostname==='script.google.com'||origin.hostname==='script.googleusercontent.com'||origin.hostname.endsWith('-script.googleusercontent.com')))return;if(e.source.top!==window)return;}catch{return;}
-e.source.postMessage('BN_ADMIN_ALLOWED',e.origin);
-});
 links.forEach((a,i)=>{a.removeAttribute('target');a.setAttribute('href','#tool-'+i);a.addEventListener('click',e=>{e.preventDefault();a.setAttribute('href','#tool-'+i);show(i)})});
 new MutationObserver(()=>{if(app.hidden){views.forEach(v=>v.remove());views.clear();main.hidden=false;host.hidden=true;highlight(0)}}).observe(app,{attributes:true,attributeFilter:['hidden']});highlight(0);
 })();
