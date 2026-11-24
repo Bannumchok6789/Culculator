@@ -3171,7 +3171,7 @@ button,input,select{font:inherit}
 .chip.f2{background:#eff6ff;border-color:#bfdbfe;color:#0369a1}
 .chip.f3{background:#faf5ff;border-color:#ddd6fe;color:#7e22ce}
 .handle{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:12px;border:1px solid #dbe2ea;background:#fff;color:#334155;cursor:pointer;font-size:20px;line-height:1}
-.handle:hover{background:#f8fafc}
+.handle:hover{background:#f8fafc}.handle{touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;-webkit-touch-callout:none}.item.dragging{opacity:.65;outline:2px solid #64748b;outline-offset:-2px}.item.dragging .handle{cursor:grabbing}
 .item-panel{border-top:1px solid #eef2f7;padding:12px 14px 14px;background:#fcfcfd}
 .grid{display:grid;grid-template-columns:1.45fr 110px auto;gap:10px;align-items:end}
 .group{display:flex;flex-direction:column;gap:6px}
@@ -3200,7 +3200,7 @@ button,input,select{font:inherit}
     <div class="hero">
       <div>
         <h2>ตารางส่งอัตโนมัติ</h2>
-        <p>Minimal Clean · เลือกสูตรรายรายการ · จัดลำดับขึ้นลงจากปุ่มสามขีดด้านหลังชื่อหวย</p>
+        <p>Minimal Clean · เลือกสูตรรายรายการ · กดค้างที่สามขีดแล้วลากขึ้น–ลง · แตะหนึ่งครั้งเพื่อตั้งค่า</p>
       </div>
     </div>
     <section class="section login-box" id="login">
@@ -3249,14 +3249,14 @@ function render(){
     const isOpen=state.openIndex===i;
     item.innerHTML=`<div class="item-head">
       <div class="item-main">
-        <div class="item-title"><span class="item-title-text">${name}</span></div>
+        <div class="item-title"><span class="item-title-text"></span></div>
         <div class="item-meta">
           <span class="chip">${r.time||'-'}</span>
           <span class="chip ${r.enabled?'live':'off'}">${r.enabled?'เปิด':'ปิด'}</span>
           ${formulaChips(r.formulas)}
         </div>
       </div>
-      <button class="handle" type="button" aria-label="ตั้งค่ารายการ" title="ตั้งค่ารายการ">☰</button>
+      <button class="handle" type="button" aria-label="ตั้งค่ารายการ" title="แตะเพื่อตั้งค่า หรือกดลากเพื่อจัดลำดับ">☰</button>
     </div>
     <div class="item-panel" ${isOpen?'':'hidden'}>
       <div class="grid">
@@ -3281,7 +3281,54 @@ function render(){
       <div class="helper js-helper"></div>
     </div>`;
     const handle=item.querySelector('.handle');
-    handle.onclick=()=>{state.openIndex=isOpen?null:i;render();};
+    item.querySelector('.item-title-text').textContent=name;
+    let gesture=null, suppressClick=false;
+    handle.onclick=()=>{if(suppressClick){suppressClick=false;return;}state.openIndex=isOpen?null:i;render();};
+    handle.addEventListener('contextmenu',e=>e.preventDefault());
+    handle.addEventListener('pointerdown',e=>{
+      if(!e.isPrimary||e.button!==0)return;
+      suppressClick=false;
+      gesture={id:e.pointerId,startY:e.clientY,y:e.clientY,from:i,to:i,active:false,frame:0};
+      handle.setPointerCapture(e.pointerId);
+    });
+    function dragPosition(){
+      if(!gesture?.active)return;
+      const g=gesture;
+      const siblings=[...rows.children].filter(x=>x!==item);
+      let target=siblings.find(x=>g.y<x.getBoundingClientRect().top+x.getBoundingClientRect().height/2);
+      if(target)rows.insertBefore(item,target);else rows.append(item);
+      g.to=[...rows.children].indexOf(item);
+    }
+    function dragScroll(){
+      if(!gesture?.active)return;
+      const y=gesture.y,h=window.innerHeight,edge=64;
+      if(y<edge)window.scrollBy(0,-Math.ceil((edge-y)/4));
+      else if(y>h-edge)window.scrollBy(0,Math.ceil((y-h+edge)/4));
+      dragPosition();gesture.frame=requestAnimationFrame(dragScroll);
+    }
+    handle.addEventListener('pointermove',e=>{
+      if(!gesture||gesture.id!==e.pointerId)return;
+      gesture.y=e.clientY;
+      if(!gesture.active&&Math.abs(e.clientY-gesture.startY)>=8){gesture.active=true;suppressClick=true;item.classList.add('dragging');gesture.frame=requestAnimationFrame(dragScroll);}
+      if(gesture.active){e.preventDefault();dragPosition();}
+    });
+    function finishDrag(e,cancel){
+      if(!gesture||gesture.id!==e.pointerId)return;
+      const g=gesture;gesture=null;cancelAnimationFrame(g.frame);
+      if(handle.hasPointerCapture(e.pointerId))handle.releasePointerCapture(e.pointerId);
+      if(!g.active)return;
+      suppressClick=true;item.classList.remove('dragging');
+      if(!cancel&&g.from!==g.to){
+        const opened=state.rows[state.openIndex];
+        const [moved]=state.rows.splice(g.from,1);state.rows.splice(g.to,0,moved);
+        state.openIndex=opened?state.rows.indexOf(opened):null;
+        status('จัดลำดับใหม่แล้ว — กรุณาบันทึกตารางเวลา');
+      }
+      render();
+    }
+    handle.addEventListener('pointerup',e=>finishDrag(e,false));
+    handle.addEventListener('pointercancel',e=>finishDrag(e,true));
+    handle.addEventListener('lostpointercapture',e=>finishDrag(e,true));
     const select=item.querySelector('.js-select');
     state.directory.forEach(d=>{const o=document.createElement('option');o.value=d.key;o.textContent=d.name;select.append(o)});
     if(!state.directory.some(d=>d.key===r.key)){const o=document.createElement('option');o.value=r.key;o.textContent='รายการไม่อยู่ในฐานข้อมูล: '+r.key;select.append(o)}
@@ -3312,7 +3359,7 @@ function render(){
     rows.append(item);
   });
 }
-el('enter').onclick=async()=>{pass=el('pass').value;el('pass').value='';el('enter').disabled=true;status('กำลังเชื่อมต่อ...');try{state=await api('state');if(state.version!==5)throw Error('กรุณา Deploy Backend V.5 ก่อนใช้งาน');state.openIndex=state.rows.length?0:null;render();el('panel').hidden=false;el('login').hidden=true;status('เชื่อมต่อสำเร็จ');}catch(e){pass='';status(e.message)}finally{el('enter').disabled=false}};
+el('enter').onclick=async()=>{pass=el('pass').value;el('pass').value='';el('enter').disabled=true;status('กำลังเชื่อมต่อ...');try{state=await api('state');if(state.version!==5)throw Error('กรุณา Deploy Backend V.5 ก่อนใช้งาน');state.openIndex=null;render();el('panel').hidden=false;el('login').hidden=true;status('เชื่อมต่อสำเร็จ');}catch(e){pass='';status(e.message)}finally{el('enter').disabled=false}};
 el('add').onclick=()=>{const d=state.directory.find(d=>!state.rows.some(r=>r.key===d.key));if(d){state.rows.push({key:d.key,time:'08:00',enabled:true,formulas:[1,3]});state.openIndex=state.rows.length-1;status('เพิ่มรายการแล้ว — กรุณาบันทึกตารางเวลา');render();}else status('ไม่มีรายการใหม่ให้เพิ่ม');};
 el('save').onclick=async()=>{el('save').disabled=true;try{status(await api('save',{rows:state.rows}));}catch(e){status(e.message)}finally{el('save').disabled=false}};
 el('exit').onclick=()=>{pass='';state=null;el('rows').replaceChildren();el('preview').textContent='เลือกรายการเพื่อดูตัวอย่าง';el('panel').hidden=true;el('login').hidden=false;status('ล็อกแล้ว');};
