@@ -1,1 +1,79 @@
+name: Update market calendar
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 19 * * *'
+permissions:
+  contents: read
+concurrency:
+  group: market-calendar
+  cancel-in-progress: false
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install 'exchange-calendars>=4.13.1,<5' 'pandas<3.1'
+      - name: Generate calendar
+        run: |
+          python - <<'PY'
+          import json
+          from datetime import datetime, timedelta, timezone
+          import exchange_calendars as xc
+          now = datetime.now(timezone.utc)
+          today = now.date()
+          start = today - timedelta(days=120)
+          codes = 'XTKS XSHG XHKG XTAI XKRX XSES XBOM XLON XETR XNYS XBKK XMOS XKLS XPHS XASX XNAS'.split()
+          markets = {}
+          for code in codes:
+              error = None
+              # Some exchanges publish only through the current year.
+              for end in sorted({today+timedelta(days=21), today+timedelta(days=7), today, min(today+timedelta(days=21),today.replace(month=12,day=31))}, reverse=True):
+                  try:
+                      cal = xc.get_calendar(code,start=str(start),end=str(end))
+                      dates = [str(d.date()) for d in cal.sessions if start <= d.date() <= end]
+                      if len(dates)<40:
+                          raise ValueError('insufficient sessions')
+                      markets[code] = {'from':str(start),'through':str(end),'sessions':dates}
+                      break
+                  except Exception as exc:
+                      error = str(exc)
+              else:
+                  markets[code] = {'error':error or 'unavailable'}
+              print(code, 'OK' if 'sessions' in markets[code] else markets[code]['error'])
+          if not any('sessions' in m for m in markets.values()):
+              raise RuntimeError('No calendar available; do not overwrite last good file')
+          with open('market-calendar.json','w',encoding='utf-8') as f:
+              json.dump({'schema':1,'generatedAt':now.isoformat(),'libraryVersion':xc.__version__,'markets':markets},f,separators=(',',':'))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: market-calendar
+          path: market-calendar.json
+          if-no-files-found: error
+          retention-days: 1
+  publish:
+    needs: generate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: market-calendar
+      - name: Publish calendar data only
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add market-calendar.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Refresh market calendar'
+            git pull --rebase
+            git push
+          fi
 
