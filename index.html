@@ -549,7 +549,7 @@ html.night body::before{background-color:#202b36;background-blend-mode:multiply}
   <a class="reset" href="./stockmarket.html" target="_blank" rel="noopener noreferrer"><svg class="nav-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="13" width="4" height="8" rx="1"/><rect x="10" y="8" width="4" height="13" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>ใบเปิดหุ้น</a>
   <a class="reset" id="statisticsLink" href="./Statistics.html" target="_blank" rel="noopener noreferrer"><svg class="nav-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-7 4 4 8-9m-6 0h6v6"/></svg>สูตรสถิติ</a>
   <a class="reset" href="./laopatthana.html" target="_blank" rel="noopener noreferrer"><svg class="nav-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>สูตรลาวพัฒนา</a>
-  <a class="reset" id="automationAdminLink" href="https://script.google.com/macros/s/AKfycbxIz18kl0A1uf4ezosEHKisZn3PhcGxw4dnyjqYCnZsDwfSQaZ2gOGtyVqUkIPAYstC/exec" target="_blank" rel="noopener noreferrer" onclick="if(this.href.includes('REPLACE_WITH_DEPLOYMENT_ID')){event.preventDefault();alert('ยังไม่ได้เชื่อม URL หน้าจัดการระบบอัตโนมัติ');}"><svg class="nav-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2M19 3l2 2"/></svg>จัดการระบบอัตโนมัติ</a>
+  <a class="reset" id="automationAdminLink" href="#tool-5"><svg class="nav-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2M19 3l2 2"/></svg>จัดการระบบอัตโนมัติ</a>
 </div></nav><div class="nav-footer"><button type="button" id="logoutBtn" class="login-logout"><svg class="nav-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17l5-5-5-5m5 5H3m10-9h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></svg>ออกจากระบบ</button></div></aside><div class="workspace-main">
 <header class="workspace-heading"><div class="heading-copy"><p class="heading-kicker">CALCULATION WORKSPACE</p><h1>สูตรคำนวณหวย</h1><p class="brand-subtitle">บ้านนำโชค6789 <span aria-hidden="true">·</span> พื้นที่ทำงานวิเคราะห์ตัวเลข</p></div><div class="login-userbar"><span>เข้าสู่ระบบ: BN001</span></div></header>
 <form id="calcForm">
@@ -3130,7 +3130,15 @@ const app=document.getElementById('siteApp'),main=app.querySelector('.workspace-
 const host=document.createElement('section');host.id='workspaceTools';host.hidden=true;app.append(host);const views=new Map();
 function highlight(i){links.forEach((a,j)=>{if(i===j)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')})}
 function show(i){if(app.hidden)return;main.hidden=i!==0;host.hidden=i===0;highlight(i);if(!i){views.forEach(v=>v.hidden=true);return;}
-let view=views.get(i);if(!view){view=document.createElement('div');view.className='native-tool';host.append(view);const root=view.attachShadow({mode:'open'});root.append(document.getElementById('native-template-'+i).content.cloneNode(true));views.set(i,view);
+let view=views.get(i);if(i===5){
+if(!view){view=document.createElement('div');view.className='native-tool';view.style.cssText='width:100%;min-height:650px';
+const heading=document.createElement('h2');heading.textContent='จัดการระบบอัตโนมัติ';
+const note=document.createElement('p');note.textContent='สำหรับเจ้าของระบบเท่านั้น · ใช้บัญชี Google เดิม หากหน้าจอไม่โหลด ให้ตรวจสอบการเข้าสู่ระบบ Google และการอนุญาตคุกกี้ของเบราว์เซอร์';
+const frame=document.createElement('iframe');frame.title='จัดการระบบอัตโนมัติ';frame.id='automationAdminFrame';frame.style.cssText='width:100%;height:850px;border:0;border-radius:16px;display:block';
+frame.src='https://script.google.com/macros/s/AKfycbxIz18kl0A1uf4ezosEHKisZn3PhcGxw4dnyjqYCnZsDwfSQaZ2gOGtyVqUkIPAYstC/exec?embed=1';
+view.append(heading,note,frame);host.append(view);views.set(i,view);}
+views.forEach((v,j)=>v.hidden=j!==i);return;}
+if(!view){view=document.createElement('div');view.className='native-tool';host.append(view);const root=view.attachShadow({mode:'open'});root.append(document.getElementById('native-template-'+i).content.cloneNode(true));views.set(i,view);
 const scoped={getElementById:id=>root.getElementById(id),createElement:tag=>document.createElement(tag),body:document.body,execCommand:(...args)=>document.execCommand(...args)};
 try{window.nativeToolInitializers[i](scoped,i===3?String(chosenName()||'').trim():'')}catch(error){console.error('Tool initialization failed',i,error);const notice=document.createElement('p');notice.textContent='ไม่สามารถเปิดเครื่องมือได้ กรุณารีเฟรชหน้า';root.append(notice);}}
 views.forEach((v,j)=>v.hidden=j!==i);
@@ -3143,6 +3151,12 @@ if(i===3){
  } else if(!name){delete view.dataset.lastMainLottery;}
 }
 }
+window.addEventListener('message',e=>{
+const frame=document.getElementById('automationAdminFrame');
+if(window.top!==window || location.origin!=='https://bannumchok6789.github.io' || app.hidden || host.hidden || !frame || frame.parentElement.hidden || e.data!=='BN_ADMIN_READY' || !e.source)return;
+let origin;try{origin=new URL(e.origin);if(origin.protocol!=='https:' || !(origin.hostname==='script.google.com'||origin.hostname==='script.googleusercontent.com'||origin.hostname.endsWith('-script.googleusercontent.com')))return;if(e.source.top!==window)return;}catch{return;}
+e.source.postMessage('BN_ADMIN_ALLOWED',e.origin);
+});
 links.forEach((a,i)=>{a.removeAttribute('target');a.setAttribute('href','#tool-'+i);a.addEventListener('click',e=>{e.preventDefault();a.setAttribute('href','#tool-'+i);show(i)})});
 new MutationObserver(()=>{if(app.hidden){views.forEach(v=>v.remove());views.clear();main.hidden=false;host.hidden=true;highlight(0)}}).observe(app,{attributes:true,attributeFilter:['hidden']});highlight(0);
 })();
