@@ -3131,44 +3131,51 @@ const host=document.createElement('section');host.id='workspaceTools';host.hidde
 function buildAutomationPanel(view){
 const root=view.attachShadow({mode:'open'});
 root.innerHTML=`<style>:host{display:block}*{box-sizing:border-box}main{font:inherit;color:inherit;padding:12px}h2{margin:0 0 12px}section{background:rgba(255,255,255,.76);color:#17364a;border:1px solid #fff;border-radius:16px;padding:16px;margin:12px 0}button,input,select{font:inherit;padding:9px;border:1px solid #b9cad4;border-radius:9px;min-width:0}button{cursor:pointer;background:#fff;color:#17364a}button.primary{background:#17664b;color:white}button:disabled{opacity:.5} .line{display:grid;grid-template-columns:minmax(100px,1fr) 110px auto auto auto;gap:8px;align-items:center;margin:10px 0}.entry-card{border:1px solid #c5d3da;border-radius:12px;padding:10px;margin:12px 0}.formula-options{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:8px 0}.formula-options label{display:inline-flex;align-items:center;gap:4px}.order-buttons{display:flex;gap:5px;align-items:center}.order-buttons button{min-width:36px}.entry-card .line{margin:6px 0}pre{white-space:pre-wrap;overflow-wrap:anywhere}small{display:block}#status{white-space:pre-wrap} @media(max-width:650px){.line{grid-template-columns:1fr 1fr}.line select{grid-column:1/-1}}[hidden]{display:none!important}</style><main><h2>จัดการระบบอัตโนมัติ</h2><section id="login"><label>รหัสแอดมิน <input id="pass" type="password" autocomplete="off" placeholder="รหัสที่ตั้งใน Cloudflare"></label> <button id="enter" class="primary">เข้าสู่ระบบ</button></section><p id="status" role="status"></p><div id="panel" hidden><section><strong id="mode"></strong><p>ตรวจทุก 5 นาที ภายใน 60 นาทีหลังเวลาที่ตั้ง · เลือกสูตร V.1 / V.2 / V.3 ได้รายรายการ</p><div id="rows"></div><button id="add">+ เพิ่มรายการหวย</button> <button id="save" class="primary">บันทึกตารางเวลา</button> <button id="exit">ล็อกหน้าจัดการ</button></section><section><h3>ตัวอย่างข้อความ (ยังไม่ส่ง LINE)</h3><pre id="preview">เลือกรายการเพื่อดูตัวอย่าง</pre></section></div></main>`;
-const el=id=>root.getElementById(id);let state=null,pass='';const status=t=>el('status').textContent=t;
+const el=id=>root.getElementById(id);let state=null,pass='',openRow=null;
+const uiStyle=document.createElement('style');uiStyle.textContent=`.entry-card .line{display:grid;grid-template-columns:minmax(0,1fr) 44px;gap:8px}.row-summary{font-size:13px;display:flex;flex-wrap:wrap;gap:8px;margin:4px 0}.row-settings{border-top:1px solid #c5d3da;margin-top:8px;padding-top:8px}.row-settings[hidden]{display:none!important}.row-controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.row-controls input[type=time]{max-width:140px}.drag-handle{touch-action:none;user-select:none;cursor:grab;font-size:23px;line-height:1;min-height:44px}.entry-card.drag-target{outline:2px solid #17664b}.entry-card.dragging{opacity:.65}`;root.append(uiStyle);
+function moveRow(from,to){if(from===to||to<0||to>=state.rows.length)return;const [r]=state.rows.splice(from,1);state.rows.splice(to,0,r);render();status('เปลี่ยนลำดับแล้ว — กรุณาบันทึกตารางเวลา');}const status=t=>el('status').textContent=t;
 async function api(action,extra={}){const r=await fetch('https://bannumchok6789-line.potae-crazy.workers.dev/admin',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+pass},body:JSON.stringify({action,...extra}),cache:'no-store'});const d=await r.json();if(!r.ok||!d.ok)throw Error(d.error||'เชื่อมต่อไม่สำเร็จ');return d.result;}
 function render(){
  el('mode').textContent=state.active?'ระบบตารางรวมเปิดแล้ว':'ตารางรวมยังไม่เปิด — ระบบเดิมยังทำงาน';
  el('rows').replaceChildren();
  state.rows.forEach((r,i)=>{
-  const card=document.createElement('div');card.className='entry-card';
-  const order=document.createElement('div');order.className='order-buttons';
-  const number=document.createElement('strong');number.textContent='รายการ '+(i+1);order.append(number);
-  for(const [delta,text,title] of [[-1,'↑','เลื่อนขึ้น'],[1,'↓','เลื่อนลง']]){
-   const b=document.createElement('button');b.type='button';b.textContent=text;b.title=title;b.setAttribute('aria-label',title);b.disabled=i+delta<0||i+delta>=state.rows.length;
-   b.onclick=()=>{[state.rows[i],state.rows[i+delta]]=[state.rows[i+delta],state.rows[i]];render()};order.append(b);
-  }
-  card.append(order);
+  const card=document.createElement('div');card.className='entry-card';card.dataset.rowIndex=String(i);
   const line=document.createElement('div');line.className='line';
   const sel=document.createElement('select');for(const d of state.directory){const o=document.createElement('option');o.value=d.key;o.textContent=d.name;sel.append(o)}
   if(!state.directory.some(d=>d.key===r.key)){const o=document.createElement('option');o.value=r.key;o.textContent='รายการไม่อยู่ในฐานข้อมูล: '+r.key;sel.append(o)}
   sel.value=r.key;sel.onchange=()=>{r.key=sel.value;render()};
-  const time=document.createElement('input');time.type='time';time.value=r.time;time.onchange=()=>r.time=time.value;
+  const time=document.createElement('input');time.type='time';time.value=r.time;time.oninput=()=>r.time=time.value;
   const label=document.createElement('label'),cb=document.createElement('input');cb.type='checkbox';cb.checked=r.enabled;cb.onchange=()=>r.enabled=cb.checked;label.append(cb,' เปิด');
   const preview=document.createElement('button');preview.textContent='ดูตัวอย่าง';preview.onclick=async()=>{if(!r.formulas.length){status('กรุณาเลือกอย่างน้อย 1 สูตร');return}el('preview').textContent='กำลังโหลด...';try{const v=await api('preview',{key:r.key,rows:{formulas:r.formulas}});el('preview').textContent=v.text}catch(e){el('preview').textContent=e.message}};
-  const del=document.createElement('button');del.textContent='ลบ';del.onclick=()=>{state.rows.splice(i,1);render()};line.append(sel,time,label,preview,del);card.append(line);
+  const del=document.createElement('button');del.textContent='ลบ';del.onclick=()=>{state.rows.splice(i,1);render()};const handle=document.createElement('button');handle.type='button';handle.className='drag-handle';handle.textContent='☰';handle.title='กดเพื่อตั้งค่า หรือกดค้างแล้วลากจัดลำดับ';handle.setAttribute('aria-label',handle.title);handle.setAttribute('aria-expanded',String(openRow===r));
+  let drag=null,suppressClick=false;
+  handle.onclick=()=>{if(suppressClick){suppressClick=false;return;}openRow=openRow===r?null:r;render();};
+  handle.onpointerdown=e=>{if(e.button!==0||!e.isPrimary)return;suppressClick=false;drag={id:e.pointerId,x:e.clientX,y:e.clientY,active:false,target:i};handle.setPointerCapture(e.pointerId);};
+  handle.onpointermove=e=>{if(!drag||drag.id!==e.pointerId)return;if(!drag.active&&Math.hypot(e.clientX-drag.x,e.clientY-drag.y)<8)return;drag.active=true;card.classList.add('dragging');const cards=[...el('rows').children];cards.forEach(c=>c.classList.remove('drag-target'));const hit=cards.findIndex(c=>{const b=c.getBoundingClientRect();return e.clientY>=b.top&&e.clientY<=b.bottom});if(hit>=0)drag.target=hit;else if(e.clientY<cards[0].getBoundingClientRect().top)drag.target=0;else if(e.clientY>cards[cards.length-1].getBoundingClientRect().bottom)drag.target=cards.length-1;cards[drag.target]?.classList.add('drag-target');};
+  function finishDrag(e,cancel){if(!drag||drag.id!==e.pointerId)return;const d=drag;drag=null;card.classList.remove('dragging');[...el('rows').children].forEach(c=>c.classList.remove('drag-target'));if(d.active){suppressClick=true;if(!cancel)moveRow(i,d.target);}};
+  handle.onpointerup=e=>finishDrag(e,false);handle.onpointercancel=e=>finishDrag(e,true);handle.onlostpointercapture=e=>finishDrag(e,true);
+  line.append(sel,handle);card.append(line);
+  const summary=document.createElement('div');summary.className='row-summary';const refreshSummary=()=>{summary.textContent=r.time+' · '+(r.enabled?'เปิด':'ปิด')+' · '+(r.formulas??[1,3]).map(f=>'V.'+f).join(' / ');};refreshSummary();card.append(summary);
+  time.oninput=()=>{r.time=time.value;refreshSummary();};cb.onchange=()=>{r.enabled=cb.checked;refreshSummary();};
+  const settings=document.createElement('div');settings.className='row-settings';settings.hidden=openRow!==r;const controls=document.createElement('div');controls.className='row-controls';controls.append(time,label,preview);
+  for(const [delta,title] of [[-1,'↑ เลื่อนขึ้น'],[1,'↓ เลื่อนลง']]){const b=document.createElement('button');b.type='button';b.textContent=title;b.disabled=i+delta<0||i+delta>=state.rows.length;b.onclick=()=>moveRow(i,i+delta);controls.append(b);}
+  controls.append(del);settings.append(controls);card.append(settings);
   const opts=document.createElement('div');opts.className='formula-options';
   r.formulas=r.formulas??[1,3];
   for(const [f,name,color] of [[1,'V.1 ชมพู','#be185d'],[2,'V.2 ฟ้า','#0369a1'],[3,'V.3 ม่วง','#7e22ce']]){
    const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=r.formulas.includes(f);l.style.color=color;
-   c.onchange=()=>{r.formulas=c.checked?[...new Set([...r.formulas,f])].sort():r.formulas.filter(x=>x!==f);if(!r.formulas.length){r.formulas=[f];c.checked=true;status('ต้องเลือกอย่างน้อย 1 สูตร')}else status('แก้ไขแล้ว — กรุณาบันทึกตารางเวลา');};l.append(c,name);opts.append(l);
+   c.onchange=()=>{r.formulas=c.checked?[...new Set([...r.formulas,f])].sort():r.formulas.filter(x=>x!==f);if(!r.formulas.length){r.formulas=[f];c.checked=true;status('ต้องเลือกอย่างน้อย 1 สูตร')}else status('แก้ไขแล้ว — กรุณาบันทึกตารางเวลา');refreshSummary();};l.append(c,name);opts.append(l);
   }
-  const all=document.createElement('button');all.textContent='เลือกทั้ง 3';all.onclick=()=>{r.formulas=[1,2,3];render()};opts.append(all);card.append(opts);
+  const all=document.createElement('button');all.textContent='เลือกทั้ง 3';all.onclick=()=>{r.formulas=[1,2,3];render()};opts.append(all);settings.append(opts);
   const market=state.directory.find(d=>d.key===r.key);
   if(market?.normalStock){const note=document.createElement('small');note.textContent=market.market?'ปฏิทินตลาดอัตโนมัติ: '+market.market+' · ไม่ต้องกรอกวันหยุด · งดส่งเมื่อข้อมูลไม่ยืนยัน':'ยังไม่รองรับปฏิทินตลาดรายการนี้ — งดส่ง';card.append(note);}
   const last=state.last[r.key];if(last){const s=document.createElement('small');s.textContent=last.time+' — '+last.status;card.append(s)}el('rows').append(card);
  });
 }
 el('enter').onclick=async()=>{pass=el('pass').value;el('pass').value='';el('enter').disabled=true;status('กำลังเชื่อมต่อ...');try{state=await api('state');if(state.version!==5)throw Error('กรุณา Deploy Backend V.5 ก่อนใช้งาน');render();el('panel').hidden=false;el('login').hidden=true;status('เชื่อมต่อสำเร็จ')}catch(e){pass='';status(e.message)}finally{el('enter').disabled=false}};
-el('add').onclick=()=>{const d=state.directory.find(d=>!state.rows.some(r=>r.key===d.key));if(d){state.rows.push({key:d.key,time:'08:00',enabled:true,formulas:[1,3]});render()}};
+el('add').onclick=()=>{const d=state.directory.find(d=>!state.rows.some(r=>r.key===d.key));if(d){const r={key:d.key,time:'08:00',enabled:true,formulas:[1,3]};state.rows.push(r);openRow=r;render()}};
 el('save').onclick=async()=>{el('save').disabled=true;try{status(await api('save',{rows:state.rows}))}catch(e){status(e.message)}finally{el('save').disabled=false}};
-el('exit').onclick=()=>{pass='';state=null;el('rows').replaceChildren();el('preview').textContent='';el('panel').hidden=true;el('login').hidden=false;status('ล็อกแล้ว')};
+el('exit').onclick=()=>{pass='';state=null;openRow=null;el('rows').replaceChildren();el('preview').textContent='';el('panel').hidden=true;el('login').hidden=false;status('ล็อกแล้ว')};
 }
 function highlight(i){links.forEach((a,j)=>{if(i===j)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')})}
 function show(i){if(app.hidden)return;main.hidden=i!==0;host.hidden=i===0;highlight(i);if(!i){views.forEach(v=>v.hidden=true);return;}
