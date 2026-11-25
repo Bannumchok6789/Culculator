@@ -3222,6 +3222,8 @@ button,input,select{font:inherit}
           </div>
           <div class="toolbar">
             <button id="add" class="btn soft" type="button">+ เพิ่มหวย</button>
+            <button id="enable-all" class="btn" type="button">เปิดทั้งหมด</button>
+            <button id="disable-all" class="btn" type="button">ปิดทั้งหมด</button>
             <button id="save" class="btn primary" type="button">บันทึกตารางเวลา</button>
             <button id="exit" class="btn" type="button">ล็อกหน้าจัดการ</button>
           </div>
@@ -3344,6 +3346,7 @@ function render(){
 }
 el('enter').onclick=async()=>{pass=el('pass').value;el('pass').value='';el('enter').disabled=true;status('กำลังเชื่อมต่อ...');try{state=await api('state');if(state.version!==5)throw Error('กรุณา Deploy Backend V.5 ก่อนใช้งาน');state.openIndex=null;render();el('panel').hidden=false;el('login').hidden=true;status('เชื่อมต่อสำเร็จ');}catch(e){pass='';status(e.message)}finally{el('enter').disabled=false}};
 el('add').onclick=()=>{const d=state.directory.find(d=>!state.rows.some(r=>r.key===d.key));if(d){state.rows.push({key:d.key,time:'08:00',enabled:true,formulas:[1,3]});state.openIndex=state.rows.length-1;status('เพิ่มรายการแล้ว — กรุณาบันทึกตารางเวลา');render();}else status('ไม่มีรายการใหม่ให้เพิ่ม');};
+for(const [id,on] of [['enable-all',true],['disable-all',false]])el(id).onclick=()=>{if(!state)return;if(!confirm((on?'เปิด':'ปิด')+'การส่งตามเวลาทั้งหมด? การค้นหาใน LINE ไม่เปลี่ยน'))return;state.rows.forEach(r=>r.enabled=on);render();status('แก้ไขแล้ว — กรุณาบันทึกตารางเวลา');};
 el('save').onclick=async()=>{el('save').disabled=true;try{status(await api('save',{rows:state.rows}));}catch(e){status(e.message)}finally{el('save').disabled=false}};
 el('exit').onclick=()=>{pass='';state=null;el('rows').replaceChildren();el('preview').textContent='เลือกรายการเพื่อดูตัวอย่าง';el('panel').hidden=true;el('login').hidden=false;status('ล็อกแล้ว');};
 }
