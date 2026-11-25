@@ -3162,6 +3162,8 @@ button,input,select{font:inherit}
 .item-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:13px 14px}
 .item-main{min-width:0}
 .item-title{font-weight:700;color:#0f172a;font-size:15px;line-height:1.35;display:flex;align-items:center;gap:8px;min-width:0}
+.item-number{display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:28px;padding:0 5px;flex-shrink:0;border-radius:8px;background:#17664b;color:#fff;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;box-sizing:border-box}
+.schedule-count{margin:12px 0;display:flex;flex-wrap:wrap;gap:8px;font-size:13px;color:#334155}
 .item-title-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .item-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .chip{display:inline-flex;align-items:center;gap:5px;min-height:26px;padding:0 10px;border-radius:999px;background:#f8fafc;border:1px solid #e2e8f0;color:#475569;font-size:12px}
@@ -3224,6 +3226,7 @@ button,input,select{font:inherit}
             <button id="exit" class="btn" type="button">ล็อกหน้าจัดการ</button>
           </div>
         </div>
+        <div id="schedule-count" class="schedule-count" role="status" aria-live="polite"></div>
         <div id="rows" class="list"></div>
       </section>
       <section class="section">
@@ -3240,6 +3243,8 @@ function formulaChips(formulas){return (formulas||[]).sort().map(f=>`<span class
 function render(){
   el('mode').textContent=state.active?'ระบบตารางรวมเปิดแล้ว':'ตารางรวมยังไม่เปิด — ระบบเดิมยังทำงาน';
   const rows=el('rows'); rows.replaceChildren();
+  const total=state.rows.length, enabled=state.rows.filter(r=>r.enabled).length;
+  el('schedule-count').textContent=`ทั้งหมด ${total} รายการ · เปิด ${enabled} · ปิด ${total-enabled}`;
   if(!state.rows.length){const empty=document.createElement('div');empty.className='empty';empty.textContent='ยังไม่มีรายการ กรุณากด “เพิ่มหวย”';rows.append(empty);return;}
   state.rows.forEach((r,i)=>{
     r.formulas=r.formulas??[1,3];
@@ -3249,7 +3254,7 @@ function render(){
     const isOpen=state.openIndex===i;
     item.innerHTML=`<div class="item-head">
       <div class="item-main">
-        <div class="item-title"><span class="item-title-text"></span></div>
+        <div class="item-title"><span class="item-number" aria-label="ลำดับ ${i+1}">${i+1}</span><span class="item-title-text"></span></div>
         <div class="item-meta">
           <span class="chip">${r.time||'-'}</span>
           <span class="chip ${r.enabled?'live':'off'}">${r.enabled?'เปิด':'ปิด'}</span>
