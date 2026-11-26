@@ -650,12 +650,13 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     <input class="login-field" id="loginUsername" name="username" type="text" required autocomplete="username" autocapitalize="characters" spellcheck="false" placeholder="ชื่อผู้ใช้">
     <label for="loginPassword">รหัสผ่าน (Password)</label>
     <input class="login-field" id="loginPassword" name="password" type="password" required autocomplete="current-password" placeholder="กรอกรหัสผ่าน">
+    <label style="display:flex;align-items:center;gap:8px;margin:12px 0"><input type="checkbox" id="adminRemember"> จดจำการเข้าสู่ระบบ 7 วัน (เฉพาะเครื่องส่วนตัว)</label>
     <button type="submit" class="login-submit" id="loginSubmit">เข้าสู่ระบบ</button>
     <p class="login-error" id="loginError" role="alert" aria-live="polite"></p>
   </form>
 <p class="login-foot">BANNUMCHOK 6789 · LINE MANAGEMENT</p>
 </main>
-<main class="container" id="siteApp" hidden><aside class="workspace-nav"><div class="workspace-brand-block"><div class="glass-logo" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><path d="M7 23 24 8l17 15M12 21v19h24V21" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><rect x="19" y="24" width="10" height="10" rx="1" fill="currentColor"/></svg></div><div class="nav-brand">บ้านนำโชค6789</div><p class="nav-sub">LINE SMART BOT</p><div class="workspace-version">Version 19.5 · LINE SMART BOT</div></div><nav aria-label="เมนูหลัก"><a class="nav-current" href="#calcForm" aria-current="page"><svg class="nav-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M7 7h10M8 11h1m3 0h1m3 0h1M8 15h1m3 0h1m3 0h1"/></svg>สูตรคำนวณ</a><div class="tool-link-grid" aria-label="เปิดหน้าเครื่องมือเพิ่มเติม">
+<main class="container" id="siteApp" hidden><aside class="workspace-nav"><div class="workspace-brand-block"><div class="glass-logo" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><path d="M7 23 24 8l17 15M12 21v19h24V21" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><rect x="19" y="24" width="10" height="10" rx="1" fill="currentColor"/></svg></div><div class="nav-brand">บ้านนำโชค6789</div><p class="nav-sub">LINE SMART BOT</p><div class="workspace-version">Version 19.7 · LINE SMART BOT</div></div><nav aria-label="เมนูหลัก"><a class="nav-current" href="#calcForm" aria-current="page"><svg class="nav-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M7 7h10M8 11h1m3 0h1m3 0h1M8 15h1m3 0h1m3 0h1"/></svg>สูตรคำนวณ</a><div class="tool-link-grid" aria-label="เปิดหน้าเครื่องมือเพิ่มเติม">
   
   
   
@@ -741,142 +742,26 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 
 </main>
 <script>
-/* This login is a client-side convenience gate, NOT server-side access control. */
-(() => {
-  'use strict';
-  const expectedUsername='BN001';
-  const expectedSha256='4672ac7b6dec63c1f1134d1cfa3d73a6d517f011ec053f3fcacd0ba9f9aaea15';
-  const sessionKey='BN_INDEX_SESSION_V2';
-  const lastActivityKey=sessionKey+'_LAST_ACTIVITY';
-  const idleLimitMs=20*60*1000; // Sign out after 20 minutes without user activity.
-  const gate=document.getElementById('loginGate');
-  const app=document.getElementById('siteApp');
-  const form=document.getElementById('loginForm');
-  const error=document.getElementById('loginError');
-  const user=document.getElementById('loginUsername');
-  const password=document.getElementById('loginPassword');
-  const submit=document.getElementById('loginSubmit');
-  let signedIn=false;
-  let failedAttempts=0, retryAfter=0;
-  let lastActionAt=0;
-  let lastSavedAt=0;
-
-  function clearSession(){
-    try{
-      localStorage.removeItem(sessionKey);
-      localStorage.removeItem(lastActivityKey);
-    }catch(_){}
-  }
-  function display(loggedIn){
-    signedIn=loggedIn;
-    gate.hidden=loggedIn;
-    app.hidden=!loggedIn;
-    if(loggedIn){error.textContent='';password.value='';}
-    else{password.value='';user.value=expectedUsername;user.focus();}
-  }
-  function expireSession(){
-    if(!signedIn)return;
-    clearSession();
-    lastActionAt=0;
-    display(false);
-    error.textContent='ออกจากระบบอัตโนมัติ เนื่องจากไม่ได้ใช้งานเกิน 20 นาที กรุณาเข้าสู่ระบบใหม่';
-  }
-  function syncSharedActivity(){
-    try{
-      const shared=Number(localStorage.getItem(lastActivityKey)||'0');
-      if(Number.isFinite(shared) && shared>lastActionAt)lastActionAt=shared;
-    }catch(_){}
-  }
-  function checkIdle(){
-    if(!signedIn)return;
-    syncSharedActivity();
-    const now=Date.now();
-    if(!Number.isFinite(lastActionAt) || lastActionAt<=0 || now<lastActionAt || now-lastActionAt>=idleLimitMs){
-      expireSession();
-    }
-  }
-  // Only real user input extends the session. Check timeout BEFORE renewing activity.
-  function recordActivity(){
-    if(!signedIn)return;
-    syncSharedActivity();
-    const now=Date.now();
-    if(now<lastActionAt || now-lastActionAt>=idleLimitMs){expireSession();return;}
-    if(now-lastActionAt<1000)return; // Limit writes from pointer movements and scrolling.
-    lastActionAt=now;
-    try{localStorage.setItem(lastActivityKey,String(now));}catch(_){}
-  }
-  function beginSession(){
-    lastActionAt=Date.now();
-    try{
-      localStorage.setItem(sessionKey,expectedUsername);
-      localStorage.setItem(lastActivityKey,String(lastActionAt));
-    }catch(_){}
-    display(true);
-  }
-  async function sha256(value){
-    if(!window.crypto?.subtle)throw new Error('เว็บเบราว์เซอร์นี้ไม่รองรับการตรวจสอบรหัสผ่าน โปรดใช้ Chrome หรือ Safari เวอร์ชันล่าสุด');
-    const digest=await window.crypto.subtle.digest('SHA-256',new TextEncoder().encode(value));
-    return [...new Uint8Array(digest)].map(x=>x.toString(16).padStart(2,'0')).join('');
-  }
-  form.addEventListener('submit',async(event)=>{
-    event.preventDefault();
-    if(submit.disabled)return;
-    if(Date.now()<retryAfter){error.textContent='กรุณารอ '+Math.ceil((retryAfter-Date.now())/1000)+' วินาที';return;}
-    submit.disabled=true;
-    error.textContent='';
-    try{
-      const name=user.value.trim().toUpperCase();
-      const hash=await sha256('BN-INDEX-AUTH|'+name+'|'+password.value);
-      if(name===expectedUsername && hash===expectedSha256){
-        failedAttempts=0;retryAfter=0;beginSession();
-      }else{
-        failedAttempts++;if(failedAttempts>=5){retryAfter=Date.now()+30000;failedAttempts=0;}
-        error.textContent='ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง';
-        password.value='';password.focus();
-      }
-    }catch(e){error.textContent=e.message||'ไม่สามารถเข้าสู่ระบบได้';}
-    finally{submit.disabled=false;}
-  });
-  document.getElementById('logoutBtn').addEventListener('click',()=>{
-    clearSession();
-    lastActionAt=0;
-    display(false);
-  });
-  for(const eventName of ['pointermove','pointerdown','keydown','input','touchstart','scroll','wheel']){
-    document.addEventListener(eventName,recordActivity,{passive:true});
-  }
-  // Browsers throttle timers in background tabs; verify again on return and restoration.
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkIdle();});
-  window.addEventListener('focus',checkIdle);
-  window.addEventListener('pageshow',checkIdle);
-  window.addEventListener('storage',(event)=>{
-    if(event.key===sessionKey && event.newValue!==expectedUsername){
-      if(signedIn){lastActionAt=0;display(false);error.textContent='ออกจากระบบแล้ว กรุณาเข้าสู่ระบบใหม่';}
-      return;
-    }
-    if(event.key===lastActivityKey && event.newValue){
-      const shared=Number(event.newValue);
-      if(Number.isFinite(shared) && shared>lastActionAt)lastActionAt=shared;
-    }
-  });
-  setInterval(checkIdle,1000);
-
-  let remembered='',storedActivity=0;
-  try{
-    remembered=localStorage.getItem(sessionKey)||'';
-    storedActivity=Number(localStorage.getItem(lastActivityKey)||'0');
-  }catch(_){}
-  const now=Date.now();
-  if(remembered===expectedUsername && storedActivity>0 && now>=storedActivity && now-storedActivity<idleLimitMs){
-    lastActionAt=storedActivity;
-    display(true);
-  }else{
-    clearSession();
-    display(false);
-    if(remembered===expectedUsername){
-      error.textContent='เซสชันหมดเวลา กรุณาเข้าสู่ระบบใหม่';
-    }
-  }
+/* Server-validated admin session. No embedded password or password hash. */
+(()=>{
+ const endpoint='https://bannumchok6789-line.potae-crazy.workers.dev/admin', key='BN_LINE_ADMIN_SESSION_V197';
+ const gate=document.getElementById('loginGate'),app=document.getElementById('siteApp'),form=document.getElementById('loginForm'),error=document.getElementById('loginError'),user=document.getElementById('loginUsername'),password=document.getElementById('loginPassword'),submit=document.getElementById('loginSubmit');
+ let token='',epoch=0;
+ function clear(){for(const store of [localStorage,sessionStorage])try{store.removeItem(key)}catch{};}
+ function show(ok){gate.hidden=ok;app.hidden=!ok;password.value='';if(!ok)user.value='admin';}
+ async function request(action,extra={},auth=token){const r=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json',...(auth?{'Authorization':'Bearer '+auth}:{})},body:JSON.stringify({action,...extra}),cache:'no-store',credentials:'omit'});const d=await r.json();if(!r.ok||!d.ok){const e=Error(d.error||'เชื่อมต่อไม่สำเร็จ');e.status=r.status;throw e;}return d.result;}
+ function invalidate(message){epoch++;token='';clear();show(false);error.textContent=message||'';}
+ async function logout(){const old=token;invalidate('');if(old)try{await request('logout',{},old)}catch{error.textContent='ออกจากเครื่องนี้แล้ว แต่ยกเลิกเซสชันบนเซิร์ฟเวอร์ไม่สำเร็จ';}}
+ window.bnLineAdmin={async api(action,extra){try{return await request(action,extra)}catch(e){if(e.status===401)invalidate(e.message);throw e;}},logout};
+ user.value='admin';show(false);
+ form.addEventListener('submit',async e=>{e.preventDefault();if(submit.disabled)return;submit.disabled=true;error.textContent='';const n=++epoch;try{const remember=document.getElementById('adminRemember').checked;const v=await request('login',{username:user.value,password:password.value,remember},'');if(n!==epoch)return;token=v.token;clear();try{(remember?localStorage:sessionStorage).setItem(key,token)}catch{};show(true);}catch(e){if(n===epoch){error.textContent=e.message;password.value='';}}finally{submit.disabled=false;}});
+ document.getElementById('logoutBtn').addEventListener('click',logout);
+ window.addEventListener('storage',e=>{if(e.key===key&&e.oldValue===token&&e.newValue!==token)invalidate('ออกจากระบบแล้ว');});
+ async function verify(){if(!token)return;const t=token,n=epoch;try{await request('session',{},t);if(n===epoch)show(true);}catch(e){if(n===epoch){if(e.status===401)invalidate(e.message);else{show(false);error.textContent='ตรวจสอบเซสชันไม่สำเร็จ กรุณาเข้าสู่ระบบใหม่';}}}}
+ try{token=sessionStorage.getItem(key)||localStorage.getItem(key)||''}catch{};
+ if(token){submit.disabled=true;verify().finally(()=>submit.disabled=false);}
+ window.addEventListener('focus',()=>{if(token)verify()});
+ setInterval(()=>{if(token&&!document.hidden)verify()},60000);
 })();
 </script>
 <script>
@@ -2332,10 +2217,9 @@ button,input,select{font:inherit}
       </div>
     </div>
     <section class="section login-box" id="login">
-      <label class="label" for="pass">รหัสแอดมิน</label>
-      <input id="pass" class="input" type="password" autocomplete="off" placeholder="รหัสที่ตั้งใน Cloudflare">
+      <p class="subnote">เข้าสู่ระบบแอดมินแล้ว · โหลดข้อมูลจาก Backend</p>
       <div class="btn-row" style="margin-top:12px">
-        <button id="enter" class="btn primary" type="button">เข้าสู่ระบบ</button>
+        <button id="enter" class="btn primary" type="button">โหลดข้อมูลอีกครั้ง</button>
       </div>
     </section>
     <p id="status" class="status" role="status">พร้อมเชื่อมต่อ</p>
@@ -2364,6 +2248,17 @@ button,input,select{font:inherit}
             <button id="exit" class="btn" type="button">ล็อกหน้าจัดการ</button>
           </div>
         </div>
+        <div class="section" style="margin:12px 0;padding:12px">
+          <strong>เลือกสูตรพร้อมกันทุกตาราง</strong>
+          <p class="subnote">แทนที่สูตรของทุกรายการในตาราง (รวมรายการที่ปิดส่ง) โดยไม่เปลี่ยนเวลาและสถานะเปิด–ปิด</p>
+          <div class="toolbar" style="margin-top:8px">
+            <button id="bulk-f1" class="btn formula-option f1" type="button">V.1 ทั้งหมด</button>
+            <button id="bulk-f2" class="btn formula-option f2" type="button">V.2 ทั้งหมด</button>
+            <button id="bulk-f3" class="btn formula-option f3" type="button">V.3 ทั้งหมด</button>
+            <button id="bulk-f123" class="btn primary" type="button">เลือกทั้ง 3 สูตรทั้งหมด</button>
+          </div>
+          <p id="bulk-formula-status" class="subnote" role="status" aria-live="polite">ยังไม่เปลี่ยนสูตร · ต้องกดบันทึกตารางเวลา</p>
+        </div>
         <div id="schedule-count" class="schedule-count" role="status" aria-live="polite"></div>
         <div id="rows" class="list"></div>
       </section></details>
@@ -2375,7 +2270,7 @@ button,input,select{font:inherit}
   </div>
 </main>`;
 const el=id=>root.getElementById(id);let state=null,pass='';const status=t=>el('status').textContent=t;
-async function api(action,extra={}){const r=await fetch('https://bannumchok6789-line.potae-crazy.workers.dev/admin',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+pass},body:JSON.stringify({action,...extra}),cache:'no-store'});const d=await r.json();if(!r.ok||!d.ok)throw Error(d.error||'เชื่อมต่อไม่สำเร็จ');return d.result;}
+async function api(action,extra={}){return window.bnLineAdmin.api(action,extra);}
 
 const opsURL='https://script.google.com/macros/s/AKfycbxssN2hAbfLevMrsqTnkFp0Z3AYyUCWYUbIkGuoo9wZoHnU2f8s5SXLumoFEywYNlLphw/exec';
 const opsMarkets={XTKS:'ญี่ปุ่น',XSHG:'จีน',XHKG:'ฮ่องกง',XTAI:'ไต้หวัน',XKRX:'เกาหลีใต้',XSES:'สิงคโปร์',XBOM:'อินเดีย',XLON:'อังกฤษ',XETR:'เยอรมนี',XNYS:'NYSE / ดาวโจนส์',XBKK:'ไทย',XMOS:'รัสเซีย',XKLS:'มาเลเซีย',XPHS:'ฟิลิปปินส์',XASX:'ออสเตรเลีย',XNAS:'Nasdaq'};
@@ -2513,11 +2408,21 @@ function render(){
     rows.append(item);
   });
 }
-el('enter').onclick=async()=>{pass=el('pass').value;el('pass').value='';el('enter').disabled=true;status('กำลังเชื่อมต่อ...');try{state=await api('state');if(![5,6].includes(Number(state.version))||!Array.isArray(state.directory)||!Array.isArray(state.rows))throw Error('Backend ไม่รองรับหรือข้อมูลไม่ครบ');state.last=state.last||{};state.openIndex=null;render();el('panel').hidden=false;el('login').hidden=true;status('เชื่อมต่อสำเร็จ');opsStamp();}catch(e){pass='';status(e.message)}finally{el('enter').disabled=false}};
+el('enter').onclick=async()=>{pass=crypto.randomUUID();el('enter').disabled=true;status('กำลังเชื่อมต่อ...');try{state=await api('state');if(![5,6].includes(Number(state.version))||!Array.isArray(state.directory)||!Array.isArray(state.rows))throw Error('Backend ไม่รองรับหรือข้อมูลไม่ครบ');state.last=state.last||{};state.openIndex=null;render();el('panel').hidden=false;el('login').hidden=true;status('เชื่อมต่อสำเร็จ');opsStamp();}catch(e){pass='';status(e.message)}finally{el('enter').disabled=false}};
 el('add').onclick=()=>{const d=state.directory.find(d=>!state.rows.some(r=>r.key===d.key));if(d){state.rows.push({key:d.key,time:'08:00',enabled:false,formulas:[1,3]});state.openIndex=state.rows.length-1;status('เพิ่มรายการแล้ว — กรุณาบันทึกตารางเวลา');render();}else status('ไม่มีรายการใหม่ให้เพิ่ม');};
 for(const [id,on] of [['enable-all',true],['disable-all',false]])el(id).onclick=()=>{if(!state)return;if(!confirm((on?'เปิด':'ปิด')+'การส่งตามเวลาทั้งหมด? การค้นหาใน LINE ไม่เปลี่ยน'))return;state.rows.forEach(r=>r.enabled=on);render();status('แก้ไขแล้ว — กรุณาบันทึกตารางเวลา');};
+for(const [id,formulas] of [['bulk-f1',[1]],['bulk-f2',[2]],['bulk-f3',[3]],['bulk-f123',[1,2,3]]])el(id).onclick=()=>{
+  if(!state||!state.rows.length||el('save').disabled)return;
+  const label=formulas.map(f=>'V.'+f).join(' / ');
+  if(!confirm('แทนที่สูตรของทั้ง '+state.rows.length+' รายการด้วย '+label+'? เวลาและสถานะเปิด–ปิดจะไม่เปลี่ยน'))return;
+  state.rows.forEach(r=>{r.formulas=[...formulas];});
+  render();
+  const msg='เลือก '+label+' ครบ '+state.rows.length+' รายการ — กรุณาบันทึกตารางเวลา';
+  el('bulk-formula-status').textContent=msg;status(msg);
+};
 el('save').onclick=async()=>{el('save').disabled=true;try{status(await api('save',{rows:state.rows}));}catch(e){status(e.message)}finally{el('save').disabled=false}};
-el('exit').onclick=()=>{opsEpoch++;opsData=null;el('ops-market-list').replaceChildren();el('ops-market-status').textContent='ยังไม่ได้โหลดข้อมูล';el('ops-api').textContent='ยังไม่ตรวจสอบ';el('ops-checked').textContent='';pass='';state=null;el('rows').replaceChildren();el('smart-list').replaceChildren();el('smart-search').value='';el('smart-advanced').open=false;el('preview').textContent='เลือกรายการเพื่อดูตัวอย่าง';el('panel').hidden=true;el('login').hidden=false;status('ล็อกแล้ว');};
+el('exit').onclick=()=>{opsEpoch++;opsData=null;el('ops-market-list').replaceChildren();el('ops-market-status').textContent='ยังไม่ได้โหลดข้อมูล';el('ops-api').textContent='ยังไม่ตรวจสอบ';el('ops-checked').textContent='';pass='';state=null;el('bulk-formula-status').textContent='ยังไม่เปลี่ยนสูตร · ต้องกดบันทึกตารางเวลา';el('rows').replaceChildren();el('smart-list').replaceChildren();el('smart-search').value='';el('smart-advanced').open=false;el('preview').textContent='เลือกรายการเพื่อดูตัวอย่าง';el('panel').hidden=true;el('login').hidden=false;status('ล็อกแล้ว');window.bnLineAdmin.logout();};
+ el('enter').click();
 }
 
 function highlight(i){links.forEach((a,j)=>{if(i===toolIds[j])a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')})}
