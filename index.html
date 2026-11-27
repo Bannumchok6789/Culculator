@@ -708,6 +708,11 @@ button,input,select{font:inherit}
 
 .ops-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.ops-card{padding:14px;border:1px solid var(--smart-border);border-radius:14px;background:var(--smart-soft);min-width:0}.ops-card strong{display:block;font-size:17px;margin:6px 0}.ops-muted{font-size:12px;line-height:1.6;color:var(--smart-ink);opacity:.8}.ops-market{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}.ops-market .ops-card{padding:10px}.ops-market .open{color:#159957}.ops-market .closed{color:#e65b65}.ops-market .unknown{color:#c58a27}.ops-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.ops-tools input{max-width:180px}.ops-link{color:var(--smart-ink);text-decoration:underline}.ops-section h3{margin:0;font-size:17px}.ops-section{scroll-margin-top:16px}@media(max-width:600px){.ops-grid,.ops-market{grid-template-columns:1fr}.ops-tools input{max-width:100%}}
 
+
+#add-lottery-dialog{position:fixed;inset:0;margin:auto;width:min(480px,calc(100% - 28px));max-width:none;max-height:calc(100dvh - 32px);overflow:auto;padding:22px;border:1px solid var(--smart-border);border-radius:22px;background:var(--smart-card);color:var(--smart-ink);box-shadow:0 24px 80px #0005;font:inherit}
+#add-lottery-dialog::backdrop{background:rgba(8,18,30,.62);backdrop-filter:blur(4px)}
+.add-lottery-fields{display:grid;gap:14px}.add-lottery-fields .label{margin-bottom:6px}.add-lottery-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:20px}.add-lottery-actions .btn{height:44px}.add-lottery-error{color:var(--smart-muted);font-size:13px;min-height:18px;margin:8px 0 0}.add-lottery-fields .formula-row{flex-wrap:wrap}
+
 #preview-dialog{position:fixed;inset:0;margin:auto;width:min(600px,calc(100% - 28px));max-width:none;max-height:calc(100dvh - 32px);padding:18px;border:1px solid var(--smart-border);border-radius:22px;background:var(--smart-card);color:var(--smart-ink);box-shadow:0 24px 80px #0005;overflow:auto;font:inherit}
 #preview-dialog::backdrop{background:rgba(8,18,30,.62);backdrop-filter:blur(4px)}
 .preview-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.preview-head strong{font-size:19px}.preview-head .subnote{font-size:12px;margin-top:4px}#preview-close{width:36px;height:36px;flex:none;border-radius:50%;border:1px solid var(--smart-border);background:var(--smart-soft);color:var(--smart-ink);font-size:24px;cursor:pointer;line-height:1}.preview-footer{display:flex;justify-content:flex-end;margin-top:12px}#preview-dialog .preview-box{margin:0;min-height:100px;max-height:55dvh;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere}#preview-done{min-width:112px}
@@ -720,6 +725,7 @@ button,input,select{font:inherit}
 /* LINE dashboard V2 — inherited shared theme */
 .wrap{max-width:1160px}.hero{position:relative;overflow:hidden;padding:28px!important;border-radius:24px!important;align-items:center;background:linear-gradient(120deg,var(--smart-card),var(--smart-soft))!important}.hero h2{font-size:clamp(24px,3vw,32px);letter-spacing:-.035em}.dash-kicker{font-size:10px;letter-spacing:.18em;font-weight:750;color:var(--smart-accent);margin-bottom:9px}.dash-mark{width:56px;height:56px;flex:none;border:1px solid var(--smart-border);border-radius:18px;display:grid;place-items:center;color:var(--smart-accent);background:var(--smart-card)}.dash-mark svg{width:28px;height:28px}.smart-stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.smart-stat{padding:17px!important;border-radius:19px!important;min-width:0;position:relative;overflow:hidden}.smart-stat:before{content:'';position:absolute;top:0;left:17px;width:28px;height:3px;border-radius:0 0 4px 4px;background:var(--smart-accent)}.smart-stat strong{font-size:30px!important;letter-spacing:-.045em;font-variant-numeric:tabular-nums;margin:10px 0 6px!important}.smart-stat small{font-size:12px;line-height:1.5}.section{border-radius:20px!important;padding:19px!important}.headline h3{margin:0;font-size:16px;letter-spacing:-.015em}.ops-card{border-radius:16px;padding:16px}.ops-tools{gap:8px}.btn{border-radius:10px;transition:filter .15s}.btn:hover{filter:brightness(.96)}.smart-row{padding:14px 3px;gap:14px}.smart-list{max-height:420px}.smart-advanced{padding:12px;border:1px solid var(--smart-border);border-radius:20px}.smart-advanced>summary{padding:12px!important}.item-head{padding:14px}.dash-guide{margin-bottom:14px}.dash-guide summary{cursor:pointer;font-weight:650;color:var(--smart-ink)}.dash-guide[open] summary{margin-bottom:12px}.dash-actions{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}.dash-actions .btn{flex:1;min-width:120px}.status{font-size:12px;margin:8px 0 16px}.dash-sources{margin-bottom:14px}.dash-sources summary{cursor:pointer;font-weight:650}.dash-sources[open] summary{margin-bottom:12px}
 @media(max-width:760px){.hero{display:flex!important;padding:18px!important}.dash-mark{width:44px;height:44px}.smart-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.smart-stat{padding:13px!important}.smart-stat strong{font-size:25px!important}.section{padding:13px!important}.ops-grid{grid-template-columns:1fr}.dash-actions .btn{min-width:100px}.smart-row{gap:8px}}
+[hidden]{display:none!important}.line-tabs{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;position:sticky;top:0;z-index:5;background:var(--smart-card);border:1px solid var(--smart-border);border-radius:14px;padding:8px;scroll-margin-top:12px}.line-tabs .btn{min-width:0!important;width:100%;white-space:normal;text-align:center}@media(max-width:600px){.line-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 <main>
   <div class="wrap">
@@ -738,14 +744,14 @@ button,input,select{font:inherit}
     <p id="status" class="status" role="status">พร้อมเชื่อมต่อ</p>
     <div id="panel" hidden>
       <div class="smart-stats"><div class="smart-stat"><small>รายชื่อใน Backend</small><strong id="smart-total">—</strong><small>คำสั่งที่ค้นหาได้</small></div><div class="smart-stat"><small>ตารางเปิดส่ง</small><strong id="smart-enabled">—</strong><small id="smart-schedule-status">—</small></div><div class="smart-stat"><small>ตารางปิดส่ง</small><strong id="dash-disabled">—</strong><small>รายการในตาราง</small></div><div class="smart-stat"><small>ตารางทั้งหมด</small><strong id="dash-total">—</strong><small>ค่าตารางปัจจุบัน</small></div></div>
-      <div class="dash-actions"><button id="ops-command" class="btn primary" type="button">Command Center</button><button id="ops-calendar" class="btn" type="button">ปฏิทินตลาด</button><button id="ops-settings" class="btn" type="button">ตั้งค่าตาราง</button></div>
-      <section class="section ops-section"><div class="headline"><h3>ภาพรวมระบบ · Dashboard</h3><span class="subnote">ข้อมูลจากการเชื่อมต่อจริง</span></div><div class="ops-grid"><div class="ops-card"><small>Admin API</small><strong id="ops-api">ยังไม่ตรวจสอบ</strong><div id="ops-checked" class="ops-muted"></div><button id="ops-check" class="btn" type="button">ตรวจการเชื่อมต่อ</button></div><div class="ops-card"><small>LINE Reply</small><strong>เรียกด้วย /ชื่อหวย</strong><div class="ops-muted">สถานะ webhook ต้องตรวจด้วยการพิมพ์คำสั่งในกลุ่มจริง</div></div></div></section>
-      <section class="section" id="ops-command-section"><div class="headline"><strong>ค้นหาคำสั่ง LINE</strong><button id="smart-exit" class="btn" type="button">ล็อกหน้าจัดการ</button></div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:8px"><button id="smart-exit" class="btn" type="button">ล็อกหน้าจัดการ</button></div><div class="dash-actions line-tabs" role="group" aria-label="หมวดจัดการ LINE"><button id="ops-home" class="btn primary" type="button">ภาพรวม</button><button id="ops-settings" class="btn" type="button">ตาราง AUTO</button><button id="ops-command" class="btn" type="button">คำสั่ง LINE</button><button id="ops-calendar" class="btn" type="button">ปฏิทินตลาด</button></div>
+      <section id="ops-home-section" class="section ops-section"><div class="headline"><h3>ภาพรวมระบบ · Dashboard</h3><span class="subnote">ข้อมูลจากการเชื่อมต่อจริง</span></div><div class="ops-grid"><div class="ops-card"><small>Admin API</small><strong id="ops-api">ยังไม่ตรวจสอบ</strong><div id="ops-checked" class="ops-muted"></div><button id="ops-check" class="btn" type="button">ตรวจการเชื่อมต่อ</button></div><div class="ops-card"><small>LINE Reply</small><strong>เรียกด้วย /ชื่อหวย</strong><div class="ops-muted">สถานะ webhook ต้องตรวจด้วยการพิมพ์คำสั่งในกลุ่มจริง</div></div></div></section>
+      <section class="section" id="ops-command-section"><div class="headline"><strong>ค้นหาคำสั่ง LINE</strong></div>
       <label class="label" for="smart-search">ชื่อหวย</label><input id="smart-search" class="input" type="search" placeholder="เช่น ลาวพัฒนา หรือ ฮานอย" autocomplete="off">
       <div class="smart-formulas"><label><input type="radio" name="smart-f" value="default" checked> ตามค่าบอท</label><label><input type="radio" name="smart-f" value="1"> V.1 ชมพู</label><label><input type="radio" name="smart-f" value="2"> V.2 ฟ้า</label><label><input type="radio" name="smart-f" value="3"> V.3 ม่วง</label></div>
       <p class="smart-caption" id="smart-count"></p><div id="smart-list" class="smart-list"></div></section>
-      <details class="section dash-guide"><summary>คู่มือคำสั่ง</summary><div class="smart-guide">/ชื่อหวย — เรียกสูตรตามค่าที่บอทตั้งไว้<br>/ชื่อหวย V1 — เลือกสูตรเดียว (V2 หรือ V3 ได้)<br>/ค้นหา ฮานอย — ค้นหาชื่อบางส่วน<br>/รายชื่อหวย — แสดงรายชื่อ<br>/วิธีใช้ — แสดงคู่มือ</div></details>
-      <details class="smart-advanced" id="smart-advanced"><summary>ตั้งค่าขั้นสูง · ตารางส่งอัตโนมัติเดิม</summary>
+      <details id="ops-guide-section" class="section dash-guide"><summary>คู่มือคำสั่ง</summary><div class="smart-guide">/ชื่อหวย — เรียกสูตรตามค่าที่บอทตั้งไว้<br>/ชื่อหวย V1 — เลือกสูตรเดียว (V2 หรือ V3 ได้)<br>/ค้นหา ฮานอย — ค้นหาชื่อบางส่วน<br>/รายชื่อหวย — แสดงรายชื่อ<br>/วิธีใช้ — แสดงคู่มือ</div></details>
+      <details class="smart-advanced" id="smart-advanced"><summary>ตาราง AUTO · ตั้งเวลาส่งอัตโนมัติ</summary>
       <section class="section">
         <div class="headline">
           <div>
@@ -775,7 +781,19 @@ button,input,select{font:inherit}
         <div id="rows" class="list"></div>
       </section></details>
       <section class="section ops-section" id="ops-market-section"><div class="headline"><h3>Market Calendar · 16 ตลาด</h3><button id="ops-market-load" class="btn primary" type="button">โหลดปฏิทิน</button></div><div class="ops-tools"><label for="ops-market-date">วันที่ตลาด</label><input id="ops-market-date" class="input" type="date"></div><p id="ops-market-status" class="ops-muted" role="status">ยังไม่ได้โหลดข้อมูล</p><div id="ops-market-list" class="ops-market"></div><p class="ops-muted">แสดงวันทำการตามปฏิทิน ไม่ใช่สถานะซื้อขาย ณ เวลาปัจจุบัน · <a class="ops-link" href="https://script.google.com/macros/s/AKfycbxssN2hAbfLevMrsqTnkFp0Z3AYyUCWYUbIkGuoo9wZoHnU2f8s5SXLumoFEywYNlLphw/exec" target="_blank" rel="noopener noreferrer">เปิด API โดยตรง</a></p></section>
-      <section class="section ops-section"><div class="headline"><h3>Data Sources</h3></div><div class="ops-grid"><div class="ops-card"><strong>WinTool37</strong><div class="ops-muted">แหล่งผลย้อนหลังหลัก · <a class="ops-link" href="https://wintool37.netlify.app/" target="_blank" rel="noopener noreferrer">เปิดแหล่งข้อมูล</a></div></div><div class="ops-card"><strong>ผลหวย.com</strong><div class="ops-muted">แหล่งเพิ่มเติมสำหรับรายการที่รองรับ · <a class="ops-link" href="https://xn--t3cmiit.com/" target="_blank" rel="noopener noreferrer">เปิดแหล่งข้อมูล</a></div></div></div><p class="ops-muted">รายการนี้แสดงการตั้งค่าแหล่งข้อมูล ไม่ใช่ผลตรวจออนไลน์ของแต่ละแหล่ง</p></section>
+      <section id="ops-source-section" class="section ops-section"><div class="headline"><h3>Data Sources</h3></div><div class="ops-grid"><div class="ops-card"><strong>WinTool37</strong><div class="ops-muted">แหล่งผลย้อนหลังหลัก · <a class="ops-link" href="https://wintool37.netlify.app/" target="_blank" rel="noopener noreferrer">เปิดแหล่งข้อมูล</a></div></div><div class="ops-card"><strong>ผลหวย.com</strong><div class="ops-muted">แหล่งเพิ่มเติมสำหรับรายการที่รองรับ · <a class="ops-link" href="https://xn--t3cmiit.com/" target="_blank" rel="noopener noreferrer">เปิดแหล่งข้อมูล</a></div></div></div><p class="ops-muted">รายการนี้แสดงการตั้งค่าแหล่งข้อมูล ไม่ใช่ผลตรวจออนไลน์ของแต่ละแหล่ง</p></section>
+      <dialog id="add-lottery-dialog" aria-labelledby="add-lottery-title">
+        <header class="preview-head"><div><strong id="add-lottery-title">เพิ่มหวยใหม่</strong><div class="subnote">เพิ่มรายการลงแถวในตาราง AUTO</div></div><button id="add-lottery-close" class="btn" type="button" aria-label="ปิด">×</button></header>
+        <div class="add-lottery-fields">
+          <div><label class="label" for="add-lottery-search">ค้นหาชื่อหวย</label><input class="input" id="add-lottery-search" type="search" placeholder="พิมพ์ชื่อหวย..." autocomplete="off"></div>
+          <div><label class="label" for="add-lottery-key">เลือกรายการ</label><select class="select" id="add-lottery-key"></select></div>
+          <div><label class="label" for="add-lottery-time">เวลาส่ง</label><input class="input" id="add-lottery-time" type="time" value="08:00"></div>
+          <div><span class="label">เลือกสูตร</span><div class="formula-row" role="group" aria-label="เลือกสูตรสำหรับรายการใหม่"><label class="formula-option f1"><input id="add-lottery-f1" type="checkbox" checked> V.1 ชมพู</label><label class="formula-option f2"><input id="add-lottery-f2" type="checkbox"> V.2 ฟ้า</label><label class="formula-option f3"><input id="add-lottery-f3" type="checkbox" checked> V.3 ม่วง</label></div></div>
+          <p class="subnote">รายการใหม่จะปิดส่งอัตโนมัติไว้ก่อน การเพิ่มลงแถวยังไม่บันทึกไปยัง Backend</p>
+        </div>
+        <p id="add-lottery-error" class="add-lottery-error" role="status" aria-live="polite"></p>
+        <footer class="add-lottery-actions"><button id="add-lottery-cancel" class="btn" type="button">ยกเลิก</button><button id="add-lottery-confirm" class="btn primary" type="button">บันทึกลงแถว</button></footer>
+      </dialog>
       <dialog id="preview-dialog" aria-labelledby="preview-title">
         <header class="preview-head"><div><strong id="preview-title">ตัวอย่างข้อความ</strong><div class="subnote">ยังไม่ส่งเข้า LINE</div></div><button id="preview-close" type="button" aria-label="ปิดตัวอย่าง" autofocus>×</button></header>
         <pre id="preview" class="preview-box" aria-live="polite"></pre>
@@ -807,7 +825,10 @@ function opsValidate(d){const validDate=x=>typeof x==='string'&&/^\d{4}-\d{2}-\d
 el('ops-market-date').value=opsDate();el('ops-market-date').onchange=opsRenderMarket;
 el('ops-market-load').onclick=async()=>{const e=opsEpoch;const b=el('ops-market-load');b.disabled=true;opsData=null;opsRenderMarket();el('ops-market-status').textContent='กำลังอ่าน Calendar API...';try{const r=await fetch(opsURL,{cache:'no-store',credentials:'omit',signal:AbortSignal.timeout(20000)});if(!r.ok)throw Error('HTTP '+r.status);const d=opsValidate(await r.json());if(e!==opsEpoch)return;opsData=d;el('ops-market-status').textContent='Calendar API · 16/16 · สร้างข้อมูล '+new Date(d.generatedAt).toLocaleString('th-TH',{timeZone:'Asia/Bangkok'})+' (ไทย)';opsRenderMarket();}catch(err){if(e===opsEpoch)el('ops-market-status').textContent='อ่าน API ไม่สำเร็จหรือข้อมูลไม่พร้อม กรุณาเปิด API โดยตรงเพื่อตรวจสอบ (อาจติดข้อจำกัดเบราว์เซอร์)';}finally{b.disabled=false;}};
 el('ops-check').onclick=async()=>{const e=opsEpoch;el('ops-check').disabled=true;el('ops-api').textContent='กำลังตรวจสอบ';try{const v=await api('state');if(!Array.isArray(v.directory)||!Array.isArray(v.rows))throw Error('invalid state');if(e===opsEpoch)opsStamp();}catch(err){if(e===opsEpoch){el('ops-api').textContent='ตรวจสอบไม่สำเร็จ';el('ops-checked').textContent='ลองใหม่ภายหลัง';}}finally{el('ops-check').disabled=false;}};
-el('ops-command').onclick=()=>el('ops-command-section').scrollIntoView({behavior:'smooth'});el('ops-calendar').onclick=()=>el('ops-market-section').scrollIntoView({behavior:'smooth'});el('ops-settings').onclick=()=>{el('smart-advanced').open=true;el('smart-advanced').scrollIntoView({behavior:'smooth'});};
+const lineSections={home:['ops-home-section','ops-source-section'],settings:['smart-advanced'],command:['ops-command-section','ops-guide-section'],calendar:['ops-market-section']};
+function selectLineSection(name){for(const [key,ids] of Object.entries(lineSections)){for(const id of ids)el(id).hidden=key!==name;const button=el('ops-'+key);button.classList.toggle('primary',key===name);button.setAttribute('aria-pressed',String(key===name));}if(name==='settings')el('smart-advanced').open=true;}
+for(const key of Object.keys(lineSections))el('ops-'+key).onclick=()=>{selectLineSection(key);el('ops-home').parentElement.scrollIntoView({block:'start',behavior:'smooth'});};
+selectLineSection('home');
 function smartName(name){return String(name||'').trim().replace(/^(?:ผลหวย|หวย)\s*/,'').trim();}
 function smartRender(){
   if(!state)return;
@@ -938,7 +959,35 @@ function render(){
   });
 }
 el('enter').onclick=async()=>{pass=crypto.randomUUID();el('enter').disabled=true;status('กำลังเชื่อมต่อ...');try{state=await api('state');if(![5,6].includes(Number(state.version))||!Array.isArray(state.directory)||!Array.isArray(state.rows))throw Error('Backend ไม่รองรับหรือข้อมูลไม่ครบ');state.last=state.last||{};state.openIndex=null;render();el('panel').hidden=false;el('login').hidden=true;status('เชื่อมต่อสำเร็จ');opsStamp();}catch(e){pass='';status(e.message)}finally{el('enter').disabled=false}};
-el('add').onclick=()=>{const d=state.directory.find(d=>!state.rows.some(r=>r.key===d.key));if(d){state.rows.push({key:d.key,time:'08:00',enabled:false,formulas:[1,3]});state.openIndex=state.rows.length-1;status('เพิ่มรายการแล้ว — กรุณาบันทึกตารางเวลา');render();}else status('ไม่มีรายการใหม่ให้เพิ่ม');};
+const addLotteryDialog=el('add-lottery-dialog');
+const addLotteryFormulas=()=>[1,2,3].filter(f=>el('add-lottery-f'+f).checked);
+function closeAddLottery(){if(addLotteryDialog.open)addLotteryDialog.close();}
+function refreshAddLottery(){
+ const select=el('add-lottery-key'), previous=select.value, q=el('add-lottery-search').value.trim().toLocaleLowerCase();
+ const available=(state?.directory||[]).filter(d=>!state.rows.some(r=>r.key===d.key));
+ const matches=available.filter(d=>String(d.name||'').toLocaleLowerCase().includes(q));
+ select.replaceChildren();const placeholder=document.createElement('option');placeholder.value='';placeholder.textContent=matches.length?'— เลือกหวย —':'ไม่พบรายการที่เพิ่มได้';select.append(placeholder);
+ for(const d of matches){const opt=document.createElement('option');opt.value=d.key;opt.textContent=d.name;select.append(opt);}
+ if(matches.some(d=>String(d.key)===previous))select.value=previous;
+ el('add-lottery-confirm').disabled=!matches.length;
+ el('add-lottery-error').textContent=matches.length?'':available.length?'ไม่พบชื่อที่ค้นหา':'ไม่มีรายการใหม่ให้เพิ่ม';
+}
+el('add').onclick=()=>{if(!state||el('save').disabled)return;el('add-lottery-search').value='';el('add-lottery-key').value='';el('add-lottery-time').value='08:00';for(const f of [1,2,3])el('add-lottery-f'+f).checked=f!==2;refreshAddLottery();if(!addLotteryDialog.open)addLotteryDialog.showModal();el('add-lottery-search').focus();};
+el('add-lottery-search').oninput=refreshAddLottery;
+el('add-lottery-close').onclick=closeAddLottery;el('add-lottery-cancel').onclick=closeAddLottery;
+addLotteryDialog.addEventListener('cancel',e=>{e.preventDefault();closeAddLottery();});
+window.addEventListener('bn-line-admin-invalidated',closeAddLottery);
+el('add-lottery-confirm').onclick=()=>{
+ if(!state||!addLotteryDialog.open||el('save').disabled)return;
+ const key=el('add-lottery-key').value,time=el('add-lottery-time').value,formulas=addLotteryFormulas();
+ const fail=t=>el('add-lottery-error').textContent=t;
+ if(!key||!state.directory.some(d=>String(d.key)===key))return fail('กรุณาเลือกหวย');
+ if(state.rows.some(r=>String(r.key)===key))return fail('มีรายการนี้ในตารางแล้ว');
+ if(state.rows.length>=100)return fail('ตารางรองรับสูงสุด 100 รายการ');
+ if(!/^([01]\d|2[0-3]):[0-5]\d$/.test(time))return fail('กรุณาระบุเวลาที่ถูกต้อง');
+ if(!formulas.length)return fail('กรุณาเลือกอย่างน้อย 1 สูตร');
+ state.rows.push({key,time,enabled:false,formulas});state.openIndex=state.rows.length-1;closeAddLottery();render();status('เพิ่มรายการลงแถวแล้ว — ยังไม่ได้บันทึกตารางเวลาไปยัง Backend');
+};
 for(const [id,on] of [['enable-all',true],['disable-all',false]])el(id).onclick=()=>{if(!state)return;if(!confirm((on?'เปิด':'ปิด')+'การส่งตามเวลาทั้งหมด? การค้นหาใน LINE ไม่เปลี่ยน'))return;state.rows.forEach(r=>r.enabled=on);render();status('แก้ไขแล้ว — กรุณาบันทึกตารางเวลา');};
 const bulkIds=['bulk-f1','bulk-f2','bulk-f3'];
 const bulkSelected=()=>bulkIds.flatMap((id,i)=>el(id).checked?[i+1]:[]);
@@ -992,7 +1041,7 @@ function closeOrder(){if(!orderBusy&&!orderGesture)orderDialog.close();}el('ord-
 el('ord-save').onclick=async()=>{if(orderBusy||orderGesture||!state||el('save').disabled)return;if(!confirm('บันทึกลำดับใหม่พร้อมการแก้ไขตารางที่ค้างอยู่? ไม่เปลี่ยนเวลาหรือสถานะเปิด–ปิดจากค่าปัจจุบัน'))return;orderBusy=true;orderSync();const previous=state.rows;const opened=previous[state.openIndex];state.rows=orderDraft.slice();state.openIndex=opened?state.rows.indexOf(opened):null;try{const ok=await saveSchedule();if(ok){render();orderDialog.close();}else{state.rows=previous;state.openIndex=opened?previous.indexOf(opened):null;render();alert('บันทึกไม่สำเร็จ กรุณาลองอีกครั้ง');}}finally{orderBusy=false;orderSync();}};
 
 el('save').onclick=saveSchedule;
-el('exit').onclick=()=>{opsEpoch++;opsData=null;el('ops-market-list').replaceChildren();el('ops-market-status').textContent='ยังไม่ได้โหลดข้อมูล';el('ops-api').textContent='ยังไม่ตรวจสอบ';el('ops-checked').textContent='';pass='';state=null;bulkIds.forEach(id=>el(id).checked=false);syncBulk();el('bulk-formula-status').textContent='เลือกอย่างน้อย 1 สูตรก่อนบันทึก';el('rows').replaceChildren();el('smart-list').replaceChildren();el('smart-search').value='';el('smart-advanced').open=false;closePreview();el('panel').hidden=true;el('login').hidden=false;status('ล็อกแล้ว');lockManagement();};
+el('exit').onclick=()=>{closeAddLottery();opsEpoch++;opsData=null;el('ops-market-list').replaceChildren();el('ops-market-status').textContent='ยังไม่ได้โหลดข้อมูล';el('ops-api').textContent='ยังไม่ตรวจสอบ';el('ops-checked').textContent='';pass='';state=null;bulkIds.forEach(id=>el(id).checked=false);syncBulk();el('bulk-formula-status').textContent='เลือกอย่างน้อย 1 สูตรก่อนบันทึก';el('rows').replaceChildren();el('smart-list').replaceChildren();el('smart-search').value='';el('smart-advanced').open=false;closePreview();el('panel').hidden=true;el('login').hidden=false;status('ล็อกแล้ว');lockManagement();};
  el('enter').click();
 }
 
