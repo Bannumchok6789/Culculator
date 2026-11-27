@@ -750,7 +750,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
  function clear(){for(const store of [localStorage,sessionStorage])try{store.removeItem(key)}catch{};}
  function show(ok){gate.hidden=ok;app.hidden=!ok;password.value='';if(!ok)user.value='admin';}
  async function request(action,extra={},auth=token){const r=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json',...(auth?{'Authorization':'Bearer '+auth}:{})},body:JSON.stringify({action,...extra}),cache:'no-store',credentials:'omit'});const d=await r.json();if(!r.ok||!d.ok){const e=Error(d.error||'เชื่อมต่อไม่สำเร็จ');e.status=r.status;throw e;}return d.result;}
- function invalidate(message){epoch++;token='';clear();show(false);error.textContent=message||'';}
+ function invalidate(message){epoch++;token='';clear();window.dispatchEvent(new Event('bn-line-admin-invalidated'));show(false);error.textContent=message||'';}
  async function logout(){const old=token;invalidate('');if(old)try{await request('logout',{},old)}catch{error.textContent='ออกจากเครื่องนี้แล้ว แต่ยกเลิกเซสชันบนเซิร์ฟเวอร์ไม่สำเร็จ';}}
  window.bnLineAdmin={async api(action,extra){try{return await request(action,extra)}catch(e){if(e.status===401)invalidate(e.message);throw e;}},logout};
  user.value='admin';show(false);
@@ -2207,6 +2207,10 @@ button,input,select{font:inherit}
 :host{color:var(--smart-ink)}main{color:var(--smart-ink)}.section,.smart-stat,.item,.item-panel,.smart-command,.smart-advanced,.status,.empty{background:var(--smart-card)!important;border-color:var(--smart-border)!important;color:var(--smart-ink)!important;box-shadow:none!important}.input,.select,.btn:not(.primary){background:var(--smart-soft)!important;color:var(--smart-ink)!important;border-color:var(--smart-border)!important}.headline strong,.label,.item-title,.smart-stat strong,.smart-stat small,.smart-caption,.subnote,.helper,.smart-guide,.schedule-count{color:var(--smart-ink)!important}.hero{background:linear-gradient(120deg,#075b40,#0c7851)!important}.btn.primary{background:var(--smart-green)!important;color:white!important;border:0!important}.preview-box{background:#0b2d20!important;color:#e4f6eb!important}
 
 .ops-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.ops-card{padding:14px;border:1px solid var(--smart-border);border-radius:14px;background:var(--smart-soft);min-width:0}.ops-card strong{display:block;font-size:17px;margin:6px 0}.ops-muted{font-size:12px;line-height:1.6;color:var(--smart-ink);opacity:.8}.ops-market{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}.ops-market .ops-card{padding:10px}.ops-market .open{color:#159957}.ops-market .closed{color:#e65b65}.ops-market .unknown{color:#c58a27}.ops-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.ops-tools input{max-width:180px}.ops-link{color:var(--smart-ink);text-decoration:underline}.ops-section h3{margin:0;font-size:17px}.ops-section{scroll-margin-top:16px}@media(max-width:600px){.ops-grid,.ops-market{grid-template-columns:1fr}.ops-tools input{max-width:100%}}
+
+#preview-dialog{position:fixed;inset:0;margin:auto;width:min(600px,calc(100% - 28px));max-width:none;max-height:calc(100dvh - 32px);padding:18px;border:1px solid var(--smart-border);border-radius:22px;background:var(--smart-card);color:var(--smart-ink);box-shadow:0 24px 80px #0005;overflow:auto;font:inherit}
+#preview-dialog::backdrop{background:rgba(8,18,30,.62);backdrop-filter:blur(4px)}
+.preview-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.preview-head strong{font-size:19px}.preview-head .subnote{font-size:12px;margin-top:4px}#preview-close{width:36px;height:36px;flex:none;border-radius:50%;border:1px solid var(--smart-border);background:var(--smart-soft);color:var(--smart-ink);font-size:24px;cursor:pointer;line-height:1}.preview-footer{display:flex;justify-content:flex-end;margin-top:12px}#preview-dialog .preview-box{margin:0;min-height:100px;max-height:55dvh;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere}#preview-done{min-width:112px}
 </style>
 <main>
   <div class="wrap">
@@ -2262,15 +2266,25 @@ button,input,select{font:inherit}
         <div id="schedule-count" class="schedule-count" role="status" aria-live="polite"></div>
         <div id="rows" class="list"></div>
       </section></details>
-      <section class="section">
-        <div class="headline" style="margin-bottom:10px"><strong>ตัวอย่างข้อความ</strong><span class="subnote">ยังไม่ส่งเข้า LINE</span></div>
-        <pre id="preview" class="preview-box">เลือกรายการเพื่อดูตัวอย่าง</pre>
-      </section>
+      <dialog id="preview-dialog" aria-labelledby="preview-title">
+        <header class="preview-head"><div><strong id="preview-title">ตัวอย่างข้อความ</strong><div class="subnote">ยังไม่ส่งเข้า LINE</div></div><button id="preview-close" type="button" aria-label="ปิดตัวอย่าง" autofocus>×</button></header>
+        <pre id="preview" class="preview-box" aria-live="polite"></pre>
+        <footer class="preview-footer"><button id="preview-done" class="btn primary" type="button">ปิดตัวอย่าง</button></footer>
+      </dialog>
     </div>
   </div>
 </main>`;
 const el=id=>root.getElementById(id);let state=null,pass='';const status=t=>el('status').textContent=t;
 async function api(action,extra={}){return window.bnLineAdmin.api(action,extra);}
+let previewEpoch=0;
+const previewDialog=el('preview-dialog');
+function closePreview(){previewEpoch++;if(previewDialog.open)previewDialog.close();el('preview').textContent='';}
+el('preview-close').onclick=closePreview;el('preview-done').onclick=closePreview;
+previewDialog.addEventListener('cancel',e=>{e.preventDefault();closePreview();});
+previewDialog.addEventListener('click',e=>{if(e.target!==previewDialog)return;const b=previewDialog.getBoundingClientRect();if(e.clientX<b.left||e.clientX>b.right||e.clientY<b.top||e.clientY>b.bottom)closePreview();});
+window.addEventListener('bn-line-admin-invalidated',closePreview);
+async function showPreview(key,formulas){const n=++previewEpoch;el('preview').textContent='กำลังโหลด...';if(!previewDialog.open)previewDialog.showModal();try{const v=await api('preview',{key,rows:{formulas}});if(n!==previewEpoch||!previewDialog.open)return;el('preview').textContent=v.text;status('โหลดตัวอย่างแล้ว — ไม่ส่ง LINE');}catch(e){if(n!==previewEpoch||!previewDialog.open)return;el('preview').textContent=e.message;status(e.message);}}
+
 
 const opsURL='https://script.google.com/macros/s/AKfycbxssN2hAbfLevMrsqTnkFp0Z3AYyUCWYUbIkGuoo9wZoHnU2f8s5SXLumoFEywYNlLphw/exec';
 const opsMarkets={XTKS:'ญี่ปุ่น',XSHG:'จีน',XHKG:'ฮ่องกง',XTAI:'ไต้หวัน',XKRX:'เกาหลีใต้',XSES:'สิงคโปร์',XBOM:'อินเดีย',XLON:'อังกฤษ',XETR:'เยอรมนี',XNYS:'NYSE / ดาวโจนส์',XBKK:'ไทย',XMOS:'รัสเซีย',XKLS:'มาเลเซีย',XPHS:'ฟิลิปปินส์',XASX:'ออสเตรเลีย',XNAS:'Nasdaq'};
@@ -2297,7 +2311,7 @@ function smartRender(){
   const choice=root.querySelector('input[name="smart-f"]:checked').value;
   for(const d of entries){const name=smartName(d.name);const cmd='/'+name+(choice==='default'?'':' V'+choice);const row=document.createElement('div');row.className='smart-row';const info=document.createElement('div');const title=document.createElement('strong');title.textContent=name;const sub=document.createElement('small');sub.textContent=cmd;info.append(title,sub);const actions=document.createElement('div');actions.className='smart-actions';
     const copy=document.createElement('button');copy.type='button';copy.className='btn';copy.textContent='คัดลอกคำสั่ง';copy.onclick=async()=>{try{await navigator.clipboard.writeText(cmd);status('คัดลอกคำสั่งแล้ว: '+cmd);}catch(e){status('คัดลอกไม่ได้ กรุณาคัดลอกคำสั่งจากรายการ');}};
-    const preview=document.createElement('button');preview.type='button';preview.className='btn primary';preview.textContent='ดูตัวอย่าง';preview.onclick=async()=>{const session=pass;const saved=state.rows.find(r=>r.key===d.key);const formulas=choice==='default'?(saved?.formulas||(String(d.key)==='external-hanoi-asean'?[1,2,3]:[1,3])):[Number(choice)];preview.disabled=true;el('preview').textContent='กำลังโหลด...';el('preview').scrollIntoView({block:'nearest'});try{const v=await api('preview',{key:d.key,rows:{formulas}});if(pass!==session||!state)return;el('preview').textContent=v.text;status('โหลดตัวอย่างแล้ว — ไม่ส่ง LINE');}catch(e){if(pass===session&&state){el('preview').textContent=e.message;status(e.message);}}finally{preview.disabled=false;}};
+    const preview=document.createElement('button');preview.type='button';preview.className='btn primary';preview.textContent='ดูตัวอย่าง';preview.onclick=async()=>{const saved=state.rows.find(r=>r.key===d.key);const formulas=choice==='default'?(saved?.formulas||(String(d.key)==='external-hanoi-asean'?[1,2,3]:[1,3])):[Number(choice)];preview.disabled=true;try{await showPreview(d.key,formulas);}finally{preview.disabled=false;}};
     actions.append(copy,preview);row.append(info,actions);list.append(row);
   }
 }
@@ -2397,7 +2411,7 @@ function render(){
     item.querySelector('.js-down').onclick=()=>moveRow(i,1);
     item.querySelector('.js-up').disabled=i===0;
     item.querySelector('.js-down').disabled=i===state.rows.length-1;
-    item.querySelector('.js-preview').onclick=async()=>{if(!r.formulas.length){status('กรุณาเลือกอย่างน้อย 1 สูตร');return;}el('preview').textContent='กำลังโหลด...';try{const v=await api('preview',{key:r.key,rows:{formulas:r.formulas}});el('preview').textContent=v.text;status('โหลดตัวอย่างแล้ว');}catch(e){el('preview').textContent=e.message;status(e.message);}};
+    item.querySelector('.js-preview').onclick=()=>{if(!r.formulas.length){status('กรุณาเลือกอย่างน้อย 1 สูตร');return;}showPreview(r.key,[...r.formulas]);};
     item.querySelector('.js-delete').onclick=()=>{state.rows.splice(i,1);if(state.openIndex===i)state.openIndex=null;status('ลบรายการแล้ว — กรุณาบันทึกตารางเวลา');render();};
     const helper=item.querySelector('.js-helper');
     const market=state.directory.find(d=>d.key===r.key);
@@ -2421,7 +2435,7 @@ for(const [id,formulas] of [['bulk-f1',[1]],['bulk-f2',[2]],['bulk-f3',[3]],['bu
   el('bulk-formula-status').textContent=msg;status(msg);
 };
 el('save').onclick=async()=>{el('save').disabled=true;try{status(await api('save',{rows:state.rows}));}catch(e){status(e.message)}finally{el('save').disabled=false}};
-el('exit').onclick=()=>{opsEpoch++;opsData=null;el('ops-market-list').replaceChildren();el('ops-market-status').textContent='ยังไม่ได้โหลดข้อมูล';el('ops-api').textContent='ยังไม่ตรวจสอบ';el('ops-checked').textContent='';pass='';state=null;el('bulk-formula-status').textContent='ยังไม่เปลี่ยนสูตร · ต้องกดบันทึกตารางเวลา';el('rows').replaceChildren();el('smart-list').replaceChildren();el('smart-search').value='';el('smart-advanced').open=false;el('preview').textContent='เลือกรายการเพื่อดูตัวอย่าง';el('panel').hidden=true;el('login').hidden=false;status('ล็อกแล้ว');window.bnLineAdmin.logout();};
+el('exit').onclick=()=>{opsEpoch++;opsData=null;el('ops-market-list').replaceChildren();el('ops-market-status').textContent='ยังไม่ได้โหลดข้อมูล';el('ops-api').textContent='ยังไม่ตรวจสอบ';el('ops-checked').textContent='';pass='';state=null;el('bulk-formula-status').textContent='ยังไม่เปลี่ยนสูตร · ต้องกดบันทึกตารางเวลา';el('rows').replaceChildren();el('smart-list').replaceChildren();el('smart-search').value='';el('smart-advanced').open=false;closePreview();el('panel').hidden=true;el('login').hidden=false;status('ล็อกแล้ว');window.bnLineAdmin.logout();};
  el('enter').click();
 }
 
