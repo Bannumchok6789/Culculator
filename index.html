@@ -539,6 +539,9 @@ window.BNMultiSourceV6 = (() => {
   let pauseUntil=0;
   function pick(raw, rows, fallback) {
     const q=norm(raw);
+    // Keep the two verified bot routes independent of WinTool aliases.
+    if([norm('ฮานอยอาเซียน'),norm('hanoi-asean')].includes(q))return {lottery_key:'external-hanoi-asean',lottery_name:'ฮานอยอาเซียน'};
+    if([norm('ลาวพิเศษ'),norm('lao-special')].includes(q))return {lottery_key:'lao_spec',lottery_name:'ลาวพิเศษ'};
     const exact=rows.filter(r=>norm(r.lottery_name)===q);
     if(exact.length===1)return exact[0];
     if(exact.length>1)return null;
@@ -552,8 +555,30 @@ window.BNMultiSourceV6 = (() => {
     }
     return ext.length>1?null:fallback(raw,rows);
   }
-  function isExternal(key){return String(key)==='lao_spec'||String(key).startsWith('external:');}
+  function botKey(key){const k=String(key);return k==='lao_spec'||k==='external:lao-special'?'lao_spec':k==='external-hanoi-asean'||k==='external:hanoi-asean'?'external-hanoi-asean':'';}
+  function isExternal(key){return !!botKey(key)||String(key).startsWith('external:');}
+  async function botHistory(key){
+    const result=await window.bnLineAdmin.api('history',{key});
+    if(!result||result.source!=='ผลหวย.com'||!Array.isArray(result.history))throw Error('แหล่งข้อมูลหรือรูปแบบผลย้อนหลังไม่ถูกต้อง');
+    const rows=result.history, unique=new Map();
+    const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Bangkok',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+    const today=['year','month','day'].map(k=>parts.find(p=>p.type===k).value).join('-');
+    for(const r of rows){
+      if(!r||typeof r.draw_date!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(r.draw_date)||!Number.isFinite(Date.parse(r.draw_date))||new Date(r.draw_date).toISOString().slice(0,10)!==r.draw_date||r.draw_date>today||typeof r.top3!=='string'||typeof r.bottom2!=='string'||!/^\d{3}$/.test(r.top3)||!/^\d{2}$/.test(r.bottom2))throw Error('ผลย้อนหลังไม่ถูกต้อง');
+      const prev=unique.get(r.draw_date);if(prev&&(prev.top3!==r.top3||prev.bottom2!==r.bottom2))throw Error('ผลย้อนหลังขัดแย้ง');
+      unique.set(r.draw_date,r);
+    }
+    const valid=[...unique.values()].sort((a,b)=>b.draw_date.localeCompare(a.draw_date));
+    if(valid.length<6||Date.parse(today)-Date.parse(valid[0].draw_date)>86400000)throw Error('ผลย้อนหลังไม่ครบหรือไม่เป็นปัจจุบัน');
+    return valid;
+  }
   async function history(key,primary){
+    const route=botKey(key);
+    if(route){
+      if(pending.has(route))return pending.get(route);
+      const task=botHistory(route);pending.set(route,task);
+      try{return await task;}finally{pending.delete(route);}
+    }
     if(!isExternal(key))return primary('lottery_results?select=draw_date,top3,bottom2&lottery_key=eq.'+encodeURIComponent(key)+'&order=draw_date.desc&limit=30');
     const slug=String(key)==='lao_spec'?'lao-special':String(key).slice(9),hit=cache.get(slug);
     if(hit&&Date.now()-hit.at<300000)return hit.rows;
@@ -1055,7 +1080,7 @@ function bestRemoteMatch(raw,rows){
 }
 async function lookupWinTool(raw,token,revision){
   if(!raw||raw.trim().length<2)return;
-  nameFeedback.textContent='';
+  nameFeedback.hidden=true;nameFeedback.textContent='';
   try{
     const directory=await fetchDirectory();
     if(token!==externalRequest||revision!==manualRevision)return;
@@ -1087,7 +1112,8 @@ async function lookupWinTool(raw,token,revision){
   }catch(err){
     if(token!==externalRequest||revision!==manualRevision)return;
     matchedNote.hidden=true;matchedNote.textContent='';
-    nameFeedback.textContent='ค้นหาออนไลน์ไม่สำเร็จ';
+    nameFeedback.hidden=false;
+    nameFeedback.textContent='ค้นหาออนไลน์ไม่สำเร็จ: '+String(err?.message||'กรุณาลองใหม่ภายหลัง');
   }
 }
 function formatLatestDate(date){
@@ -1122,7 +1148,7 @@ function updateName(){
   externalMatch=null;externalCredit.hidden=true;externalCredit.replaceChildren();
   matchedName.textContent='—';
   matchedNote.hidden=true;matchedNote.textContent='';
-  nameFeedback.textContent='';
+  nameFeedback.hidden=true;nameFeedback.textContent='';
   topInput.value='';downInput.value='';clearResults();
   const revision=manualRevision;
   if(raw.length>=2)searchTimer=setTimeout(()=>lookupWinTool(raw,token,revision),400);
