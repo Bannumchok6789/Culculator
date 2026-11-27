@@ -873,6 +873,7 @@ function render(){
         <button class="btn soft js-up" type="button">เลื่อนขึ้น</button>
         <button class="btn soft js-down" type="button">เลื่อนลง</button>
         <button class="btn soft js-all" type="button">เลือกทั้ง 3 สูตร</button>
+        <button class="btn primary js-save-row" type="button">บันทึกตารางเวลา</button>
         <button class="btn js-preview" type="button">ดูตัวอย่าง</button>
         <button class="btn js-delete" type="button">ลบรายการ</button>
       </div>
@@ -919,11 +920,12 @@ function render(){
       c.onchange=()=>{r.formulas=c.checked?[...new Set([...r.formulas,f])].sort():r.formulas.filter(x=>x!==f);if(!r.formulas.length){r.formulas=[f];c.checked=true;status('ต้องเลือกอย่างน้อย 1 สูตร');}else status('แก้ไขแล้ว — กรุณาบันทึกตารางเวลา');render();};
       wrap.append(c,label);fRow.append(wrap);
     });
-    item.querySelector('.js-all').onclick=()=>{r.formulas=[1,2,3];status('เลือกครบทั้ง 3 สูตรแล้ว');render();};
+    item.querySelector('.js-all').onclick=()=>{r.formulas=[1,2,3];status('เลือกครบทั้ง 3 สูตรแล้ว — กรุณาบันทึกตารางเวลา');render();};
     item.querySelector('.js-up').onclick=()=>moveRow(i,-1);
     item.querySelector('.js-down').onclick=()=>moveRow(i,1);
     item.querySelector('.js-up').disabled=i===0;
     item.querySelector('.js-down').disabled=i===state.rows.length-1;
+    item.querySelector('.js-save-row').onclick=async()=>{if(!confirm('บันทึกการแก้ไขตารางทั้งหมดที่ค้างอยู่?'))return;const ok=await saveSchedule();alert(ok?'บันทึกและยืนยันข้อมูล Backend แล้ว':'ยังยืนยันการบันทึกไม่ได้ กรุณาตรวจสอบสถานะ');};
     item.querySelector('.js-preview').onclick=()=>{if(!r.formulas.length){status('กรุณาเลือกอย่างน้อย 1 สูตร');return;}showPreview(r.key,[...r.formulas]);};
     item.querySelector('.js-delete').onclick=()=>{state.rows.splice(i,1);if(state.openIndex===i)state.openIndex=null;status('ลบรายการแล้ว — กรุณาบันทึกตารางเวลา');render();};
     const helper=item.querySelector('.js-helper');
@@ -948,7 +950,19 @@ el('bulk-save').onclick=async()=>{
   if(!confirm('บันทึก '+label+' ให้ทั้ง '+state.rows.length+' รายการ? เวลาและสถานะเปิด–ปิดจะไม่เปลี่ยนจากค่าปัจจุบัน และการแก้ไขตารางที่ค้างอยู่จะถูกบันทึกด้วย'))return;
   state.rows.forEach(r=>{r.formulas=[...formulas]});render();await saveSchedule();
 };
-async function saveSchedule(){if(!state||el('save').disabled)return;el('save').disabled=true;syncBulk();try{await api('save',{rows:state.rows});status('บันทึกตารางเวลาสำเร็จ');el('bulk-formula-status').textContent='บันทึกตารางเวลาสำเร็จ';return true;}catch(e){status('บันทึกไม่สำเร็จ: '+e.message);el('bulk-formula-status').textContent='บันทึกไม่สำเร็จ — กรุณาลองอีกครั้ง';return false;}finally{el('save').disabled=false;syncBulk();}}
+function canonicalRows(rows){if(!Array.isArray(rows))throw Error('Backend ไม่ส่งตารางกลับมา');return rows.map(r=>({key:String(r.key),time:r.time,enabled:r.enabled,formulas:[...(r.formulas??[1,3])].sort((a,b)=>a-b)}));}
+async function saveSchedule(){
+ if(!state||el('save').disabled)return false;
+ const current=state, snapshot=canonicalRows(state.rows), panel=el('panel');
+ el('save').disabled=true;syncBulk();panel.inert=true;status('กำลังบันทึกและตรวจสอบ Backend...');
+ try{await api('save',{rows:snapshot});const fresh=await api('state');
+ if(state!==current)throw Error('หน้าจัดการเปลี่ยนไป กรุณาโหลดใหม่');
+ if(JSON.stringify(canonicalRows(fresh.rows))!==JSON.stringify(snapshot))throw Error('ค่าที่ Backend ส่งกลับไม่ตรงกับค่าที่เลือก กรุณาตรวจสอบการเชื่อมต่อก่อนบันทึกอีกครั้ง');
+ current.last=fresh.last||{};current.active=fresh.active;render();
+ status('บันทึกและยืนยันข้อมูล Backend แล้ว');el('bulk-formula-status').textContent='บันทึกและยืนยันข้อมูล Backend แล้ว';return true;
+ }catch(e){status('ยังยืนยันการบันทึกไม่ได้: '+e.message);el('bulk-formula-status').textContent='ยังยืนยันการบันทึกไม่ได้';return false;}
+ finally{panel.inert=false;el('save').disabled=false;syncBulk();}
+}
 // V19.9.1: floating reorder animation.
 const orderDialog=document.createElement('dialog');orderDialog.id='order-dialog';orderDialog.setAttribute('aria-label','จัดลำดับรายการ');
 orderDialog.innerHTML=`<div class="ord-head"><strong>จัดลำดับรายการ</strong><button type="button" class="btn" id="ord-close" aria-label="ปิด">×</button></div><p class="subnote">ติ๊กหลายรายการ แล้วลากที่ ☰ เพื่อย้ายพร้อมกัน หรือใช้ปุ่มขึ้น–ลง</p><div class="ord-tools"><label><input type="checkbox" id="ord-all"> เลือกทั้งหมด</label><span id="ord-count"></span><button class="btn" id="ord-up" type="button">↑ ขึ้น</button><button class="btn" id="ord-down" type="button">↓ ลง</button></div><div id="ord-list"></div><div class="ord-foot"><button class="btn" id="ord-cancel" type="button">ยกเลิก</button><button class="btn primary" id="ord-save" type="button">บันทึกลำดับ</button></div>`;
