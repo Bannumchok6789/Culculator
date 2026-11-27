@@ -656,7 +656,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   </form>
 <p class="login-foot">BANNUMCHOK 6789 · LINE MANAGEMENT</p>
 </main>
-<main class="container" id="siteApp" hidden><aside class="workspace-nav"><div class="workspace-brand-block"><div class="glass-logo" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><path d="M7 23 24 8l17 15M12 21v19h24V21" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><rect x="19" y="24" width="10" height="10" rx="1" fill="currentColor"/></svg></div><div class="nav-brand">บ้านนำโชค6789</div><p class="nav-sub">LINE SMART BOT</p><div class="workspace-version">Version 19.7 · LINE SMART BOT</div></div><nav aria-label="เมนูหลัก"><a class="nav-current" href="#calcForm" aria-current="page"><svg class="nav-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M7 7h10M8 11h1m3 0h1m3 0h1M8 15h1m3 0h1m3 0h1"/></svg>สูตรคำนวณ</a><div class="tool-link-grid" aria-label="เปิดหน้าเครื่องมือเพิ่มเติม">
+<main class="container" id="siteApp" hidden><aside class="workspace-nav"><div class="workspace-brand-block"><div class="glass-logo" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><path d="M7 23 24 8l17 15M12 21v19h24V21" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><rect x="19" y="24" width="10" height="10" rx="1" fill="currentColor"/></svg></div><div class="nav-brand">บ้านนำโชค6789</div><p class="nav-sub">LINE SMART BOT</p><div class="workspace-version">Version 19.8 · LINE SMART BOT</div></div><nav aria-label="เมนูหลัก"><a class="nav-current" href="#calcForm" aria-current="page"><svg class="nav-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M7 7h10M8 11h1m3 0h1m3 0h1M8 15h1m3 0h1m3 0h1"/></svg>สูตรคำนวณ</a><div class="tool-link-grid" aria-label="เปิดหน้าเครื่องมือเพิ่มเติม">
   
   
   
@@ -2254,14 +2254,14 @@ button,input,select{font:inherit}
         </div>
         <div class="section" style="margin:12px 0;padding:12px">
           <strong>เลือกสูตรพร้อมกันทุกตาราง</strong>
-          <p class="subnote">แทนที่สูตรของทุกรายการในตาราง (รวมรายการที่ปิดส่ง) โดยไม่เปลี่ยนเวลาและสถานะเปิด–ปิด</p>
-          <div class="toolbar" style="margin-top:8px">
-            <button id="bulk-f1" class="btn formula-option f1" type="button">V.1 ทั้งหมด</button>
-            <button id="bulk-f2" class="btn formula-option f2" type="button">V.2 ทั้งหมด</button>
-            <button id="bulk-f3" class="btn formula-option f3" type="button">V.3 ทั้งหมด</button>
-            <button id="bulk-f123" class="btn primary" type="button">เลือกทั้ง 3 สูตรทั้งหมด</button>
+          <p class="subnote">ติ๊กได้หลายสูตร แล้วกดบันทึกสูตรทั้งหมดเพื่อใช้กับทุกรายการ (รวมรายการที่ปิดส่ง) โดยไม่เปลี่ยนเวลาและสถานะเปิด–ปิด</p>
+          <div class="formula-row" role="group" aria-label="เลือกสูตรทุกตาราง">
+            <label class="formula-option f1"><input id="bulk-f1" type="checkbox"> V.1 ชมพู</label>
+            <label class="formula-option f2"><input id="bulk-f2" type="checkbox"> V.2 ฟ้า</label>
+            <label class="formula-option f3"><input id="bulk-f3" type="checkbox"> V.3 ม่วง</label>
+            <button id="bulk-save" class="btn primary" type="button" disabled>บันทึกสูตรทั้งหมด</button>
           </div>
-          <p id="bulk-formula-status" class="subnote" role="status" aria-live="polite">ยังไม่เปลี่ยนสูตร · ต้องกดบันทึกตารางเวลา</p>
+          <p id="bulk-formula-status" class="subnote" role="status" aria-live="polite">เลือกอย่างน้อย 1 สูตรก่อนบันทึก</p>
         </div>
         <div id="schedule-count" class="schedule-count" role="status" aria-live="polite"></div>
         <div id="rows" class="list"></div>
@@ -2320,6 +2320,7 @@ el('smart-exit').onclick=()=>el('exit').click();
 function moveRow(i,delta){const ni=i+delta;if(ni<0||ni>=state.rows.length)return;[state.rows[i],state.rows[ni]]=[state.rows[ni],state.rows[i]];state.openIndex=ni;render();}
 function formulaChips(formulas){return (formulas||[]).sort().map(f=>`<span class="chip f${f}">V.${f}</span>`).join('');}
 function render(){
+  syncBulk();
   smartRender();
   el('mode').textContent=state.active?'ระบบตารางรวมเปิดแล้ว':'ตารางรวมยังไม่เปิด — ระบบเดิมยังทำงาน';
   const rows=el('rows'); rows.replaceChildren();
@@ -2425,17 +2426,37 @@ function render(){
 el('enter').onclick=async()=>{pass=crypto.randomUUID();el('enter').disabled=true;status('กำลังเชื่อมต่อ...');try{state=await api('state');if(![5,6].includes(Number(state.version))||!Array.isArray(state.directory)||!Array.isArray(state.rows))throw Error('Backend ไม่รองรับหรือข้อมูลไม่ครบ');state.last=state.last||{};state.openIndex=null;render();el('panel').hidden=false;el('login').hidden=true;status('เชื่อมต่อสำเร็จ');opsStamp();}catch(e){pass='';status(e.message)}finally{el('enter').disabled=false}};
 el('add').onclick=()=>{const d=state.directory.find(d=>!state.rows.some(r=>r.key===d.key));if(d){state.rows.push({key:d.key,time:'08:00',enabled:false,formulas:[1,3]});state.openIndex=state.rows.length-1;status('เพิ่มรายการแล้ว — กรุณาบันทึกตารางเวลา');render();}else status('ไม่มีรายการใหม่ให้เพิ่ม');};
 for(const [id,on] of [['enable-all',true],['disable-all',false]])el(id).onclick=()=>{if(!state)return;if(!confirm((on?'เปิด':'ปิด')+'การส่งตามเวลาทั้งหมด? การค้นหาใน LINE ไม่เปลี่ยน'))return;state.rows.forEach(r=>r.enabled=on);render();status('แก้ไขแล้ว — กรุณาบันทึกตารางเวลา');};
-for(const [id,formulas] of [['bulk-f1',[1]],['bulk-f2',[2]],['bulk-f3',[3]],['bulk-f123',[1,2,3]]])el(id).onclick=()=>{
-  if(!state||!state.rows.length||el('save').disabled)return;
+const bulkIds=['bulk-f1','bulk-f2','bulk-f3'];
+const bulkSelected=()=>bulkIds.flatMap((id,i)=>el(id).checked?[i+1]:[]);
+function syncBulk(){el('bulk-save').disabled=!state?.rows?.length||!bulkSelected().length||el('save').disabled;}
+for(const id of bulkIds)el(id).onchange=syncBulk;
+el('bulk-save').onclick=async()=>{
+  const formulas=bulkSelected();if(!state?.rows?.length||!formulas.length||el('save').disabled)return;
   const label=formulas.map(f=>'V.'+f).join(' / ');
-  if(!confirm('แทนที่สูตรของทั้ง '+state.rows.length+' รายการด้วย '+label+'? เวลาและสถานะเปิด–ปิดจะไม่เปลี่ยน'))return;
-  state.rows.forEach(r=>{r.formulas=[...formulas];});
-  render();
-  const msg='เลือก '+label+' ครบ '+state.rows.length+' รายการ — กรุณาบันทึกตารางเวลา';
-  el('bulk-formula-status').textContent=msg;status(msg);
+  if(!confirm('บันทึก '+label+' ให้ทั้ง '+state.rows.length+' รายการ? เวลาและสถานะเปิด–ปิดจะไม่เปลี่ยนจากค่าปัจจุบัน และการแก้ไขตารางที่ค้างอยู่จะถูกบันทึกด้วย'))return;
+  state.rows.forEach(r=>{r.formulas=[...formulas]});render();await saveSchedule();
 };
-el('save').onclick=async()=>{el('save').disabled=true;try{status(await api('save',{rows:state.rows}));}catch(e){status(e.message)}finally{el('save').disabled=false}};
-el('exit').onclick=()=>{opsEpoch++;opsData=null;el('ops-market-list').replaceChildren();el('ops-market-status').textContent='ยังไม่ได้โหลดข้อมูล';el('ops-api').textContent='ยังไม่ตรวจสอบ';el('ops-checked').textContent='';pass='';state=null;el('bulk-formula-status').textContent='ยังไม่เปลี่ยนสูตร · ต้องกดบันทึกตารางเวลา';el('rows').replaceChildren();el('smart-list').replaceChildren();el('smart-search').value='';el('smart-advanced').open=false;closePreview();el('panel').hidden=true;el('login').hidden=false;status('ล็อกแล้ว');window.bnLineAdmin.logout();};
+async function saveSchedule(){if(!state||el('save').disabled)return;el('save').disabled=true;syncBulk();try{await api('save',{rows:state.rows});status('บันทึกตารางเวลาสำเร็จ');el('bulk-formula-status').textContent='บันทึกตารางเวลาสำเร็จ';return true;}catch(e){status('บันทึกไม่สำเร็จ: '+e.message);el('bulk-formula-status').textContent='บันทึกไม่สำเร็จ — กรุณาลองอีกครั้ง';return false;}finally{el('save').disabled=false;syncBulk();}}
+// V19.9: compact multi-row reorder editor.
+const orderDialog=document.createElement('dialog');orderDialog.id='order-dialog';orderDialog.setAttribute('aria-label','จัดลำดับรายการ');
+orderDialog.innerHTML=`<div class="ord-head"><strong>จัดลำดับรายการ</strong><button type="button" class="btn" id="ord-close" aria-label="ปิด">×</button></div><p class="subnote">ติ๊กหลายรายการ แล้วลากที่ ☰ เพื่อย้ายพร้อมกัน หรือใช้ปุ่มขึ้น–ลง</p><div class="ord-tools"><label><input type="checkbox" id="ord-all"> เลือกทั้งหมด</label><span id="ord-count"></span><button class="btn" id="ord-up" type="button">↑ ขึ้น</button><button class="btn" id="ord-down" type="button">↓ ลง</button></div><div id="ord-list"></div><div class="ord-foot"><button class="btn" id="ord-cancel" type="button">ยกเลิก</button><button class="btn primary" id="ord-save" type="button">บันทึกลำดับ</button></div>`;
+root.append(orderDialog);
+const orderCss=document.createElement('style');orderCss.textContent=`#order-dialog{box-sizing:border-box;width:min(540px,94vw);max-height:86vh;padding:16px;border:1px solid var(--border,#aab9cb);border-radius:18px;color:inherit;background:var(--card,#fff);box-shadow:0 20px 70px #0005;margin:auto;overflow:hidden}#order-dialog[open]{display:flex;flex-direction:column;gap:10px}#order-dialog::backdrop{background:#07132299;backdrop-filter:blur(3px)}.ord-head,.ord-tools,.ord-foot{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.ord-head strong{flex:1;font-size:18px}.ord-tools label{display:flex;align-items:center;gap:6px}.ord-foot{justify-content:flex-end}#ord-list{overflow:auto;min-height:0;max-height:56vh;overscroll-behavior:contain;display:grid;gap:6px;padding:3px}.ord-row{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid #94a3b655;border-radius:12px;background:var(--surface,transparent);min-height:48px}.ord-row.chosen{background:#229ed91c;border-color:#229ed9}.ord-row.target{border-top:3px solid #229ed9}.ord-row.target-end{border-bottom:3px solid #229ed9}.ord-row .ord-name{flex:1;min-width:0;overflow-wrap:anywhere}.ord-row .ord-num{font-size:12px;opacity:.7;min-width:20px}.ord-handle{touch-action:none;user-select:none;cursor:grab;font-size:23px;line-height:1;min-width:40px;min-height:40px;border:0;border-radius:8px;background:transparent;color:inherit}#order-dialog input[type=checkbox]{appearance:auto!important;width:18px!important;height:18px!important;min-height:0!important;flex:none;accent-color:#229ed9;margin:0!important}#ord-count{font-size:12px;opacity:.8}@media(prefers-color-scheme:dark){#order-dialog{background:var(--card,#172338)}}`;
+root.append(orderCss);
+const orderButton=document.createElement('button');orderButton.type='button';orderButton.className='btn soft';orderButton.textContent='☰ จัดลำดับรายการ';el('rows').before(orderButton);
+let orderDraft=[],orderSelected=new Set(),orderBusy=false,orderGesture=null;
+function orderSync(){const n=orderSelected.size;el('ord-count').textContent='เลือก '+n+' / '+orderDraft.length;el('ord-all').checked=!!orderDraft.length&&n===orderDraft.length;el('ord-all').indeterminate=n>0&&n<orderDraft.length;for(const id of ['ord-up','ord-down'])el(id).disabled=!n||n===orderDraft.length;el('ord-save').disabled=orderBusy||!orderDraft.length;}
+function orderMove(group,to){const rest=orderDraft.filter(r=>!group.has(r));const moved=orderDraft.filter(r=>group.has(r));rest.splice(Math.max(0,Math.min(to,rest.length)),0,...moved);orderDraft=rest;orderRender();}
+function orderRender(){const list=el('ord-list');list.replaceChildren();orderDraft.forEach((r,i)=>{const row=document.createElement('div');row.className='ord-row'+(orderSelected.has(r)?' chosen':'');row.innerHTML='<input type="checkbox"><span class="ord-num"></span><span class="ord-name"></span><button type="button" class="ord-handle" aria-label="ลากจัดลำดับ">☰</button>';row.querySelector('.ord-num').textContent=i+1;const name=state.directory.find(d=>d.key===r.key)?.name||r.key;row.querySelector('.ord-name').textContent=name;const cb=row.querySelector('input');cb.checked=orderSelected.has(r);cb.setAttribute('aria-label','เลือก '+name);cb.onchange=()=>{if(cb.checked)orderSelected.add(r);else orderSelected.delete(r);row.classList.toggle('chosen',cb.checked);orderSync();};const h=row.querySelector('button');h.onpointerdown=e=>{if(e.button!==0||orderGesture||orderBusy)return;e.preventDefault();const group=orderSelected.has(r)?new Set(orderSelected):new Set([r]);orderGesture={id:e.pointerId,y:e.clientY,start:e.clientY,group,active:false,to:0,frame:0};h.setPointerCapture(e.pointerId);};function mark(){const g=orderGesture;if(!g?.active)return;const nodes=[...list.children];const rest=nodes.filter((_,j)=>!g.group.has(orderDraft[j]));nodes.forEach(x=>x.classList.remove('target','target-end'));const target=rest.find(x=>g.y<x.getBoundingClientRect().top+x.getBoundingClientRect().height/2);g.to=target?rest.indexOf(target):rest.length;if(target)target.classList.add('target');else rest.at(-1)?.classList.add('target-end');}function scroll(){const g=orderGesture;if(!g?.active)return;const b=list.getBoundingClientRect();if(g.y<b.top+35)list.scrollTop-=10;else if(g.y>b.bottom-35)list.scrollTop+=10;mark();g.frame=requestAnimationFrame(scroll);}h.onpointermove=e=>{const g=orderGesture;if(!g||g.id!==e.pointerId)return;g.y=e.clientY;if(!g.active&&Math.abs(g.y-g.start)>5){g.active=true;g.frame=requestAnimationFrame(scroll);}mark();};function finish(e,cancel){const g=orderGesture;if(!g||g.id!==e.pointerId)return;orderGesture=null;cancelAnimationFrame(g.frame);[...list.children].forEach(x=>x.classList.remove('target','target-end'));if(g.active&&!cancel)orderMove(g.group,g.to);}h.onpointerup=e=>finish(e,false);h.onpointercancel=e=>finish(e,true);h.onlostpointercapture=e=>finish(e,true);list.append(row);});orderSync();}
+orderButton.onclick=()=>{if(!state?.rows?.length||el('save').disabled)return;orderDraft=[...state.rows];orderSelected.clear();orderRender();orderDialog.showModal();};
+el('ord-all').onchange=e=>{orderSelected=new Set(e.target.checked?orderDraft:[]);orderRender();};
+function orderStep(dir){if(!orderSelected.size)return;const a=orderDraft.slice();if(dir<0){for(let i=1;i<a.length;i++)if(orderSelected.has(a[i])&&!orderSelected.has(a[i-1]))[a[i-1],a[i]]=[a[i],a[i-1]];}else{for(let i=a.length-2;i>=0;i--)if(orderSelected.has(a[i])&&!orderSelected.has(a[i+1]))[a[i],a[i+1]]=[a[i+1],a[i]];}orderDraft=a;orderRender();}
+el('ord-up').onclick=()=>orderStep(-1);el('ord-down').onclick=()=>orderStep(1);
+function closeOrder(){if(!orderBusy)orderDialog.close();}el('ord-close').onclick=closeOrder;el('ord-cancel').onclick=closeOrder;orderDialog.addEventListener('cancel',e=>{e.preventDefault();closeOrder();});
+el('ord-save').onclick=async()=>{if(orderBusy||!state||el('save').disabled)return;if(!confirm('บันทึกลำดับใหม่พร้อมการแก้ไขตารางที่ค้างอยู่? ไม่เปลี่ยนเวลาหรือสถานะเปิด–ปิดจากค่าปัจจุบัน'))return;orderBusy=true;orderSync();const previous=state.rows;const opened=previous[state.openIndex];state.rows=orderDraft.slice();state.openIndex=opened?state.rows.indexOf(opened):null;try{const ok=await saveSchedule();if(ok){render();orderDialog.close();}else{state.rows=previous;state.openIndex=opened?previous.indexOf(opened):null;render();alert('บันทึกไม่สำเร็จ กรุณาลองอีกครั้ง');}}finally{orderBusy=false;orderSync();}};
+
+el('save').onclick=saveSchedule;
+el('exit').onclick=()=>{opsEpoch++;opsData=null;el('ops-market-list').replaceChildren();el('ops-market-status').textContent='ยังไม่ได้โหลดข้อมูล';el('ops-api').textContent='ยังไม่ตรวจสอบ';el('ops-checked').textContent='';pass='';state=null;bulkIds.forEach(id=>el(id).checked=false);syncBulk();el('bulk-formula-status').textContent='เลือกอย่างน้อย 1 สูตรก่อนบันทึก';el('rows').replaceChildren();el('smart-list').replaceChildren();el('smart-search').value='';el('smart-advanced').open=false;closePreview();el('panel').hidden=true;el('login').hidden=false;status('ล็อกแล้ว');window.bnLineAdmin.logout();};
  el('enter').click();
 }
 
