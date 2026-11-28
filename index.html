@@ -596,7 +596,18 @@ html #siteApp .workspace-nav .nav-footer #logoutBtn{border-color:color-mix(in sr
 .smart-nav-icon{width:18px;height:18px;flex:0 0 18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 @media(min-width:760px){.smart-action-bar{grid-template-columns:repeat(auto-fit,minmax(135px,1fr))}.smart-action-bar #save,.smart-action-bar #exit{grid-column:auto}.smart-order-bar{grid-template-columns:repeat(2,minmax(0,1fr));max-width:440px}}
 @media(max-width:480px){.line-tabs,.tg-admin-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}.line-tabs .btn,.tg-admin-tabs .btn,.smart-action-bar .btn,.smart-order-bar .btn{padding:9px 6px!important;font-size:12px}}
-</style></head>
+</style><style id="line-group-switch-v710">
+#ops-groups-section .lg-switch-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid rgba(128,128,128,.25)}
+#ops-groups-section .lg-switch-words{min-width:0;display:grid;gap:3px}
+#ops-groups-section .lg-switch-caption{font-size:12px;opacity:.85;overflow-wrap:anywhere}
+#ops-groups-section button.lg-switch{position:relative;flex:0 0 48px;width:48px;height:28px;min-height:28px;border:0;border-radius:20px;background:#87909e;padding:3px;cursor:pointer;box-shadow:none;display:block}
+#ops-groups-section button.lg-switch[aria-checked="true"]{background:#16a34a}
+#ops-groups-section .lg-switch-knob{display:block;width:22px;height:22px;border-radius:50%;background:#fff;transform:translateX(0);transition:transform .15s ease;box-shadow:0 1px 3px #0003}
+#ops-groups-section button.lg-switch[aria-checked="true"] .lg-switch-knob{transform:translateX(20px)}
+#ops-groups-section button.lg-switch:disabled{opacity:.5;cursor:not-allowed}
+#ops-groups-section button.lg-switch:focus-visible{outline:2px solid #38bdf8;outline-offset:3px}
+</style>
+</head>
 <body><main class="container login-panel" id="loginGate" aria-label="เข้าสู่ระบบ">
   <div class="glass-logo" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><path d="M7 23 24 8l17 15M12 21v19h24V21" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><rect x="19" y="24" width="10" height="10" rx="1" fill="currentColor"/></svg></div><h1 class="login-brand">SMART BOT CENTER</h1>
   <p class="login-heading">บ้านนำโชค 6789</p>
@@ -786,7 +797,37 @@ el('ops-check').onclick=async()=>{const e=opsEpoch;el('ops-check').disabled=true
 
 let lineGroupsBusyV78=false;
 async function loadLineGroupsV78(){if(lineGroupsBusyV78)return;lineGroupsBusyV78=true;el('line-groups-status').textContent='กำลังโหลด...';el('line-groups-list').replaceChildren();try{renderLineGroupsV78(await api('groups_list'));el('line-groups-status').textContent='โหลดข้อมูลแล้ว';}catch(e){el('line-groups-status').textContent=e.message;}finally{lineGroupsBusyV78=false;}}
-function renderLineGroupsV78(data){const list=el('line-groups-list');list.replaceChildren();const make=(tag,text,cls)=>{const x=document.createElement(tag);x.textContent=text;if(cls)x.className=cls;return x;};if(!data.groups.length)list.append(make('p','ยังไม่มีกลุ่มที่ลงทะเบียน','subnote'));for(const r of data.groups){const card=make('div','','ops-card');card.append(make('strong',r.name));card.append(make('p','รหัส '+r.id.slice(-8)+' · '+({pending:'รออนุมัติ',approved:'เปิดเรียกคำสั่ง',disabled:'ปิดสิทธิ์'}[r.status]||'ไม่ทราบสถานะ')+' · AUTO '+(r.auto?'เปิด':'ปิด'),'subnote'));const actions=make('div','','btn-row');actions.style.flexWrap='wrap';const add=(label,op)=>{const b=make('button',label,'btn');b.type='button';b.onclick=async()=>{if(lineGroupsBusyV78)return;const change={op};if(op==='rename'){const name=prompt('ชื่อกลุ่ม',r.name);if(name===null)return;change.name=name;}else if(op==='approve'||op==='delete'||op==='auto_on'){if(!confirm(label+' กลุ่มรหัส '+r.id.slice(-8)+' ?'))return;}lineGroupsBusyV78=true;try{renderLineGroupsV78(await api('groups_update',{key:r.id,rows:change}));el('line-groups-status').textContent='บันทึกแล้ว';}catch(e){el('line-groups-status').textContent=e.message;}finally{lineGroupsBusyV78=false;}};actions.append(b);};if(r.status!=='approved')add('อนุมัติ / เปิดสิทธิ์','approve');else {add('ปิดสิทธิ์','disable');add(r.auto?'ปิด AUTO':'เปิด AUTO (ใช้โควตา)',r.auto?'auto_off':'auto_on');}add('แก้ชื่อ','rename');add('ลบ','delete');card.append(actions);list.append(card);}}
+function renderLineGroupsV78(data){
+  const list=el('line-groups-list');list.replaceChildren();
+  const make=(tag,text,cls)=>{const x=document.createElement(tag);x.textContent=text;if(cls)x.className=cls;return x;};
+  if(!data.groups.length)list.append(make('p','ยังไม่มีกลุ่มที่ลงทะเบียน','subnote'));
+  for(const r of data.groups){
+    const card=make('div','','ops-card');card.append(make('strong',r.name));
+    card.append(make('p','รหัส '+r.id.slice(-8)+(r.status==='pending'?' · รออนุมัติ':''),'subnote'));
+    const approved=r.status==='approved';
+    const changeGroup=async(op)=>{
+      if(lineGroupsBusyV78)return;
+      const change={op};
+      if(op==='rename'){const name=prompt('ชื่อกลุ่ม',r.name);if(name===null)return;change.name=name;}
+      else if(op==='auto_on'){if(!confirm('เปิดส่ง AUTO ให้กลุ่มรหัส '+r.id.slice(-8)+'? การส่งตามเวลาจะใช้โควตา LINE OA'))return;}
+      else if(op==='disable'){if(!confirm('ปิดสิทธิ์เรียกคำสั่งและปิด AUTO ของกลุ่มนี้?'))return;}
+      else if(op==='approve'||op==='delete'){if(!confirm((op==='approve'?'อนุมัติ / เปิดสิทธิ์':'ลบ')+' กลุ่มรหัส '+r.id.slice(-8)+' ?'))return;}
+      lineGroupsBusyV78=true;list.querySelectorAll('button').forEach(x=>x.disabled=true);el('line-groups-status').textContent='กำลังบันทึก...';
+      try{renderLineGroupsV78(await api('groups_update',{key:r.id,rows:change}));el('line-groups-status').textContent='บันทึกแล้ว';}
+      catch(e){renderLineGroupsV78(data);el('line-groups-status').textContent=e.message+' · กรุณาโหลดรายชื่อใหม่เพื่อตรวจสอบสถานะ';}
+      finally{lineGroupsBusyV78=false;}
+    };
+    const toggle=(label,on,description,op,disabled=false)=>{
+      const row=make('div','','lg-switch-row');const words=make('div','','lg-switch-words');words.append(make('strong',label),make('small',description,'lg-switch-caption'));
+      const btn=make('button','','lg-switch');btn.type='button';btn.setAttribute('role','switch');btn.setAttribute('aria-checked',String(on));btn.setAttribute('aria-label',label+' '+r.name);btn.disabled=disabled;btn.append(make('span','','lg-switch-knob'));btn.onclick=()=>changeGroup(op);row.append(words,btn);card.append(row);
+    };
+    toggle('เรียกคำสั่ง',approved,approved?'เปิดใช้งาน':r.status==='pending'?'รออนุมัติ':'ปิดใช้งาน',approved?'disable':'approve');
+    toggle('ส่ง AUTO',approved&&!!r.auto,approved&&r.auto?'เปิด · ใช้โควตา OA':approved?'ปิด · ไม่ใช้โควตา AUTO':'ปิด · ต้องเปิดสิทธิ์ก่อน',r.auto?'auto_off':'auto_on',!approved);
+    const actions=make('div','','btn-row');actions.style.flexWrap='wrap';
+    for(const [label,op] of [['แก้ชื่อ','rename'],['ลบ','delete']]){const btn=make('button',label,'btn');btn.type='button';btn.onclick=()=>changeGroup(op);actions.append(btn);}
+    card.append(actions);list.append(card);
+  }
+}
 el('line-groups-refresh').onclick=loadLineGroupsV78;
 
 const lineSections={home:['ops-home-section','ops-source-section'],settings:['smart-advanced'],command:['ops-command-section','ops-guide-section'],calendar:['ops-market-section'],groups:['ops-groups-section']};
