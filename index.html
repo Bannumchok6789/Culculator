@@ -712,20 +712,20 @@ ${window.bnManagementCSS}
     <p id="status" class="status" role="status">พร้อมเชื่อมต่อ</p>
     <div id="panel" hidden>
       <div class="smart-stats"><div class="smart-stat"><small>รายชื่อใน Backend</small><strong id="smart-total">—</strong><small>คำสั่งที่ค้นหาได้</small></div><div class="smart-stat"><small>ตารางเปิดส่ง</small><strong id="smart-enabled">—</strong><small id="smart-schedule-status">—</small></div><div class="smart-stat"><small>ตารางปิดส่ง</small><strong id="dash-disabled">—</strong><small>รายการในตาราง</small></div><div class="smart-stat"><small>ตารางทั้งหมด</small><strong id="dash-total">—</strong><small>ค่าตารางปัจจุบัน</small></div></div>
-      <div style="display:flex;justify-content:flex-end;margin-bottom:8px"><button id="smart-exit" class="btn" type="button"><svg class="smart-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><span>ล็อกหน้าจัดการ</span></button></div><div class="dash-actions line-tabs" role="group" aria-label="หมวดจัดการ LINE"><button id="ops-home" class="btn primary" type="button"><svg class="smart-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>ภาพรวม</span></button><button id="ops-settings" class="btn" type="button"><svg class="smart-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>ตาราง AUTO</span></button><button id="ops-command" class="btn" type="button"><svg class="smart-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11a8 8 0 0 1-8 8H8l-5 3 2-6a8 8 0 1 1 16-5Z"/></svg><span>คำสั่ง LINE</span></button><button id="ops-calendar" class="btn" type="button"><svg class="smart-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18"/></svg><span>ปฏิทินตลาด</span></button><button id="ops-groups" class="btn" type="button"><span>จัดการกลุ่ม LINE</span></button></div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:8px"><button id="smart-exit" class="btn" type="button"><svg class="smart-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><span>ล็อกหน้าจัดการ</span></button></div><div class="dash-actions line-tabs" role="group" aria-label="หมวดจัดการ LINE"><button id="ops-home" class="btn primary" type="button"><svg class="smart-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>ภาพรวม</span></button><button id="ops-settings" class="btn" type="button"><svg class="smart-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>ตารางเวลา</span></button><button id="ops-command" class="btn" type="button"><svg class="smart-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11a8 8 0 0 1-8 8H8l-5 3 2-6a8 8 0 1 1 16-5Z"/></svg><span>คำสั่ง LINE</span></button><button id="ops-calendar" class="btn" type="button"><svg class="smart-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18"/></svg><span>ปฏิทินตลาด</span></button><button id="ops-groups" class="btn" type="button"><span>จัดการกลุ่ม LINE</span></button></div>
       <section id="ops-groups-section" class="section" hidden><div class="headline"><h3>จัดการกลุ่ม LINE</h3><button id="line-groups-refresh" class="btn primary" type="button">โหลดรายชื่อ</button></div><p class="subnote">เชิญ OA เข้ากลุ่ม แล้วพิมพ์ /ลงทะเบียน จากนั้นเทียบรหัสกลุ่ม 8 ตัวก่อนอนุมัติ · ทุกกลุ่มจัดการสิทธิ์ได้ · เปิด AUTO เฉพาะกลุ่มที่ต้องการ (ใช้โควตา OA)</p><p id="line-groups-status" role="status" class="subnote"></p><div id="line-groups-list" style="display:grid;gap:10px"></div></section>
       <section id="ops-home-section" class="section ops-section"><div class="headline"><h3>ภาพรวมระบบ · Dashboard</h3><span class="subnote">ข้อมูลจากการเชื่อมต่อจริง</span></div><div class="ops-grid"><div class="ops-card"><small>Admin API</small><strong id="ops-api">ยังไม่ตรวจสอบ</strong><div id="ops-checked" class="ops-muted"></div><button id="ops-check" class="btn" type="button">ตรวจการเชื่อมต่อ</button></div><div class="ops-card"><small>LINE Reply</small><strong>เรียกด้วย /ชื่อหวย</strong><div class="ops-muted">สถานะ webhook ต้องตรวจด้วยการพิมพ์คำสั่งในกลุ่มจริง</div></div></div></section>
       <section class="section" id="ops-command-section"><div class="headline"><strong>ค้นหาคำสั่ง LINE</strong></div>
       <label class="label" for="smart-search">ชื่อหวย</label><input id="smart-search" class="input" type="search" placeholder="เช่น ลาวพัฒนา หรือ ฮานอย" autocomplete="off">
-      <div class="smart-formulas"><label><input type="radio" name="smart-f" value="default" checked> ตามค่าบอท</label><label><input type="radio" name="smart-f" value="1"> V.1 ชมพู</label><label><input type="radio" name="smart-f" value="2"> V.2 ฟ้า</label><label><input type="radio" name="smart-f" value="3"> V.3 ม่วง</label></div>
+      <div class="smart-formulas"><label><input type="radio" name="smart-f" value="default" checked> ทุกสูตร (ตัวอย่าง)</label><label><input type="radio" name="smart-f" value="1"> V.1 ชมพู</label><label><input type="radio" name="smart-f" value="2"> V.2 ฟ้า</label><label><input type="radio" name="smart-f" value="3"> V.3 ม่วง</label></div>
       <p class="smart-caption" id="smart-count"></p><div id="smart-list" class="smart-list"></div></section>
-      <details id="ops-guide-section" class="section dash-guide"><summary>คู่มือคำสั่ง</summary><div class="smart-guide">/ชื่อหวย — เรียกสูตรตามค่าที่บอทตั้งไว้<br>/ชื่อหวย V1 — เลือกสูตรเดียว (V2 หรือ V3 ได้)<br>/ค้นหา ฮานอย — ค้นหาชื่อบางส่วน<br>/รายชื่อหวย — แสดงรายชื่อ<br>/วิธีใช้ — แสดงคู่มือ</div></details>
-      <details class="smart-advanced" id="smart-advanced"><summary>ตาราง AUTO · ตั้งเวลาส่งอัตโนมัติ</summary>
+      <details id="ops-guide-section" class="section dash-guide"><summary>คู่มือคำสั่ง</summary><div class="smart-guide">/ชื่อหวย — เรียกสูตรตามสิทธิ์กลุ่ม<br>/ชื่อหวย V1 — เลือกสูตรเดียว (V2 หรือ V3 ได้)<br>/ค้นหา ฮานอย — ค้นหาชื่อบางส่วน<br>/รายชื่อหวย — แสดงรายชื่อ<br>/วิธีใช้ — แสดงคู่มือ</div></details>
+      <details class="smart-advanced" id="smart-advanced"><summary>ตารางเวลา · ตั้งเวลาส่งอัตโนมัติ</summary>
       <section class="section">
         <div class="headline">
           <div>
             <strong id="mode"></strong>
-            <p class="subnote">ตรวจทุก 5 นาที ภายใน 60 นาทีหลังเวลาที่ตั้ง · เลือกสูตร V.1 / V.2 / V.3 ได้รายรายการ</p>
+            <p class="subnote">ตรวจทุก 5 นาที ภายใน 60 นาทีหลังเวลาที่ตั้ง · สูตร AUTO กำหนดจากกลุ่มเท่านั้น</p>
           </div>
           <div class="toolbar smart-action-bar">
             <button id="add" class="btn soft" type="button"><svg class="smart-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>เพิ่มหวย</span></button>
@@ -735,29 +735,19 @@ ${window.bnManagementCSS}
             <button id="exit" class="btn" type="button"><svg class="smart-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><span>ล็อกหน้าจัดการ</span></button>
           </div>
         </div>
-        <div class="section" style="margin:12px 0;padding:12px">
-          <strong>เลือกสูตรพร้อมกันทุกตาราง</strong>
-          <p class="subnote">ติ๊กได้หลายสูตร แล้วกดบันทึกสูตรทั้งหมดเพื่อใช้กับทุกรายการ (รวมรายการที่ปิดส่ง) โดยไม่เปลี่ยนเวลาและสถานะเปิด–ปิด</p>
-          <div class="formula-row" role="group" aria-label="เลือกสูตรทุกตาราง">
-            <label class="formula-option f1"><input id="bulk-f1" type="checkbox"> V.1 ชมพู</label>
-            <label class="formula-option f2"><input id="bulk-f2" type="checkbox"> V.2 ฟ้า</label>
-            <label class="formula-option f3"><input id="bulk-f3" type="checkbox"> V.3 ม่วง</label>
-            <button id="bulk-save" class="btn primary" type="button" disabled>บันทึกสูตรทั้งหมด</button>
-          </div>
-          <p id="bulk-formula-status" class="subnote" role="status" aria-live="polite">เลือกอย่างน้อย 1 สูตรก่อนบันทึก</p>
-        </div>
+
         <div id="schedule-count" class="schedule-count" role="status" aria-live="polite"></div>
         <div id="rows" class="list"></div>
       </section></details>
       <section class="section ops-section" id="ops-market-section"><div class="headline"><h3>Market Calendar · 16 ตลาด</h3><button id="ops-market-load" class="btn primary" type="button">โหลดปฏิทิน</button></div><div class="ops-tools"><label for="ops-market-date">วันที่ตลาด</label><input id="ops-market-date" class="input" type="date"></div><p id="ops-market-status" class="ops-muted" role="status">ยังไม่ได้โหลดข้อมูล</p><div id="ops-market-list" class="ops-market"></div><p class="ops-muted">แสดงวันทำการตามปฏิทิน ไม่ใช่สถานะซื้อขาย ณ เวลาปัจจุบัน · <a class="ops-link" href="https://script.google.com/macros/s/AKfycbxssN2hAbfLevMrsqTnkFp0Z3AYyUCWYUbIkGuoo9wZoHnU2f8s5SXLumoFEywYNlLphw/exec" target="_blank" rel="noopener noreferrer">เปิด API โดยตรง</a></p></section>
       <section id="ops-source-section" class="section ops-section"><div class="headline"><h3>Data Sources</h3></div><div class="ops-grid"><div class="ops-card"><strong>WinTool37</strong><div class="ops-muted">แหล่งผลย้อนหลังหลัก · <a class="ops-link" href="https://wintool37.netlify.app/" target="_blank" rel="noopener noreferrer">เปิดแหล่งข้อมูล</a></div></div><div class="ops-card"><strong>ผลหวย.com</strong><div class="ops-muted">แหล่งเพิ่มเติมสำหรับรายการที่รองรับ · <a class="ops-link" href="https://xn--t3cmiit.com/" target="_blank" rel="noopener noreferrer">เปิดแหล่งข้อมูล</a></div></div></div><p class="ops-muted">รายการนี้แสดงการตั้งค่าแหล่งข้อมูล ไม่ใช่ผลตรวจออนไลน์ของแต่ละแหล่ง</p></section>
       <dialog id="add-lottery-dialog" aria-labelledby="add-lottery-title">
-        <header class="preview-head"><div><strong id="add-lottery-title">เพิ่มหวยใหม่</strong><div class="subnote">เพิ่มรายการลงแถวในตาราง AUTO</div></div><button id="add-lottery-close" class="btn" type="button" aria-label="ปิด">×</button></header>
+        <header class="preview-head"><div><strong id="add-lottery-title">เพิ่มหวยใหม่</strong><div class="subnote">เพิ่มรายการลงแถวในตารางเวลา</div></div><button id="add-lottery-close" class="btn" type="button" aria-label="ปิด">×</button></header>
         <div class="add-lottery-fields">
           <div><label class="label" for="add-lottery-search">ค้นหาชื่อหวย</label><input class="input" id="add-lottery-search" type="search" placeholder="พิมพ์ชื่อหวย..." autocomplete="off"></div>
           <div><label class="label" for="add-lottery-key">เลือกรายการ</label><select class="select" id="add-lottery-key"></select></div>
           <div><label class="label" for="add-lottery-time">เวลาส่ง</label><input class="input" id="add-lottery-time" type="time" value="08:00"></div>
-          <div><span class="label">เลือกสูตร</span><div class="formula-row" role="group" aria-label="เลือกสูตรสำหรับรายการใหม่"><label class="formula-option f1"><input id="add-lottery-f1" type="checkbox" checked> V.1 ชมพู</label><label class="formula-option f2"><input id="add-lottery-f2" type="checkbox"> V.2 ฟ้า</label><label class="formula-option f3"><input id="add-lottery-f3" type="checkbox" checked> V.3 ม่วง</label></div></div>
+
           <p class="subnote">รายการใหม่จะปิดส่งอัตโนมัติไว้ก่อน การเพิ่มลงแถวยังไม่บันทึกไปยัง Backend</p>
         </div>
         <p id="add-lottery-error" class="add-lottery-error" role="status" aria-live="polite"></p>
@@ -798,47 +788,39 @@ el('ops-check').onclick=async()=>{const e=opsEpoch;el('ops-check').disabled=true
 let lineGroupsBusyV78=false;
 async function loadLineGroupsV78(){if(lineGroupsBusyV78)return;lineGroupsBusyV78=true;el('line-groups-status').textContent='กำลังโหลด...';el('line-groups-list').replaceChildren();try{renderLineGroupsV78(await api('groups_list'));el('line-groups-status').textContent='โหลดข้อมูลแล้ว';}catch(e){el('line-groups-status').textContent=e.message;}finally{lineGroupsBusyV78=false;}}
 function renderLineGroupsV78(data){
-  const list=el('line-groups-list');list.replaceChildren();
-  const make=(tag,text,cls)=>{const x=document.createElement(tag);x.textContent=text;if(cls)x.className=cls;return x;};
-  if(!data.groups.length)list.append(make('p','ยังไม่มีกลุ่มที่ลงทะเบียน','subnote'));
-  for(const r of data.groups){
-    const card=make('div','','ops-card');card.append(make('strong',r.name));
-    card.append(make('p','รหัส '+r.id.slice(-8)+(r.status==='pending'?' · รออนุมัติ':''),'subnote'));
-    const approved=r.status==='approved';
-    const changeGroup=async(op,formulas)=>{
-      if(lineGroupsBusyV78)return;
-      const change={op};if(op==='formulas')change.formulas=formulas;
-      if(op==='rename'){const name=prompt('ชื่อกลุ่ม',r.name);if(name===null)return;change.name=name;}
-      else if(op==='auto_on'){if(!confirm('เปิดส่ง AUTO ให้กลุ่มรหัส '+r.id.slice(-8)+'? การส่งตามเวลาจะใช้โควตา LINE OA'))return;}
-      else if(op==='disable'){if(!confirm('ปิดสิทธิ์เรียกคำสั่งและปิด AUTO ของกลุ่มนี้?'))return;}
-      else if(op==='approve'||op==='delete'){if(!confirm((op==='approve'?'อนุมัติ / เปิดสิทธิ์':'ลบ')+' กลุ่มรหัส '+r.id.slice(-8)+' ?'+(op==='approve'&&r.status==='pending'?' การแจ้งอนุมัติใช้โควตา OA 1 ข้อความ':'')))return;}
-      lineGroupsBusyV78=true;list.querySelectorAll('button').forEach(x=>x.disabled=true);el('line-groups-status').textContent='กำลังบันทึก...';
-      try{const result=await api('groups_update',{key:r.id,rows:change});renderLineGroupsV78(result);el('line-groups-status').textContent=result.notice||'บันทึกแล้ว';}
-      catch(e){renderLineGroupsV78(data);el('line-groups-status').textContent=e.message+' · กรุณาโหลดรายชื่อใหม่เพื่อตรวจสอบสถานะ';}
-      finally{lineGroupsBusyV78=false;}
-    };
-    const toggle=(label,on,description,op,disabled=false)=>{
-      const row=make('div','','lg-switch-row');
-      row.style.cssText='display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;padding:12px 0!important;border-top:1px solid var(--smart-border,#cbd5e1);width:100%;box-sizing:border-box';
-      const words=make('div','','lg-switch-words');words.style.cssText='display:flex!important;flex-direction:column!important;gap:4px;flex:1;min-width:0;text-align:left';
-      const title=make('strong',label);title.style.cssText='font-size:15px;line-height:1.4;margin:0';
-      const caption=make('small',description,'lg-switch-caption');caption.style.cssText='font-size:12px;line-height:1.5;overflow-wrap:anywhere;color:var(--smart-muted,inherit);margin:0';words.append(title,caption);
-      const btn=make('button','','lg-switch');btn.type='button';btn.setAttribute('role','switch');btn.setAttribute('aria-checked',String(on));btn.setAttribute('aria-label',label+' '+r.name);btn.disabled=disabled;
-      btn.style.cssText='appearance:none!important;-webkit-appearance:none!important;position:relative!important;display:block!important;flex:0 0 52px!important;width:52px!important;min-width:52px!important;max-width:52px!important;height:30px!important;min-height:30px!important;max-height:30px!important;padding:0!important;margin:0!important;border:0!important;border-radius:999px!important;box-sizing:border-box!important;box-shadow:none!important;background:'+(on?'#16a34a':'#94a3b8')+'!important;cursor:'+(disabled?'not-allowed':'pointer')+';opacity:'+(disabled?'.5':'1');
-      const knob=make('span','','lg-switch-knob');knob.style.cssText='position:absolute!important;display:block!important;top:3px!important;left:'+(on?'25px':'3px')+'!important;width:24px!important;height:24px!important;border-radius:50%!important;background:#fff!important;transform:none!important;box-shadow:0 1px 4px #0003!important;pointer-events:none';btn.append(knob);btn.onclick=()=>changeGroup(op);row.append(words,btn);card.append(row);
-    };
-    toggle('เรียกคำสั่ง',approved,approved?'อนุญาต':r.status==='pending'?'รออนุมัติ':'ไม่อนุญาต',approved?'disable':'approve');
-    toggle('ส่ง AUTO',approved&&!!r.auto,approved&&r.auto?'ส่งอัตโนมัติ · ใช้โควตา OA':approved?'ไม่ส่งอัตโนมัติ':'ไม่ส่งอัตโนมัติ · ต้องอนุญาตก่อน',r.auto?'auto_off':'auto_on',!approved);
-    const perms=make('div','','lg-formula-perms');perms.style.cssText='padding:12px 0;border-top:1px solid var(--smart-border,#cbd5e1)';
-    perms.append(make('strong','สูตรที่อนุญาต'));
-    const chips=make('div','','lg-formula-chips');chips.style.cssText='display:flex!important;gap:8px!important;margin-top:10px;flex-wrap:wrap';
-    const fs=Array.isArray(r.formulas)?r.formulas:[1,2,3];
-    for(const [f,c] of [[1,'#db2777'],[2,'#0284c7'],[3,'#9333ea']]){const on=fs.includes(f);const btn=make('button',(on?'✓ ':'')+'V.'+f,'lg-formula-chip');btn.type='button';btn.setAttribute('aria-pressed',String(on));btn.style.cssText='flex:1!important;min-width:65px!important;padding:10px 8px!important;border:1px solid '+c+'!important;border-radius:10px!important;background:'+(on?c:'transparent')+'!important;color:'+(on?'#fff':c)+'!important;font-weight:700!important;cursor:pointer';btn.onclick=()=>changeGroup('formulas',on?fs.filter(x=>x!==f):[...fs,f]);chips.append(btn);}
-    perms.append(chips);if(!fs.length)perms.append(make('small','ยังไม่อนุญาตสูตรใด','subnote'));card.append(perms);
-    const actions=make('div','','btn-row');actions.style.cssText='display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--smart-border,#cbd5e1)';
-    for(const [label,op] of [['แก้ชื่อ','rename'],['ลบ','delete']]){const btn=make('button',label,'btn');btn.type='button';btn.onclick=()=>changeGroup(op);actions.append(btn);}
-    card.append(actions);list.append(card);
-  }
+ const list=el('line-groups-list');list.replaceChildren();list.style.cssText='display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));align-items:start';
+ const make=(tag,text,cls)=>{const x=document.createElement(tag);x.textContent=text;if(cls)x.className=cls;return x;};
+ if(!data.groups.length)list.append(make('p','ยังไม่มีกลุ่มที่ลงทะเบียน','subnote'));
+ for(const r of data.groups){
+  const approved=r.status==='approved', reply=approved&&r.reply!==false;
+  const card=make('div','','lg-compact-card');card.style.cssText='border:1px solid var(--smart-border,#94a3b8);background:var(--smart-soft,transparent);border-radius:12px;padding:10px 12px;min-width:0;display:grid;gap:6px;box-sizing:border-box';
+  const changeGroup=async(op,formulas)=>{
+   if(lineGroupsBusyV78)return;const change={op};if(formulas!==undefined)change.formulas=formulas;
+   if(op==='rename'){const name=prompt('ชื่อกลุ่ม',r.name);if(name===null)return;change.name=name;}
+   if(op==='auto_on'&&!confirm('เปิด AUTO กลุ่มนี้? การส่งจะใช้โควตา LINE OA'))return;
+   if(op==='approve'&&r.status==='pending'&&!confirm('อนุมัติกลุ่มและส่งข้อความแจ้งเตือน (ใช้โควตา OA)?'))return;
+   if(op==='delete'&&!confirm('ลบกลุ่ม '+r.name+' ?'))return;
+   lineGroupsBusyV78=true;list.querySelectorAll('button').forEach(x=>x.disabled=true);el('line-groups-status').textContent='กำลังบันทึก...';
+   try{const result=await api('groups_update',{key:r.id,rows:change});renderLineGroupsV78(result);el('line-groups-status').textContent=result.notice||'บันทึกแล้ว';}
+   catch(e){renderLineGroupsV78(data);el('line-groups-status').textContent=e.message+' · โหลดรายชื่อใหม่เพื่อตรวจสอบ';}finally{lineGroupsBusyV78=false;}
+  };
+  const action=(label,op,fn)=>{const b=make('button',label,'btn');b.type='button';b.style.cssText='padding:3px 8px!important;min-height:28px!important;height:auto!important;font-size:12px!important;line-height:1.4!important;white-space:nowrap';b.onclick=fn||(()=>changeGroup(op));return b;};
+  const head=make('div','');head.style.cssText='display:flex;align-items:center;gap:6px;min-width:0;flex-wrap:wrap';
+  const name=make('strong',r.name);name.style.cssText='flex:1;min-width:90px;overflow-wrap:anywhere;font-size:14px';head.append(name,action('แก้ชื่อ','rename'),action('ลบ','delete'));card.append(head);
+  const meta=make('small','รหัส '+r.id.slice(-8)+(r.status==='pending'?' · รออนุมัติ':''),'subnote');meta.style.cssText='margin:0;font-size:11px';card.append(meta);
+  const section=(label,on,op,fs,formulaOp,disabled)=>{
+   const row=make('div','');row.style.cssText='display:flex!important;align-items:center!important;gap:5px!important;flex-wrap:wrap;padding:6px 0 0;border-top:1px solid var(--smart-border,#94a3b8);min-width:0';
+   const title=make('strong',label);title.style.cssText='font-size:12px;flex:1;min-width:80px';row.append(title);
+   for(const [f,c] of [[1,'#db2777'],[2,'#0284c7'],[3,'#9333ea']]){const chosen=fs.includes(f),btn=make('button','V.'+f);btn.type='button';btn.setAttribute('aria-pressed',String(chosen));btn.setAttribute('aria-label',label+' สูตร V.'+f);btn.style.cssText='width:34px!important;min-width:34px!important;height:28px!important;min-height:28px!important;padding:0!important;margin:0!important;border:1px solid '+c+'!important;border-radius:6px!important;background:'+(chosen?c:'transparent')+'!important;color:'+(chosen?'#fff':c)+'!important;font-size:11px!important;font-weight:700!important;flex:0 0 34px!important;cursor:pointer';btn.onclick=()=>changeGroup(formulaOp,chosen?fs.filter(x=>x!==f):[...fs,f]);row.append(btn);}
+   const sw=make('button','');sw.type='button';sw.setAttribute('role','switch');sw.setAttribute('aria-checked',String(on));sw.setAttribute('aria-label',label+' '+r.name);sw.title=on?'เปิด':'ปิด';sw.disabled=disabled;sw.style.cssText='appearance:none!important;position:relative!important;flex:0 0 38px!important;width:38px!important;min-width:38px!important;height:22px!important;min-height:22px!important;padding:0!important;margin:0 0 0 3px!important;border:0!important;border-radius:99px!important;background:'+(on?'#16a34a':'#64748b')+'!important;opacity:'+(disabled?'.5':'1')+';cursor:pointer';
+   const knob=make('span','');knob.style.cssText='position:absolute!important;display:block!important;top:3px!important;left:'+(on?'19px':'3px')+'!important;width:16px!important;height:16px!important;border-radius:50%!important;background:#fff!important;pointer-events:none';sw.append(knob);sw.onclick=()=>changeGroup(op);row.append(sw);card.append(row);
+  };
+  const rf=Array.isArray(r.replyFormulas)?r.replyFormulas:(r.formulas||[1,2,3]),af=Array.isArray(r.autoFormulas)?r.autoFormulas:(r.formulas||[1,2,3]);
+  section('เรียกคำสั่ง',reply,reply?'reply_off':'approve',rf,'reply_formulas',false);
+  section('ส่ง AUTO',approved&&!!r.auto,r.auto?'auto_off':'auto_on',af,'auto_formulas',!approved);
+  if(r.autoReview)card.append(make('small','AUTO ถูกพักเพื่อทบทวนสูตรกลุ่มก่อนเปิดอีกครั้ง','subnote'));
+  list.append(card);
+ }
 }
 el('line-groups-refresh').onclick=loadLineGroupsV78;
 
@@ -861,7 +843,7 @@ function smartRender(){
   const choice=root.querySelector('input[name="smart-f"]:checked').value;
   for(const d of entries){const name=smartName(d.name);const cmd='/'+name+(choice==='default'?'':' V'+choice);const row=document.createElement('div');row.className='smart-row';const info=document.createElement('div');const title=document.createElement('strong');title.textContent=name;const sub=document.createElement('small');sub.textContent=cmd;info.append(title,sub);const actions=document.createElement('div');actions.className='smart-actions';
     const copy=document.createElement('button');copy.type='button';copy.className='btn';copy.textContent='คัดลอกคำสั่ง';copy.onclick=async()=>{try{await navigator.clipboard.writeText(cmd);status('คัดลอกคำสั่งแล้ว: '+cmd);}catch(e){status('คัดลอกไม่ได้ กรุณาคัดลอกคำสั่งจากรายการ');}};
-    const preview=document.createElement('button');preview.type='button';preview.className='btn primary';preview.textContent='ดูตัวอย่าง';preview.onclick=async()=>{const saved=state.rows.find(r=>r.key===d.key);const formulas=choice==='default'?(saved?.formulas||(String(d.key)==='external-hanoi-asean'?[1,2,3]:[1,3])):[Number(choice)];preview.disabled=true;try{await showPreview(d.key,formulas);}finally{preview.disabled=false;}};
+    const preview=document.createElement('button');preview.type='button';preview.className='btn primary';preview.textContent='ดูตัวอย่าง';preview.onclick=async()=>{const saved=state.rows.find(r=>r.key===d.key);const formulas=choice==='default'?[1,2,3]:[Number(choice)];preview.disabled=true;try{await showPreview(d.key,formulas);}finally{preview.disabled=false;}};
     actions.append(copy,preview);row.append(info,actions);list.append(row);
   }
 }
@@ -870,7 +852,6 @@ el('smart-exit').onclick=()=>el('exit').click();
 function moveRow(i,delta){const ni=i+delta;if(ni<0||ni>=state.rows.length)return;[state.rows[i],state.rows[ni]]=[state.rows[ni],state.rows[i]];state.openIndex=ni;render();}
 function formulaChips(formulas){return (formulas||[]).sort().map(f=>`<span class="chip f${f}">V.${f}</span>`).join('');}
 function render(){
-  syncBulk();
   smartRender();
   el('mode').textContent=state.active?'ระบบตารางรวมเปิดแล้ว':'ตารางรวมยังไม่เปิด — ระบบเดิมยังทำงาน';
   const rows=el('rows'); rows.replaceChildren();
@@ -878,7 +859,6 @@ function render(){
   el('schedule-count').textContent=`ทั้งหมด ${total} รายการ · เปิด ${enabled} · ปิด ${total-enabled}`;
   if(!state.rows.length){const empty=document.createElement('div');empty.className='empty';empty.textContent='ยังไม่มีรายการ กรุณากด “เพิ่มหวย”';rows.append(empty);return;}
   state.rows.forEach((r,i)=>{
-    r.formulas=r.formulas??[1,3];
     const item=document.createElement('article');item.className='item';
     const current=state.directory.find(d=>d.key===r.key);
     const name=current?.name||('รายการ '+r.key);
@@ -889,7 +869,7 @@ function render(){
         <div class="item-meta">
           <span class="chip">${r.time||'-'}</span>
           <span class="chip ${r.enabled?'live':'off'}">${r.enabled?'เปิด':'ปิด'}</span>
-          ${formulaChips(r.formulas)}
+          
         </div>
       </div>
       <div class="row-controls"><button class="expand-btn" type="button" aria-label="เปิดหรือปิดรายละเอียด" aria-expanded="${isOpen}" title="ตั้งค่ารายการ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${isOpen?'M6 15l6-6 6 6':'M6 9l6 6 6-6'}"/></svg></button><button class="handle" type="button" aria-label="ลากจัดลำดับ" title="กดค้างแล้วลากขึ้นลง"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button></div>
@@ -906,11 +886,9 @@ function render(){
         </div>
         <label class="toggle"><input class="js-enabled" type="checkbox" ${r.enabled?'checked':''}> เปิดใช้งาน</label>
       </div>
-      <div class="formula-row"></div>
       <div class="action-row">
         <button class="btn soft js-up" type="button">เลื่อนขึ้น</button>
         <button class="btn soft js-down" type="button">เลื่อนลง</button>
-        <button class="btn soft js-all" type="button">เลือกทั้ง 3 สูตร</button>
         <button class="btn primary js-save-row" type="button">บันทึกตารางเวลา</button>
         <button class="btn js-preview" type="button">ดูตัวอย่าง</button>
         <button class="btn js-delete" type="button">ลบรายการ</button>
@@ -951,20 +929,12 @@ function render(){
     select.onchange=()=>{r.key=select.value;status('แก้ไขแล้ว — กรุณาบันทึกตารางเวลา');render();};
     item.querySelector('.js-time').onchange=e=>{r.time=e.target.value;status('แก้ไขแล้ว — กรุณาบันทึกตารางเวลา');render();};
     item.querySelector('.js-enabled').onchange=e=>{r.enabled=e.target.checked;status('แก้ไขแล้ว — กรุณาบันทึกตารางเวลา');render();};
-    const fRow=item.querySelector('.formula-row');
-    [[1,'V.1 ชมพู','f1'],[2,'V.2 ฟ้า','f2'],[3,'V.3 ม่วง','f3']].forEach(([f,label,cls])=>{
-      const wrap=document.createElement('label');wrap.className='formula-option '+cls;
-      const c=document.createElement('input');c.type='checkbox';c.checked=r.formulas.includes(f);
-      c.onchange=()=>{r.formulas=c.checked?[...new Set([...r.formulas,f])].sort():r.formulas.filter(x=>x!==f);if(!r.formulas.length){r.formulas=[f];c.checked=true;status('ต้องเลือกอย่างน้อย 1 สูตร');}else status('แก้ไขแล้ว — กรุณาบันทึกตารางเวลา');render();};
-      wrap.append(c,label);fRow.append(wrap);
-    });
-    item.querySelector('.js-all').onclick=()=>{r.formulas=[1,2,3];status('เลือกครบทั้ง 3 สูตรแล้ว — กรุณาบันทึกตารางเวลา');render();};
     item.querySelector('.js-up').onclick=()=>moveRow(i,-1);
     item.querySelector('.js-down').onclick=()=>moveRow(i,1);
     item.querySelector('.js-up').disabled=i===0;
     item.querySelector('.js-down').disabled=i===state.rows.length-1;
     item.querySelector('.js-save-row').onclick=async()=>{if(!confirm('บันทึกการแก้ไขตารางทั้งหมดที่ค้างอยู่?'))return;const ok=await saveSchedule();alert(ok?'บันทึกและยืนยันข้อมูล Backend แล้ว':'ยังยืนยันการบันทึกไม่ได้ กรุณาตรวจสอบสถานะ');};
-    item.querySelector('.js-preview').onclick=()=>{if(!r.formulas.length){status('กรุณาเลือกอย่างน้อย 1 สูตร');return;}showPreview(r.key,[...r.formulas]);};
+    item.querySelector('.js-preview').onclick=()=>{showPreview(r.key,[1,2,3]);};
     item.querySelector('.js-delete').onclick=()=>{state.rows.splice(i,1);if(state.openIndex===i)state.openIndex=null;status('ลบรายการแล้ว — กรุณาบันทึกตารางเวลา');render();};
     const helper=item.querySelector('.js-helper');
     const market=state.directory.find(d=>d.key===r.key);
@@ -977,7 +947,6 @@ function render(){
 }
 el('enter').onclick=async()=>{pass=crypto.randomUUID();el('enter').disabled=true;status('กำลังเชื่อมต่อ...');try{state=await api('state');if(![5,6].includes(Number(state.version))||!Array.isArray(state.directory)||!Array.isArray(state.rows))throw Error('Backend ไม่รองรับหรือข้อมูลไม่ครบ');state.last=state.last||{};state.openIndex=null;render();el('panel').hidden=false;el('login').hidden=true;status('เชื่อมต่อสำเร็จ');opsStamp();}catch(e){pass='';status(e.message)}finally{el('enter').disabled=false}};
 const addLotteryDialog=el('add-lottery-dialog');
-const addLotteryFormulas=()=>[1,2,3].filter(f=>el('add-lottery-f'+f).checked);
 function closeAddLottery(){if(addLotteryDialog.open)addLotteryDialog.close();}
 function refreshAddLottery(){
  const select=el('add-lottery-key'), previous=select.value, q=el('add-lottery-search').value.trim().toLocaleLowerCase();
@@ -989,45 +958,34 @@ function refreshAddLottery(){
  el('add-lottery-confirm').disabled=!matches.length;
  el('add-lottery-error').textContent=matches.length?'':available.length?'ไม่พบชื่อที่ค้นหา':'ไม่มีรายการใหม่ให้เพิ่ม';
 }
-el('add').onclick=()=>{if(!state||el('save').disabled)return;el('add-lottery-search').value='';el('add-lottery-key').value='';el('add-lottery-time').value='08:00';for(const f of [1,2,3])el('add-lottery-f'+f).checked=f!==2;refreshAddLottery();if(!addLotteryDialog.open)addLotteryDialog.showModal();el('add-lottery-search').focus();};
+el('add').onclick=()=>{if(!state||el('save').disabled)return;el('add-lottery-search').value='';el('add-lottery-key').value='';el('add-lottery-time').value='08:00';refreshAddLottery();if(!addLotteryDialog.open)addLotteryDialog.showModal();el('add-lottery-search').focus();};
 el('add-lottery-search').oninput=refreshAddLottery;
 el('add-lottery-close').onclick=closeAddLottery;el('add-lottery-cancel').onclick=closeAddLottery;
 addLotteryDialog.addEventListener('cancel',e=>{e.preventDefault();closeAddLottery();});
 window.addEventListener('bn-line-admin-invalidated',closeAddLottery);
 el('add-lottery-confirm').onclick=()=>{
  if(!state||!addLotteryDialog.open||el('save').disabled)return;
- const key=el('add-lottery-key').value,time=el('add-lottery-time').value,formulas=addLotteryFormulas();
+ const key=el('add-lottery-key').value,time=el('add-lottery-time').value;
  const fail=t=>el('add-lottery-error').textContent=t;
  if(!key||!state.directory.some(d=>String(d.key)===key))return fail('กรุณาเลือกหวย');
  if(state.rows.some(r=>String(r.key)===key))return fail('มีรายการนี้ในตารางแล้ว');
  if(state.rows.length>=100)return fail('ตารางรองรับสูงสุด 100 รายการ');
  if(!/^([01]\d|2[0-3]):[0-5]\d$/.test(time))return fail('กรุณาระบุเวลาที่ถูกต้อง');
- if(!formulas.length)return fail('กรุณาเลือกอย่างน้อย 1 สูตร');
- state.rows.push({key,time,enabled:false,formulas});state.openIndex=state.rows.length-1;closeAddLottery();render();status('เพิ่มรายการลงแถวแล้ว — ยังไม่ได้บันทึกตารางเวลาไปยัง Backend');
+ state.rows.push({key,time,enabled:false});state.openIndex=state.rows.length-1;closeAddLottery();render();status('เพิ่มรายการลงแถวแล้ว — ยังไม่ได้บันทึกตารางเวลาไปยัง Backend');
 };
 for(const [id,on] of [['enable-all',true],['disable-all',false]])el(id).onclick=()=>{if(!state)return;if(!confirm((on?'เปิด':'ปิด')+'การส่งตามเวลาทั้งหมด? การค้นหาใน LINE ไม่เปลี่ยน'))return;state.rows.forEach(r=>r.enabled=on);render();status('แก้ไขแล้ว — กรุณาบันทึกตารางเวลา');};
-const bulkIds=['bulk-f1','bulk-f2','bulk-f3'];
-const bulkSelected=()=>bulkIds.flatMap((id,i)=>el(id).checked?[i+1]:[]);
-function syncBulk(){el('bulk-save').disabled=!state?.rows?.length||!bulkSelected().length||el('save').disabled;}
-for(const id of bulkIds)el(id).onchange=syncBulk;
-el('bulk-save').onclick=async()=>{
-  const formulas=bulkSelected();if(!state?.rows?.length||!formulas.length||el('save').disabled)return;
-  const label=formulas.map(f=>'V.'+f).join(' / ');
-  if(!confirm('บันทึก '+label+' ให้ทั้ง '+state.rows.length+' รายการ? เวลาและสถานะเปิด–ปิดจะไม่เปลี่ยนจากค่าปัจจุบัน และการแก้ไขตารางที่ค้างอยู่จะถูกบันทึกด้วย'))return;
-  state.rows.forEach(r=>{r.formulas=[...formulas]});render();await saveSchedule();
-};
-function canonicalRows(rows){if(!Array.isArray(rows))throw Error('Backend ไม่ส่งตารางกลับมา');return rows.map(r=>({key:String(r.key),time:r.time,enabled:r.enabled,formulas:[...(r.formulas??[1,3])].sort((a,b)=>a-b)}));}
+function canonicalRows(rows){if(!Array.isArray(rows))throw Error('Backend ไม่ส่งตารางกลับมา');return rows.map(r=>({key:String(r.key),time:r.time,enabled:r.enabled}));}
 async function saveSchedule(){
  if(!state||el('save').disabled)return false;
  const current=state, snapshot=canonicalRows(state.rows), panel=el('panel');
- el('save').disabled=true;syncBulk();panel.inert=true;status('กำลังบันทึกและตรวจสอบ Backend...');
+ el('save').disabled=true;panel.inert=true;status('กำลังบันทึกและตรวจสอบ Backend...');
  try{await api('save',{rows:snapshot});const fresh=await api('state');
  if(state!==current)throw Error('หน้าจัดการเปลี่ยนไป กรุณาโหลดใหม่');
  if(JSON.stringify(canonicalRows(fresh.rows))!==JSON.stringify(snapshot))throw Error('ค่าที่ Backend ส่งกลับไม่ตรงกับค่าที่เลือก กรุณาตรวจสอบการเชื่อมต่อก่อนบันทึกอีกครั้ง');
  current.last=fresh.last||{};current.active=fresh.active;render();
- status('บันทึกและยืนยันข้อมูล Backend แล้ว');el('bulk-formula-status').textContent='บันทึกและยืนยันข้อมูล Backend แล้ว';return true;
- }catch(e){status('ยังยืนยันการบันทึกไม่ได้: '+e.message);el('bulk-formula-status').textContent='ยังยืนยันการบันทึกไม่ได้';return false;}
- finally{panel.inert=false;el('save').disabled=false;syncBulk();}
+ status('บันทึกและยืนยันข้อมูล Backend แล้ว');return true;
+ }catch(e){status('ยังยืนยันการบันทึกไม่ได้: '+e.message);return false;}
+ finally{panel.inert=false;el('save').disabled=false;}
 }
 // V19.9.1: floating reorder animation.
 const orderDialog=document.createElement('dialog');orderDialog.id='order-dialog';orderDialog.setAttribute('aria-label','จัดลำดับรายการ');
@@ -1074,7 +1032,7 @@ function lgSignature(rows){return JSON.stringify([...rows].sort((a,b)=>a.key.loc
 el('lg-save').onclick=async()=>{if(lgBusy||!state||!lgDraft.size)return;const current=state;lgBusy=true;lgRender();el('lg-status').textContent='กำลังตรวจสอบตารางล่าสุด...';try{const fresh=await api('state');if(state!==current||!lineGroupDialog.open)return;const original=canonicalRows(fresh.rows);const next=lgPlan(original,lgDraft);const local=canonicalRows(state.rows);const localDiff=lgSignature(local)!==lgSignature(original)||JSON.stringify(local.map(r=>r.key))!==JSON.stringify(original.map(r=>r.key));if(localDiff&&!confirm('ตารางในหน้าจอแตกต่างจาก Backend ล่าสุด จะใช้รายชื่อ ลำดับ สูตร และสถานะเปิด–ปิดที่บันทึกอยู่บน Backend แล้วเปลี่ยนเฉพาะเวลาที่จัดกลุ่ม การแก้ไขในหน้าจอที่ยังไม่ได้บันทึกจะไม่ถูกนำไปใช้ ยืนยันหรือไม่?')){el('lg-status').textContent='ยกเลิกการบันทึก — กลุ่มที่จัดไว้ยังอยู่';return;}el('lg-status').textContent='กำลังบันทึกและตรวจสอบ...';await api('save',{rows:next});const checked=await api('state');if(state!==current||!lineGroupDialog.open)return;if(JSON.stringify(canonicalRows(checked.rows))!==JSON.stringify(next))throw Error('ยังยืนยันค่าที่บันทึกไม่ได้ — กลุ่มที่จัดไว้ยังอยู่ สามารถลองบันทึกอีกครั้ง');current.rows=checked.rows;current.last=checked.last||{};current.active=checked.active;current.openIndex=-1;render();status('บันทึกเวลากลุ่ม LINE และยืนยัน Backend แล้ว');lgDraft.clear();lineGroupDialog.close();}catch(e){el('lg-status').textContent='ยังยืนยันการบันทึกไม่ได้: '+e.message;}finally{lgBusy=false;lgRender();}};
 
 el('save').onclick=saveSchedule;
-el('exit').onclick=()=>{closeAddLottery();opsEpoch++;opsData=null;el('ops-market-list').replaceChildren();el('ops-market-status').textContent='ยังไม่ได้โหลดข้อมูล';el('ops-api').textContent='ยังไม่ตรวจสอบ';el('ops-checked').textContent='';pass='';state=null;bulkIds.forEach(id=>el(id).checked=false);syncBulk();el('bulk-formula-status').textContent='เลือกอย่างน้อย 1 สูตรก่อนบันทึก';el('rows').replaceChildren();el('smart-list').replaceChildren();el('smart-search').value='';el('smart-advanced').open=false;closePreview();el('panel').hidden=true;el('login').hidden=false;status('ล็อกแล้ว');lockManagement();};
+el('exit').onclick=()=>{closeAddLottery();opsEpoch++;opsData=null;el('ops-market-list').replaceChildren();el('ops-market-status').textContent='ยังไม่ได้โหลดข้อมูล';el('ops-api').textContent='ยังไม่ตรวจสอบ';el('ops-checked').textContent='';pass='';state=null;el('rows').replaceChildren();el('smart-list').replaceChildren();el('smart-search').value='';el('smart-advanced').open=false;closePreview();el('panel').hidden=true;el('login').hidden=false;status('ล็อกแล้ว');lockManagement();};
  el('enter').click();
 }
 
