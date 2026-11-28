@@ -805,15 +805,15 @@ function renderLineGroupsV78(data){
     const card=make('div','','ops-card');card.append(make('strong',r.name));
     card.append(make('p','รหัส '+r.id.slice(-8)+(r.status==='pending'?' · รออนุมัติ':''),'subnote'));
     const approved=r.status==='approved';
-    const changeGroup=async(op)=>{
+    const changeGroup=async(op,formulas)=>{
       if(lineGroupsBusyV78)return;
-      const change={op};
+      const change={op};if(op==='formulas')change.formulas=formulas;
       if(op==='rename'){const name=prompt('ชื่อกลุ่ม',r.name);if(name===null)return;change.name=name;}
       else if(op==='auto_on'){if(!confirm('เปิดส่ง AUTO ให้กลุ่มรหัส '+r.id.slice(-8)+'? การส่งตามเวลาจะใช้โควตา LINE OA'))return;}
       else if(op==='disable'){if(!confirm('ปิดสิทธิ์เรียกคำสั่งและปิด AUTO ของกลุ่มนี้?'))return;}
-      else if(op==='approve'||op==='delete'){if(!confirm((op==='approve'?'อนุมัติ / เปิดสิทธิ์':'ลบ')+' กลุ่มรหัส '+r.id.slice(-8)+' ?'))return;}
+      else if(op==='approve'||op==='delete'){if(!confirm((op==='approve'?'อนุมัติ / เปิดสิทธิ์':'ลบ')+' กลุ่มรหัส '+r.id.slice(-8)+' ?'+(op==='approve'&&r.status==='pending'?' การแจ้งอนุมัติใช้โควตา OA 1 ข้อความ':'')))return;}
       lineGroupsBusyV78=true;list.querySelectorAll('button').forEach(x=>x.disabled=true);el('line-groups-status').textContent='กำลังบันทึก...';
-      try{renderLineGroupsV78(await api('groups_update',{key:r.id,rows:change}));el('line-groups-status').textContent='บันทึกแล้ว';}
+      try{const result=await api('groups_update',{key:r.id,rows:change});renderLineGroupsV78(result);el('line-groups-status').textContent=result.notice||'บันทึกแล้ว';}
       catch(e){renderLineGroupsV78(data);el('line-groups-status').textContent=e.message+' · กรุณาโหลดรายชื่อใหม่เพื่อตรวจสอบสถานะ';}
       finally{lineGroupsBusyV78=false;}
     };
@@ -827,8 +827,14 @@ function renderLineGroupsV78(data){
       btn.style.cssText='appearance:none!important;-webkit-appearance:none!important;position:relative!important;display:block!important;flex:0 0 52px!important;width:52px!important;min-width:52px!important;max-width:52px!important;height:30px!important;min-height:30px!important;max-height:30px!important;padding:0!important;margin:0!important;border:0!important;border-radius:999px!important;box-sizing:border-box!important;box-shadow:none!important;background:'+(on?'#16a34a':'#94a3b8')+'!important;cursor:'+(disabled?'not-allowed':'pointer')+';opacity:'+(disabled?'.5':'1');
       const knob=make('span','','lg-switch-knob');knob.style.cssText='position:absolute!important;display:block!important;top:3px!important;left:'+(on?'25px':'3px')+'!important;width:24px!important;height:24px!important;border-radius:50%!important;background:#fff!important;transform:none!important;box-shadow:0 1px 4px #0003!important;pointer-events:none';btn.append(knob);btn.onclick=()=>changeGroup(op);row.append(words,btn);card.append(row);
     };
-    toggle('เรียกคำสั่ง',approved,approved?'เปิดใช้งาน':r.status==='pending'?'รออนุมัติ':'ปิดใช้งาน',approved?'disable':'approve');
-    toggle('ส่ง AUTO',approved&&!!r.auto,approved&&r.auto?'เปิด · ใช้โควตา OA':approved?'ปิด · ไม่ใช้โควตา AUTO':'ปิด · ต้องเปิดสิทธิ์ก่อน',r.auto?'auto_off':'auto_on',!approved);
+    toggle('เรียกคำสั่ง',approved,approved?'อนุญาต':r.status==='pending'?'รออนุมัติ':'ไม่อนุญาต',approved?'disable':'approve');
+    toggle('ส่ง AUTO',approved&&!!r.auto,approved&&r.auto?'ส่งอัตโนมัติ · ใช้โควตา OA':approved?'ไม่ส่งอัตโนมัติ':'ไม่ส่งอัตโนมัติ · ต้องอนุญาตก่อน',r.auto?'auto_off':'auto_on',!approved);
+    const perms=make('div','','lg-formula-perms');perms.style.cssText='padding:12px 0;border-top:1px solid var(--smart-border,#cbd5e1)';
+    perms.append(make('strong','สูตรที่อนุญาต'));
+    const chips=make('div','','lg-formula-chips');chips.style.cssText='display:flex!important;gap:8px!important;margin-top:10px;flex-wrap:wrap';
+    const fs=Array.isArray(r.formulas)?r.formulas:[1,2,3];
+    for(const [f,c] of [[1,'#db2777'],[2,'#0284c7'],[3,'#9333ea']]){const on=fs.includes(f);const btn=make('button',(on?'✓ ':'')+'V.'+f,'lg-formula-chip');btn.type='button';btn.setAttribute('aria-pressed',String(on));btn.style.cssText='flex:1!important;min-width:65px!important;padding:10px 8px!important;border:1px solid '+c+'!important;border-radius:10px!important;background:'+(on?c:'transparent')+'!important;color:'+(on?'#fff':c)+'!important;font-weight:700!important;cursor:pointer';btn.onclick=()=>changeGroup('formulas',on?fs.filter(x=>x!==f):[...fs,f]);chips.append(btn);}
+    perms.append(chips);if(!fs.length)perms.append(make('small','ยังไม่อนุญาตสูตรใด','subnote'));card.append(perms);
     const actions=make('div','','btn-row');actions.style.cssText='display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--smart-border,#cbd5e1)';
     for(const [label,op] of [['แก้ชื่อ','rename'],['ลบ','delete']]){const btn=make('button',label,'btn');btn.type='button';btn.onclick=()=>changeGroup(op);actions.append(btn);}
     card.append(actions);list.append(card);
