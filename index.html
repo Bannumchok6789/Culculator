@@ -818,12 +818,18 @@ function renderLineGroupsV78(data){
       finally{lineGroupsBusyV78=false;}
     };
     const toggle=(label,on,description,op,disabled=false)=>{
-      const row=make('div','','lg-switch-row');const words=make('div','','lg-switch-words');words.append(make('strong',label),make('small',description,'lg-switch-caption'));
-      const btn=make('button','','lg-switch');btn.type='button';btn.setAttribute('role','switch');btn.setAttribute('aria-checked',String(on));btn.setAttribute('aria-label',label+' '+r.name);btn.disabled=disabled;btn.append(make('span','','lg-switch-knob'));btn.onclick=()=>changeGroup(op);row.append(words,btn);card.append(row);
+      const row=make('div','','lg-switch-row');
+      row.style.cssText='display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;padding:12px 0!important;border-top:1px solid var(--smart-border,#cbd5e1);width:100%;box-sizing:border-box';
+      const words=make('div','','lg-switch-words');words.style.cssText='display:flex!important;flex-direction:column!important;gap:4px;flex:1;min-width:0;text-align:left';
+      const title=make('strong',label);title.style.cssText='font-size:15px;line-height:1.4;margin:0';
+      const caption=make('small',description,'lg-switch-caption');caption.style.cssText='font-size:12px;line-height:1.5;overflow-wrap:anywhere;color:var(--smart-muted,inherit);margin:0';words.append(title,caption);
+      const btn=make('button','','lg-switch');btn.type='button';btn.setAttribute('role','switch');btn.setAttribute('aria-checked',String(on));btn.setAttribute('aria-label',label+' '+r.name);btn.disabled=disabled;
+      btn.style.cssText='appearance:none!important;-webkit-appearance:none!important;position:relative!important;display:block!important;flex:0 0 52px!important;width:52px!important;min-width:52px!important;max-width:52px!important;height:30px!important;min-height:30px!important;max-height:30px!important;padding:0!important;margin:0!important;border:0!important;border-radius:999px!important;box-sizing:border-box!important;box-shadow:none!important;background:'+(on?'#16a34a':'#94a3b8')+'!important;cursor:'+(disabled?'not-allowed':'pointer')+';opacity:'+(disabled?'.5':'1');
+      const knob=make('span','','lg-switch-knob');knob.style.cssText='position:absolute!important;display:block!important;top:3px!important;left:'+(on?'25px':'3px')+'!important;width:24px!important;height:24px!important;border-radius:50%!important;background:#fff!important;transform:none!important;box-shadow:0 1px 4px #0003!important;pointer-events:none';btn.append(knob);btn.onclick=()=>changeGroup(op);row.append(words,btn);card.append(row);
     };
     toggle('เรียกคำสั่ง',approved,approved?'เปิดใช้งาน':r.status==='pending'?'รออนุมัติ':'ปิดใช้งาน',approved?'disable':'approve');
     toggle('ส่ง AUTO',approved&&!!r.auto,approved&&r.auto?'เปิด · ใช้โควตา OA':approved?'ปิด · ไม่ใช้โควตา AUTO':'ปิด · ต้องเปิดสิทธิ์ก่อน',r.auto?'auto_off':'auto_on',!approved);
-    const actions=make('div','','btn-row');actions.style.flexWrap='wrap';
+    const actions=make('div','','btn-row');actions.style.cssText='display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--smart-border,#cbd5e1)';
     for(const [label,op] of [['แก้ชื่อ','rename'],['ลบ','delete']]){const btn=make('button',label,'btn');btn.type='button';btn.onclick=()=>changeGroup(op);actions.append(btn);}
     card.append(actions);list.append(card);
   }
